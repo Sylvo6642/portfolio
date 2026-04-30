@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(powershell *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -sf http://localhost:5173 -o /tmp/vite-out.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -sf \"http://localhost:5173/src/main.tsx\" -o /tmp/main-out.js)",
+      "Bash(curl -sf \"http://localhost:5173/src/App.tsx\" -o /tmp/app-out.js)",
+      "Read(//c/Users/Sylvo/Downloads/**)",
+      "Bash(curl -sI http://localhost:5173/media/void-vault.mp4)",
+      "Bash(curl -sf \"http://localhost:5173/src/components/sections/Projects.tsx\" -o /tmp/p.js)",
+      "Bash(curl -sf \"http://localhost:5173/src/components/shared/VideoModal.tsx\" -o /tmp/v.js)",
+      "Bash(curl -sf \"http://localhost:5173/src/components/layout/CustomCursor.tsx\" -o /tmp/c.js)",
+      "Bash(curl -s \"https://api.github.com/repos/bscottnz/portfolio-site/contents/src\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bscottnz/portfolio-site/main/src/bgCanvas.js\" -o /tmp/bgCanvas.js)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bscottnz/portfolio-site/main/src/heroCanvas.js\" -o /tmp/heroCanvas.js)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bscottnz/portfolio-site/main/src/index.js\" -o /tmp/index.js)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bscottnz/portfolio-site/main/src/template.html\" -o /tmp/template.html)",
+      "Bash(curl -s \"https://api.github.com/repos/bscottnz/portfolio-site/contents/src/sass\")",
+      "Bash(curl *)",
+      "WebFetch(domain:rulian.co)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

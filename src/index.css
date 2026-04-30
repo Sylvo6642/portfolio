@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 249 249 249;
+  --fg: 10 10 11;
+  --muted: 100 100 110;
+  --edge: 10 10 11;
+  --edge-alpha: 0.1;
+  --accent: 124 58 237;
+  --void: 26 10 46;
+  color-scheme: light;
+}
+
+html.dark {
+  --bg: 10 10 11;
+  --fg: 245 245 245;
+  --muted: 150 150 160;
+  --edge: 245 245 245;
+  --edge-alpha: 0.12;
+  --accent: 167 139 250;
+  --void: 26 10 46;
+  color-scheme: dark;
+}
+
+* {
+  border-color: rgb(var(--edge) / var(--edge-alpha));
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+@media (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none !important;
+  }
+}
+
+::selection {
+  background: rgb(var(--accent) / 0.3);
+  color: rgb(var(--fg));
+}
+
+/* Hairline border helper */
+.hairline {
+  border: 1px solid rgb(var(--edge) / var(--edge-alpha));
+}
+.hairline-b {
+  border-bottom: 1px solid rgb(var(--edge) / var(--edge-alpha));
+}
+.hairline-t {
+  border-top: 1px solid rgb(var(--edge) / var(--edge-alpha));
+}
+
+/* Animated underline for inline links */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.35s ease;
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  width: 100%;
+}
+
+/* Shimmer / gloss sweep on hover */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shimmer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(var(--fg) / 0.06) 45%,
+    rgb(var(--fg) / 0.18) 50%,
+    rgb(var(--fg) / 0.06) 55%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  transition: transform 0.9s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.shimmer:hover::before {
+  transform: translateX(110%);
+}
+
+/* Char-by-char hover lift on nav links */
+.nav-link-chars span {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover .nav-link-chars span {
+  transform: translateY(-2px);
+}
+.nav-link:hover .nav-link-chars span:nth-child(2n) {
+  transform: translateY(-3px);
+}
+.nav-link:hover .nav-link-chars span:nth-child(3n) {
+  transform: translateY(-1px);
+}
+
+/* Caret blink */
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret {
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+/* Slow drift for hero orb */
+@keyframes orb-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(20px, -25px, 0) scale(1.05); }
+}
+.orb-drift {
+  animation: orb-drift 9s ease-in-out infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
