@@ -21,6 +21,7 @@ export function Hero() {
     typeMs: 70,
     eraseMs: 35,
     holdMs: 1800,
+    finalHoldMs: 1800,
     startDelayMs: 250,
   });
 
