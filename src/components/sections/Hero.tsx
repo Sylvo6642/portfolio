@@ -98,7 +98,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.85 }}
-          className="mt-10 flex flex-wrap items-center gap-3"
+          className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-3"
         >
           <button
             type="button"
