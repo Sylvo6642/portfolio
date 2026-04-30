@@ -177,11 +177,11 @@ export function Contact() {
               <div className="flex items-baseline gap-3">
                 <span className="text-muted text-xs uppercase tracking-[0.2em]">Email</span>
                 <a
-                  href="mailto:kevinrobin6642@gmail.com"
+                  href="mailto:robinkevin648@gmail.com"
                   data-cursor="hover"
                   className="link-underline text-fg"
                 >
-                  kevinrobin6642@gmail.com
+                  robinkevin648@gmail.com
                 </a>
               </div>
               <div className="flex items-baseline gap-3">
