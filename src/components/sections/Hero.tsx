@@ -10,7 +10,7 @@ const ROTATING = [
   "A Gym Rat Who Ships Code",
   "Swimmer by Morning, Developer by Day",
   "Always One Semicolon Away From a Breakdown",
-  "One Deployment Away From a Mental Breakdown",
+  "Mentally Stable, Except During Deployments",
 ];
 
 
