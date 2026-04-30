@@ -5,21 +5,22 @@ import { ConnectingDots } from '../layout/ConnectingDots';
 
 const NAME = "Hi, I'm Kevin Robin";
 
+const ROTATING = [
+  "A Full-Stack Developer",
+  "A Gym Rat Who Ships Code",
+  "Swimmer by Morning, Developer by Day",
+  "Always One Semicolon Away From a Breakdown",
+  "One Deployment Away From a Mental Breakdown",
+];
+
+
 export function Hero() {
-  const phrases = useMemo(
-    () => [
-      NAME,
-      "Hi, I'm A Full-Stack Developer",
-      "Hi, I'm A Django + Angular Engineer",
-      "Hi, I'm Building With React & Node",
-      NAME,
-    ],
-    [],
-  );
+  const phrases = useMemo(() => [NAME, ...ROTATING.map((r) => `Hi, I'm ${r}`)], []);
+
   const { text, done } = useTypewriterSequence(phrases, {
     typeMs: 70,
     eraseMs: 35,
-    holdMs: 1500,
+    holdMs: 1800,
     startDelayMs: 250,
   });
 

@@ -110,7 +110,6 @@ export function useTypewriterSequence(phrases: string[], opts: SequenceOptions =
         const target = phrases[p];
         const isLast = p === phrases.length - 1;
 
-        // Erase down to shared prefix with target (no-op on first iteration since current === '')
         const keep = sharedPrefixLength(current, target);
         if (current.length > keep) {
           await eraseTo(current, keep);
@@ -118,12 +117,10 @@ export function useTypewriterSequence(phrases: string[], opts: SequenceOptions =
           current = current.slice(0, keep);
         }
 
-        // Type up to target
         await typeFrom(current, target);
         if (cancelled) return;
         current = target;
 
-        // Hold
         const hold = isLast ? finalHoldMs : holdMs;
         if (hold === Infinity) {
           setDoneAll(true);
@@ -132,7 +129,24 @@ export function useTypewriterSequence(phrases: string[], opts: SequenceOptions =
         await wait(hold);
         if (cancelled) return;
       }
-      setDoneAll(true);
+      // Loop back from phrase index 1 indefinitely
+      let loopCurrent = phrases[phrases.length - 1];
+      let loopIdx = 1;
+      while (!cancelled) {
+        const target = phrases[loopIdx % phrases.length];
+        loopIdx++;
+        const keep = sharedPrefixLength(loopCurrent, target);
+        if (loopCurrent.length > keep) {
+          await eraseTo(loopCurrent, keep);
+          if (cancelled) return;
+          loopCurrent = loopCurrent.slice(0, keep);
+        }
+        await typeFrom(loopCurrent, target);
+        if (cancelled) return;
+        loopCurrent = target;
+        await wait(holdMs);
+        if (cancelled) return;
+      }
     };
 
     void run();
