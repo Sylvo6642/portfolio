@@ -87,6 +87,26 @@ body {
   width: 100%;
 }
 
+/* Void Vault card */
+.vv-bg {
+  display: none;
+}
+html.dark .vv-bg {
+  display: block;
+}
+.vv-icon {
+  color: rgb(10 10 11);
+}
+html.dark .vv-icon {
+  color: white;
+}
+
+/* Void Vault floating lock icons */
+@keyframes vv-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+
 /* Shimmer / gloss sweep on hover */
 .shimmer {
   position: relative;

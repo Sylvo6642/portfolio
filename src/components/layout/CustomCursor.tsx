@@ -73,7 +73,7 @@ export function CustomCursor() {
         scale: { type: 'spring', stiffness: 400, damping: 30 },
         opacity: { duration: 0.15 },
       }}
-      className="pointer-events-none fixed top-0 left-0 z-[80] rounded-full bg-accent mix-blend-difference"
+      className="pointer-events-none fixed top-0 left-0 z-[100] rounded-full bg-accent mix-blend-difference"
     />
   );
 }
