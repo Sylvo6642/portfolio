@@ -70,9 +70,11 @@ export function Hero() {
           <span className="text-accent">●</span> available for select work
         </motion.p>
 
-        <h1
+        <motion.h1
+          layout
+          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
           className="font-sans font-bold tracking-tight leading-[1.05]"
-          style={{ fontSize: 'clamp(2.5rem, 7vw, 5.5rem)' }}
+          style={{ fontSize: 'clamp(2.2rem, 6vw, 4.8rem)' }}
           aria-label={NAME}
         >
           <span aria-hidden>
@@ -81,7 +83,7 @@ export function Hero() {
               <span className="inline-block w-[0.1em] h-[0.85em] align-[-0.05em] bg-fg" />
             </span>
           </span>
-        </h1>
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -89,11 +91,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-6 max-w-2xl text-lg md:text-xl text-fg/80"
         >
-          Full-Stack Developer{' '}
-          <span className="text-fg/50">—</span>{' '}
-          <span className="font-mono text-base text-fg/70">
-            Django · Angular · React · Node.js
-          </span>
+          Full-Stack Developer
         </motion.p>
 
         <motion.div

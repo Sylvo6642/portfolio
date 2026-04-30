@@ -28,6 +28,10 @@ html.dark {
   border-color: rgb(var(--edge) / var(--edge-alpha));
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   margin: 0;
