@@ -129,9 +129,9 @@ export function useTypewriterSequence(phrases: string[], opts: SequenceOptions =
         await wait(hold);
         if (cancelled) return;
       }
-      // Loop back from phrase index 1 indefinitely
+      // Loop back from phrase index 0 indefinitely
       let loopCurrent = phrases[phrases.length - 1];
-      let loopIdx = 1;
+      let loopIdx = 0;
       while (!cancelled) {
         const target = phrases[loopIdx % phrases.length];
         loopIdx++;
