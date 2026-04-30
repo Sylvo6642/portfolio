@@ -89,7 +89,7 @@ export function useTypewriterSequence(phrases: string[], opts: SequenceOptions =
       for (let i = current.length + 1; i <= target.length; i++) {
         if (cancelled) return;
         setOut(target.slice(0, i));
-        await wait(typeMs);
+        await wait(typeMs + Math.random() * 40 - 20);
       }
     };
 
