@@ -5,7 +5,7 @@ export const SKILL_GROUPS: { title: string; items: string[] }[] = [
   },
   {
     title: 'Expanding Into',
-    items: ['React', 'Node.js', 'Supabase', 'PostgreSQL', 'Redis'],
+    items: ['React', 'Node.js', 'Express.js', 'Next.js', 'Supabase', 'PostgreSQL'],
   },
   {
     title: 'Also Familiar With',

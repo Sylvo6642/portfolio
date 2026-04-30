@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { SectionReveal } from '../shared/SectionReveal';
 import { Pill } from '../shared/Pill';
 import { SKILL_GROUPS } from '../../data/skills';
+import { SKILL_ICONS } from '../../data/skillIcons';
 
 export function Skills() {
   return (
@@ -35,7 +36,7 @@ export function Skills() {
                 className="flex flex-wrap gap-2"
               >
                 {group.items.map((s) => (
-                  <Pill key={s}>{s}</Pill>
+                  <Pill key={s} icon={SKILL_ICONS[s]}>{s}</Pill>
                 ))}
               </motion.div>
             </div>

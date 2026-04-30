@@ -5,7 +5,6 @@ import { useCountUp } from '../../hooks/useCountUp';
 
 const STATS = [
   { value: 2, suffix: '+', label: 'Years Experience' },
-  { value: 10, suffix: '+', label: 'Systems Built' },
   { value: 5, suffix: '+', label: 'Tech Stacks' },
 ];
 

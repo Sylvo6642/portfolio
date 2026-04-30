@@ -259,7 +259,7 @@ export function Contact() {
 
         <footer className="mt-32 hairline-t pt-8 flex items-center justify-between text-xs text-muted">
           <span className="font-mono">© {new Date().getFullYear()} Kevin Robin</span>
-          <span className="font-mono">crafted with care · framer motion · react</span>
+          <span className="font-mono">kevin robin · {new Date().getFullYear()}</span>
         </footer>
       </div>
     </section>
