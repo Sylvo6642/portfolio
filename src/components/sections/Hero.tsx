@@ -119,6 +119,19 @@ export function Hero() {
           >
             Get In Touch
           </button>
+          <a
+            href="/Kevin-Robin-CV.pdf"
+            download
+            data-cursor="hover"
+            className="group inline-flex items-center gap-2 rounded-full hairline px-6 py-3 text-sm transition-all hover:scale-[1.03] hover:bg-fg/5"
+          >
+            Download CV
+            <svg className="transition-transform group-hover:translate-y-0.5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </a>
         </motion.div>
 
         <motion.div

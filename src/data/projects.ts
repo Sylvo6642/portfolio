@@ -6,6 +6,7 @@ export interface PersonalProject {
   link: string | null;
   linkLabel: string;
   void?: boolean;
+  skilldash?: boolean;
   video?: string;
 }
 
@@ -25,6 +26,17 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     linkLabel: 'GitHub',
     void: true,
     video: '/media/void-vault.mp4',
+  },
+  {
+    name: 'SKILLDASH',
+    tag: 'Personal Project',
+    description:
+      'Skilled hands, one tap away — a platform connecting customers with manual-labor workers across India (handymen, plumbers, electricians, cooks, and more). Customers post jobs, browse local workers on a live map, and pay on assignment; workers bid, manage jobs, and stream live location updates via Supabase Realtime. Built on a Postgres schema with Row-Level Security, auto-provisioned profiles via auth triggers, a payment-on-assign trigger, and three Supabase Edge Functions handling assignment, payout, and notification fan-out. Auth supports email/password and phone OTP, with dual-role switching between customer and worker dashboards.',
+    tech: ['React', 'Vite', 'Tailwind', 'Framer Motion', 'Supabase', 'Postgres', 'Edge Functions', 'Zustand', 'React Router', 'Leaflet'],
+    link: null,
+    linkLabel: 'In Development',
+    skilldash: true,
+    video: '/media/skilldash.mp4',
   },
 ];
 
