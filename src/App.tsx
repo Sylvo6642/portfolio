@@ -1,5 +1,6 @@
 import { MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
+import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { Navbar } from './components/layout/Navbar';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
@@ -14,6 +15,8 @@ import { Blog } from './components/sections/Blog';
 import { Contact } from './components/sections/Contact';
 
 export default function App() {
+  useVisitorTracking();
+
   return (
     <ThemeProvider>
       <MotionConfig reducedMotion="user">
