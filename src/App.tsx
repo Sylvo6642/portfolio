@@ -14,8 +14,12 @@ import { Courses } from './components/sections/Courses';
 import { Blog } from './components/sections/Blog';
 import { Contact } from './components/sections/Contact';
 import { Admin } from './components/sections/Admin';
+import { NotFound } from './pages/NotFound';
 
-const isAdmin = window.location.pathname === '/admin';
+const KNOWN_PATHS = ['/', '/admin'];
+const path = window.location.pathname;
+const isAdmin = path === '/admin';
+const isNotFound = !KNOWN_PATHS.includes(path);
 
 export default function App() {
   useVisitorTracking();
@@ -26,6 +30,17 @@ export default function App() {
         <MotionConfig reducedMotion="user">
           <CustomCursor />
           <Admin />
+        </MotionConfig>
+      </ThemeProvider>
+    );
+  }
+
+  if (isNotFound) {
+    return (
+      <ThemeProvider>
+        <MotionConfig reducedMotion="user">
+          <CustomCursor />
+          <NotFound />
         </MotionConfig>
       </ThemeProvider>
     );
