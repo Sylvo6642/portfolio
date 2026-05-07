@@ -7,26 +7,44 @@ const SPRING_CFG = { stiffness: 60, damping: 18 };
 
 const GLITCH_CHARS = '!@#$%^&*<>?/\\|[]{}~';
 
-function useGlitchText(target: string, active: boolean) {
+function useGlitchText(target: string, forceActive: boolean) {
   const [display, setDisplay] = useState(target);
 
   useEffect(() => {
-    if (!active) { setDisplay(target); return; }
-    let iter = 0;
-    const interval = setInterval(() => {
-      setDisplay(
-        target.split('').map((char, i) =>
-          i < iter ? char : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
-        ).join('')
-      );
-      iter += 0.4;
-      if (iter >= target.length) {
-        setDisplay(target);
-        clearInterval(interval);
-      }
-    }, 40);
-    return () => clearInterval(interval);
-  }, [active, target]);
+    let glitchTimeout: ReturnType<typeof setTimeout>;
+    let frameInterval: ReturnType<typeof setInterval>;
+
+    function runGlitch() {
+      let iter = 0;
+      frameInterval = setInterval(() => {
+        setDisplay(
+          target.split('').map((char, i) =>
+            i < iter ? char : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+          ).join('')
+        );
+        iter += 0.4;
+        if (iter >= target.length) {
+          setDisplay(target);
+          clearInterval(frameInterval);
+          if (!forceActive) scheduleNext();
+        }
+      }, 40);
+    }
+
+    function scheduleNext() {
+      const delay = 1500 + Math.random() * 3500;
+      glitchTimeout = setTimeout(runGlitch, delay);
+    }
+
+    runGlitch();
+    if (!forceActive) scheduleNext();
+
+    return () => {
+      clearTimeout(glitchTimeout);
+      clearInterval(frameInterval);
+      setDisplay(target);
+    };
+  }, [forceActive, target]);
 
   return display;
 }
