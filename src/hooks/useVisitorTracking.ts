@@ -4,18 +4,24 @@ import { supabase } from '../lib/supabase';
 export function useVisitorTracking() {
   useEffect(() => {
     async function log() {
-      // ipify gives us the visitor's public IP
       let ip: string | null = null;
+      let country: string | null = null;
+      let city: string | null = null;
+
       try {
-        const res = await fetch('https://api.ipify.org?format=json');
+        const res = await fetch('https://ipapi.co/json/');
         const data = await res.json();
         ip = data.ip ?? null;
+        country = data.country_name ?? null;
+        city = data.city ?? null;
       } catch {
-        // silently fail — don't block the page
+        // silently fail
       }
 
       await supabase.from('visitor_logs').insert({
         ip,
+        country,
+        city,
         user_agent: navigator.userAgent,
         page: window.location.pathname,
       });

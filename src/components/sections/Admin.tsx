@@ -1,0 +1,232 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
+
+const ADMIN_PASSWORD = 'papparobin36';
+
+type Visitor = {
+  id: string;
+  ip: string | null;
+  country: string | null;
+  city: string | null;
+  user_agent: string | null;
+  page: string | null;
+  visited_at: string;
+};
+
+type Message = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+};
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+function StatCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl border border-fg/10 bg-fg/[0.03] p-6">
+      <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted">{label}</p>
+      <p className="mt-2 text-4xl font-semibold">{value}</p>
+    </div>
+  );
+}
+
+export function Admin() {
+  const [authed, setAuthed] = useState(false);
+  const [input, setInput] = useState('');
+  const [error, setError] = useState(false);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [tab, setTab] = useState<'visitors' | 'messages'>('visitors');
+  const [loading, setLoading] = useState(false);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (input === ADMIN_PASSWORD) {
+      setAuthed(true);
+      setError(false);
+    } else {
+      setError(true);
+      setInput('');
+    }
+  }
+
+  useEffect(() => {
+    if (!authed) return;
+    setLoading(true);
+    Promise.all([
+      supabase.from('visitor_logs').select('*').order('visited_at', { ascending: false }).limit(100),
+      supabase.from('messages').select('*').order('created_at', { ascending: false }),
+    ]).then(([v, m]) => {
+      setVisitors((v.data as Visitor[]) ?? []);
+      setMessages((m.data as Message[]) ?? []);
+      setLoading(false);
+    });
+  }, [authed]);
+
+  const uniqueIPs = new Set(visitors.map(v => v.ip)).size;
+  const uniqueCountries = new Set(visitors.map(v => v.country).filter(Boolean)).size;
+
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-sm"
+        >
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-2">Admin</p>
+          <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="password"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Password"
+              autoFocus
+              className="w-full bg-transparent px-4 py-3 text-sm outline-none rounded-lg border border-fg/10 focus:border-accent placeholder:text-muted/60"
+            />
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="font-mono text-xs text-red-400"
+                >
+                  incorrect password
+                </motion.p>
+              )}
+            </AnimatePresence>
+            <button
+              type="submit"
+              className="w-full rounded-full bg-fg text-bg px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.02]"
+            >
+              Enter
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen px-6 py-16 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-1">Admin</p>
+          <h1 className="text-3xl font-semibold">Dashboard</h1>
+        </div>
+        <button
+          onClick={() => setAuthed(false)}
+          className="font-mono text-xs text-muted hover:text-fg transition-colors"
+        >
+          sign out
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-32">
+          <div className="w-6 h-6 rounded-full border-2 border-fg/20 border-t-fg animate-spin" />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <StatCard label="Total Visits" value={visitors.length} />
+            <StatCard label="Unique IPs" value={uniqueIPs} />
+            <StatCard label="Countries" value={uniqueCountries} />
+            <StatCard label="Messages" value={messages.length} />
+          </div>
+
+          <div className="flex gap-1 mb-6 border-b border-fg/10">
+            {(['visitors', 'messages'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-4 py-2 font-mono text-xs tracking-[0.1em] uppercase transition-colors relative ${tab === t ? 'text-fg' : 'text-muted hover:text-fg'}`}
+              >
+                {t}
+                {tab === t && (
+                  <motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-[1px] bg-fg" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {tab === 'visitors' && (
+              <motion.div
+                key="visitors"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                className="overflow-x-auto"
+              >
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="font-mono text-[10px] tracking-[0.15em] uppercase text-muted border-b border-fg/10">
+                      <th className="text-left py-3 pr-6">IP</th>
+                      <th className="text-left py-3 pr-6">Location</th>
+                      <th className="text-left py-3 pr-6">Page</th>
+                      <th className="text-left py-3 pr-6">Browser</th>
+                      <th className="text-left py-3">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visitors.map(v => (
+                      <tr key={v.id} className="border-b border-fg/5 hover:bg-fg/[0.02] transition-colors">
+                        <td className="py-3 pr-6 font-mono text-xs text-muted">{v.ip ?? '—'}</td>
+                        <td className="py-3 pr-6">
+                          {v.city && v.country ? `${v.city}, ${v.country}` : v.country ?? '—'}
+                        </td>
+                        <td className="py-3 pr-6 font-mono text-xs">{v.page ?? '/'}</td>
+                        <td className="py-3 pr-6 text-xs text-muted max-w-[200px] truncate">{v.user_agent ?? '—'}</td>
+                        <td className="py-3 text-xs text-muted whitespace-nowrap">{formatDate(v.visited_at)}</td>
+                      </tr>
+                    ))}
+                    {visitors.length === 0 && (
+                      <tr><td colSpan={5} className="py-12 text-center text-muted font-mono text-xs">no visitors yet</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </motion.div>
+            )}
+
+            {tab === 'messages' && (
+              <motion.div
+                key="messages"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                className="space-y-4"
+              >
+                {messages.map(m => (
+                  <div key={m.id} className="rounded-xl border border-fg/10 bg-fg/[0.02] p-6">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <p className="font-medium">{m.name}</p>
+                        <a href={`mailto:${m.email}`} className="font-mono text-xs text-muted hover:text-accent transition-colors">{m.email}</a>
+                      </div>
+                      <p className="font-mono text-xs text-muted whitespace-nowrap">{formatDate(m.created_at)}</p>
+                    </div>
+                    <p className="text-sm text-fg/80 leading-relaxed">{m.message}</p>
+                  </div>
+                ))}
+                {messages.length === 0 && (
+                  <p className="py-12 text-center text-muted font-mono text-xs">no messages yet</p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </div>
+  );
+}

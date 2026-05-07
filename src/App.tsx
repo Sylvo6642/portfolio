@@ -13,9 +13,23 @@ import { Projects } from './components/sections/Projects';
 import { Courses } from './components/sections/Courses';
 import { Blog } from './components/sections/Blog';
 import { Contact } from './components/sections/Contact';
+import { Admin } from './components/sections/Admin';
+
+const isAdmin = window.location.pathname === '/admin';
 
 export default function App() {
   useVisitorTracking();
+
+  if (isAdmin) {
+    return (
+      <ThemeProvider>
+        <MotionConfig reducedMotion="user">
+          <CustomCursor />
+          <Admin />
+        </MotionConfig>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider>
