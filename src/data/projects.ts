@@ -5,6 +5,7 @@ export interface PersonalProject {
   tech: string[];
   link: string | null;
   linkLabel: string;
+  liveUrl?: string;
   void?: boolean;
   skilldash?: boolean;
   video?: string;
@@ -35,6 +36,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     tech: ['React', 'Vite', 'Tailwind', 'Framer Motion', 'Supabase', 'Postgres', 'Edge Functions', 'Zustand', 'React Router', 'Leaflet'],
     link: 'https://github.com/Sylvo6642/SkillDash/',
     linkLabel: 'GitHub',
+    liveUrl: '/projects/SkillDash/',
     skilldash: true,
     video: '/media/skilldash.mp4',
   },

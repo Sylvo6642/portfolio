@@ -292,6 +292,22 @@ export function Projects() {
                             Watch demo
                           </span>
                         )}
+                        {p.liveUrl && (
+                          <a
+                            href={p.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-cursor="hover"
+                            className={`inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full transition-all ${
+                              p.skilldash
+                                ? 'border border-amber-500/60 bg-amber-500/20 dark:text-amber-100 text-amber-800 hover:bg-amber-500/35 hover:border-amber-500/80'
+                                : 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70 hover:border-fg/50 dark:hover:border-white/50'
+                            }`}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            View Project
+                          </a>
+                        )}
                         {p.link ? (
                           <a href={p.link} target="_blank" rel="noopener noreferrer" data-cursor="hover" className={`font-mono text-xs px-3 py-1 rounded-full ${(p.void || p.skilldash) ? 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70 hover:border-fg/50 dark:hover:border-white/50 hover:text-fg dark:hover:text-white' : 'hairline text-muted hover:text-fg'} transition-colors`}>
                             {p.linkLabel}
