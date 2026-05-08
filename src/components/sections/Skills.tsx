@@ -58,7 +58,7 @@ function SkillPill({ name, group }: { name: string; group: string }) {
 
   return (
     <span
-      className="inline-flex items-center gap-2.5 rounded-full px-5 py-2.5 text-sm font-medium hairline shrink-0 cursor-default select-none"
+      className="inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium hairline shrink-0 cursor-default select-none"
       style={{
         background: 'rgb(var(--bg) / 0.6)',
         backdropFilter: 'blur(8px)',
@@ -75,10 +75,10 @@ function SkillPill({ name, group }: { name: string; group: string }) {
         el.style.borderColor = '';
       }}
     >
-      {icon && <span className="shrink-0">{icon}</span>}
+      {icon && <span className="shrink-0 scale-75 sm:scale-100">{icon}</span>}
       <span style={{ color: 'rgb(var(--fg) / 0.85)' }}>{name}</span>
       <span
-        className="font-mono text-[9px] tracking-[0.15em] uppercase hidden sm:inline"
+        className="font-mono text-[9px] tracking-[0.15em] uppercase"
         style={{ color: 'rgb(var(--fg) / 0.3)' }}
       >
         {label}
@@ -117,7 +117,7 @@ export function Skills() {
   const inView = useInView(ref, { once: false, amount: 0.1 });
 
   return (
-    <section id="skills" className="relative py-32 hairline-b overflow-hidden">
+    <section id="skills" className="relative py-32 hairline-b">
       {/* keyframes injected once */}
       <style>{`
         @keyframes marquee {
@@ -125,16 +125,6 @@ export function Skills() {
           to   { transform: translateX(-33.333%); }
         }
       `}</style>
-
-      {/* Fade edges */}
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 sm:w-40"
-        style={{ background: 'linear-gradient(to right, rgb(var(--bg)), transparent)' }}
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 sm:w-40"
-        style={{ background: 'linear-gradient(to left, rgb(var(--bg)), transparent)' }}
-      />
 
       <div className="mx-auto max-w-6xl px-6 mb-16">
         <SectionReveal>
@@ -154,25 +144,38 @@ export function Skills() {
         </p>
       </div>
 
-      {/* Marquee rows */}
-      <motion.div
-        ref={ref}
-        className="flex flex-col gap-4"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      >
-        {ROWS.map((row, i) => (
-          <MarqueeRow
-            key={i}
-            items={row}
-            speed={SPEEDS[i]}
-            direction={DIRS[i]}
-            paused={!inView}
+      {/* Marquee rows — contained to max-w-6xl */}
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="relative overflow-hidden">
+          {/* Fade edges inside container */}
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 sm:w-12"
+            style={{ background: 'linear-gradient(to right, rgb(var(--bg)), transparent)' }}
           />
-        ))}
-      </motion.div>
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 sm:w-12"
+            style={{ background: 'linear-gradient(to left, rgb(var(--bg)), transparent)' }}
+          />
+          <motion.div
+            ref={ref}
+            className="flex flex-col gap-4"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {ROWS.map((row, i) => (
+              <MarqueeRow
+                key={i}
+                items={row}
+                speed={SPEEDS[i]}
+                direction={DIRS[i]}
+                paused={!inView}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
       {/* Legend */}
       <div className="mx-auto max-w-6xl px-6 mt-14">

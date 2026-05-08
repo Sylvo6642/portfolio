@@ -103,6 +103,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   const barWidth = useTransform(springProgress, [0, 1], ['0%', '100%']);
+  const EXIT_DURATION = 0.65;
 
   return (
     <motion.div
@@ -110,9 +111,25 @@ export function Loader({ onDone }: { onDone: () => void }) {
       style={{ background: 'rgb(var(--bg))' }}
       exit={{
         clipPath: ['inset(0% 0% 0% 0%)', 'inset(0% 0% 100% 0%)'],
-        transition: { duration: 0.65, ease: [0.76, 0, 0.24, 1] },
+        transition: { duration: EXIT_DURATION, ease: [0.76, 0, 0.24, 1] },
       }}
     >
+      {/* Exit edge line — sits at the bottom edge of the loader as it wipes up */}
+      {phase === 'exit' && (
+        <motion.div
+          className="fixed left-0 right-0 z-[102] pointer-events-none"
+          style={{
+            height: '2px',
+            bottom: 0,
+            background: `linear-gradient(90deg, transparent 0%, rgb(var(--accent)) 20%, rgb(var(--fg)) 50%, rgb(var(--accent)) 80%, transparent 100%)`,
+            boxShadow: '0 0 12px 2px rgb(var(--accent) / 0.6), 0 0 30px 6px rgb(var(--accent) / 0.2)',
+            originY: 0,
+          }}
+          initial={{ y: '0vh' }}
+          animate={{ y: '-100vh' }}
+          transition={{ duration: EXIT_DURATION, ease: [0.76, 0, 0.24, 1], delay: 0.6 }}
+        />
+      )}
       {/* Noise grain overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.035]"
