@@ -83,8 +83,8 @@ export function Loader({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     // Ramp to ~0.7 in 1.2s, then slow, then burst to 1
     const t1 = setTimeout(() => rawProgress.set(0.72), 50);
-    const t2 = setTimeout(() => rawProgress.set(0.88), 1300);
-    const t3 = setTimeout(() => rawProgress.set(1), 1900);
+    const t2 = setTimeout(() => rawProgress.set(0.88), 1100);
+    const t3 = setTimeout(() => rawProgress.set(1), 1400);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [rawProgress]);
 
