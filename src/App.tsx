@@ -1,10 +1,11 @@
-import { MotionConfig } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { Navbar } from './components/layout/Navbar';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
 import { CustomCursor } from './components/layout/CustomCursor';
+import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { About } from './components/sections/About';
 import { Skills } from './components/sections/Skills';
@@ -23,6 +24,7 @@ const isNotFound = !KNOWN_PATHS.includes(path);
 
 export default function App() {
   useVisitorTracking();
+  const { done, dismiss } = useLoader();
 
   if (isAdmin) {
     return (
@@ -49,6 +51,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <MotionConfig reducedMotion="user">
+        <AnimatePresence>
+          {!done && <Loader key="loader" onDone={dismiss} />}
+        </AnimatePresence>
         <ScrollProgress />
         <CustomCursor />
         <Navbar />
