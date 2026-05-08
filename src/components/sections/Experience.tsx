@@ -1,6 +1,7 @@
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { FadeText } from '../shared/FadeText';
 import { EXPERIENCE, durationMonths, formatDuration, type Experience as Exp } from '../../data/experience';
 import { useCountUp } from '../../hooks/useCountUp';
 
@@ -91,6 +92,10 @@ export function Experience() {
             Where I've shipped.
           </h2>
         </SectionReveal>
+
+        <p className="mt-4 text-base text-fg/50">
+          <FadeText text="Two years in. Still just getting started." delay={0.2} />
+        </p>
 
         <div ref={containerRef} className="relative mt-16">
           {/* Background guide line */}

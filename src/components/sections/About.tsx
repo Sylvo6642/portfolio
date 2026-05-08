@@ -1,6 +1,7 @@
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { FadeText } from '../shared/FadeText';
 import { useCountUp } from '../../hooks/useCountUp';
 
 const STATS = [
@@ -159,6 +160,10 @@ export function About() {
                 <span className="text-accent">2+ years</span> building scalable ERP and web systems.
               </h2>
             </SectionReveal>
+
+            <p className="mt-3 font-mono text-sm text-fg/45 tracking-wide">
+              <FadeText text="A developer who obsesses over the details others skip." delay={0.3} />
+            </p>
 
             <SectionReveal delay={0.3}>
               <p className="mt-6 text-lg text-fg/75 leading-relaxed">

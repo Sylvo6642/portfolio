@@ -1,4 +1,5 @@
 import { SectionReveal } from '../shared/SectionReveal';
+import { FadeText } from '../shared/FadeText';
 import { COURSES } from '../../data/courses';
 
 export function Courses() {
@@ -16,6 +17,10 @@ export function Courses() {
             Always learning.
           </h2>
         </SectionReveal>
+
+        <p className="mt-4 text-base text-fg/50">
+          <FadeText text="What I've studied. What stuck." delay={0.2} />
+        </p>
 
         <div className="mt-12 hairline-t">
           {COURSES.map((c, i) => (

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { FadeText } from '../shared/FadeText';
 import { BlogModal } from '../shared/BlogModal';
 import { BLOG_POSTS, type BlogPost } from '../../data/courses';
 
@@ -24,6 +25,10 @@ export function Blog() {
             <p className="font-mono text-xs text-muted">{BLOG_POSTS.filter(p => p.content).length} notes</p>
           </div>
         </SectionReveal>
+
+        <p className="mt-4 text-base text-fg/50">
+          <FadeText text="Learning in public. Notes from the rabbit hole." delay={0.2} />
+        </p>
 
         <div
           className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"

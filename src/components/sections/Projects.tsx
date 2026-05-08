@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { FadeText } from '../shared/FadeText';
 import { TiltCard } from '../shared/TiltCard';
 import { VideoModal } from '../shared/VideoModal';
 import { PERSONAL_PROJECTS, PROFESSIONAL_CARDS, type PersonalProject } from '../../data/projects';
@@ -22,6 +23,10 @@ export function Projects() {
             Things I've built.
           </h2>
         </SectionReveal>
+
+        <p className="mt-4 text-base text-fg/50">
+          <FadeText text="Side projects, client work, and everything in between." delay={0.2} />
+        </p>
 
         {/* Personal projects */}
         <SectionReveal delay={0.15}>

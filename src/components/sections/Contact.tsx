@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { FadeText } from '../shared/FadeText';
 import { useState, useEffect, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
 
@@ -146,6 +147,10 @@ export function Contact() {
           07 / contact
         </p>
 
+        <p className="text-base text-fg/45 mb-4">
+          <FadeText text="Have an idea? Let's build it." delay={0.1} />
+        </p>
+
         <h2
           className="text-4xl md:text-7xl font-semibold tracking-tight leading-[1.05]"
           aria-label={HEADING}
@@ -170,7 +175,7 @@ export function Contact() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
             <p className="text-lg text-fg/80 max-w-md">
-              Open to interesting roles, collaborations, and freelance work. Drop a line — I read everything.
+              Open to interesting roles, collaborations, and freelance work. Drop a line. I read everything.
             </p>
 
             <div className="mt-10 space-y-5 font-mono text-sm">
