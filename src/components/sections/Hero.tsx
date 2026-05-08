@@ -159,7 +159,7 @@ export function Hero() {
       >
         <span
           className="font-sans font-extrabold tracking-tighter text-fg/[0.035]"
-          style={{ fontSize: 'clamp(6rem, 16vw, 16rem)', lineHeight: 1 }}
+          style={{ fontSize: 'clamp(3.5rem, 16vw, 16rem)', lineHeight: 1 }}
         >
           DEVELOPER
         </span>
