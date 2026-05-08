@@ -12,10 +12,10 @@ const NAME = "Hi, I'm Kevin Robin";
 
 const ROTATING = [
   "A Full-Stack Developer",
-  "A Gym Rat Who Ships Code",
-  "Swimmer by Morning, Developer by Day",
-  "Always One Semicolon Away From a Breakdown",
-  "Mentally Stable, Except During Deployments",
+  "Building Scalable Web Systems",
+  "Crafting ERP & Web Solutions",
+  "Passionate About Clean, Scalable Code",
+  "Turning Ideas Into Production Code",
 ];
 
 // Parallax layer configs: [dotsMultiplier, watermarkMultiplier, contentMultiplier]
@@ -159,7 +159,7 @@ export function Hero() {
       >
         <span
           className="font-sans font-extrabold tracking-tighter text-fg/[0.035]"
-          style={{ fontSize: 'clamp(8rem, 22vw, 22rem)', lineHeight: 1 }}
+          style={{ fontSize: 'clamp(6rem, 16vw, 16rem)', lineHeight: 1 }}
         >
           DEVELOPER
         </span>

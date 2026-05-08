@@ -20,8 +20,8 @@ function tierForWidth(w: number): Tier {
   if (w > 1300) return { nb: 525, distance: 60, dRadius: 280 };
   if (w > 1100) return { nb: 450, distance: 55, dRadius: 250 };
   if (w > 800) return { nb: 280, distance: 50, dRadius: 220 };
-  if (w > 600) return { nb: 180, distance: 0, dRadius: 0 };
-  return { nb: 110, distance: 0, dRadius: 0 };
+  if (w > 600) return { nb: 180, distance: 45, dRadius: 180 };
+  return { nb: 110, distance: 40, dRadius: 150 };
 }
 
 function readAccent(): { r: number; g: number; b: number } {
@@ -162,6 +162,38 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
       mouseY = e.clientY - rect.top;
     };
 
+    // Gyroscope for coarse-pointer (mobile) devices
+    // gamma: left/right tilt (-90..90), beta: front/back tilt (-180..180)
+    const GYRO_RANGE_X = 30; // degrees of gamma mapped to full width
+    const GYRO_RANGE_Y = 40; // degrees of beta mapped to full height
+    const onOrient = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
+      const gx = Math.max(-GYRO_RANGE_X, Math.min(GYRO_RANGE_X, e.gamma));
+      const gy = Math.max(-GYRO_RANGE_Y, Math.min(GYRO_RANGE_Y, e.beta - 45)); // 45° is natural hold angle
+      mouseX = cssW * (gx / (GYRO_RANGE_X * 2) + 0.5);
+      mouseY = cssH * (gy / (GYRO_RANGE_Y * 2) + 0.5);
+    };
+
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+
+    const attachGyro = () => {
+      window.addEventListener('deviceorientation', onOrient);
+    };
+
+    if (isCoarse) {
+      // iOS 13+ requires permission; Android grants automatically
+      const DevOri = window.DeviceOrientationEvent as unknown as {
+        requestPermission?: () => Promise<string>;
+      };
+      if (typeof DevOri?.requestPermission === 'function') {
+        DevOri.requestPermission()
+          .then((state: string) => { if (state === 'granted') attachGyro(); })
+          .catch(() => {});
+      } else {
+        attachGyro();
+      }
+    }
+
     resize();
     if (!reduced) {
       raf = requestAnimationFrame(tick);
@@ -184,6 +216,7 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('deviceorientation', onOrient);
       themeObserver.disconnect();
     };
   }, []);
