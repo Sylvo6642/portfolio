@@ -58,20 +58,31 @@ export function Projects() {
                   <div className="block">
                     {p.skilldash && (
                       <>
+                        {/* dark mode: caramel/honey-brown */}
                         <div
                           aria-hidden
                           className="absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 80% 0%, rgb(239 159 39 / 0.22), transparent 60%), linear-gradient(135deg, rgb(46 26 8), rgb(20 12 6))',
+                              'radial-gradient(ellipse at 80% 0%, rgb(217 145 36 / 0.28), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(159 99 24 / 0.16), transparent 60%), linear-gradient(135deg, rgb(48 30 12), rgb(28 18 8))',
                           }}
                         />
+                        {/* light mode: honey-gold parchment */}
                         <div
                           aria-hidden
-                          className="absolute inset-0 -z-10 opacity-40 hidden dark:block"
+                          className="absolute inset-0 -z-10 block dark:hidden"
+                          style={{
+                            background:
+                              'radial-gradient(ellipse at 80% 0%, rgb(238 178 64 / 0.55), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(206 137 51 / 0.30), transparent 60%), linear-gradient(135deg, rgb(252 240 213), rgb(245 224 178))',
+                          }}
+                        />
+                        {/* dot grid */}
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-40"
                           style={{
                             backgroundImage:
-                              'radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.07) 1px, transparent 0)',
+                              'radial-gradient(circle at 1px 1px, rgb(120 70 16 / 0.18) 1px, transparent 0)',
                             backgroundSize: '24px 24px',
                           }}
                         />
@@ -174,20 +185,22 @@ export function Projects() {
                     )}
                     {p.spendwise && (
                       <>
+                        {/* dark mode: faintest warm — soft cream-tinted brown */}
                         <div
                           aria-hidden
                           className="absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 75% 0%, rgb(223 161 44 / 0.22), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(196 104 68 / 0.16), transparent 60%), linear-gradient(135deg, rgb(36 22 12), rgb(20 12 6))',
+                              'radial-gradient(ellipse at 75% 0%, rgb(244 212 136 / 0.16), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(220 195 150 / 0.10), transparent 60%), linear-gradient(135deg, rgb(34 26 18), rgb(22 16 10))',
                           }}
                         />
+                        {/* light mode: lightest of trio — cream + pale amber */}
                         <div
                           aria-hidden
                           className="absolute inset-0 -z-10 block dark:hidden"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 75% 0%, rgb(244 212 136 / 0.45), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(220 152 118 / 0.30), transparent 60%), linear-gradient(135deg, rgb(251 247 240), rgb(246 239 225))',
+                              'radial-gradient(ellipse at 75% 0%, rgb(248 224 163 / 0.50), transparent 65%), radial-gradient(ellipse at 10% 100%, rgb(232 200 162 / 0.28), transparent 60%), linear-gradient(135deg, rgb(253 249 238), rgb(248 240 223))',
                           }}
                         />
                         {/* paper grain */}
@@ -301,20 +314,30 @@ export function Projects() {
                     )}
                     {p.void && (
                       <>
+                        {/* dark mode: deepest — walnut+bronze */}
                         <div
                           aria-hidden
-                          className="vv-bg absolute inset-0 -z-10"
+                          className="vv-bg absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 20% 0%, rgb(223 161 44 / 0.22), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(196 104 68 / 0.14), transparent 60%), linear-gradient(135deg, rgb(26 16 8), rgb(14 8 4))',
+                              'radial-gradient(ellipse at 20% 0%, rgb(184 124 38 / 0.30), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(140 78 24 / 0.22), transparent 60%), linear-gradient(135deg, rgb(28 18 10), rgb(14 8 4))',
+                          }}
+                        />
+                        {/* light mode: warm bronze parchment — deepest of trio */}
+                        <div
+                          aria-hidden
+                          className="vv-bg absolute inset-0 -z-10 block dark:hidden"
+                          style={{
+                            background:
+                              'radial-gradient(ellipse at 20% 0%, rgb(180 113 36 / 0.40), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(149 90 26 / 0.30), transparent 60%), linear-gradient(135deg, rgb(238 215 175), rgb(220 192 145))',
                           }}
                         />
                         <div
                           aria-hidden
-                          className="absolute inset-0 -z-10 opacity-40"
+                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-40"
                           style={{
                             backgroundImage:
-                              'radial-gradient(circle at 1px 1px, rgb(244 212 136 / 0.08) 1px, transparent 0)',
+                              'radial-gradient(circle at 1px 1px, rgb(82 50 12 / 0.18) 1px, transparent 0)',
                             backgroundSize: '24px 24px',
                           }}
                         />
@@ -334,7 +357,7 @@ export function Projects() {
                           <div
                             key={`lock-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-500 dark:text-amber-300"
+                            className="vv-icon text-amber-700 dark:text-amber-400"
                             style={{
                               position: 'absolute',
                               top: lk.top,
@@ -371,7 +394,7 @@ export function Projects() {
                           <div
                             key={`server-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-600 dark:text-amber-200"
+                            className="vv-icon text-amber-800 dark:text-amber-300"
                             style={{
                               position: 'absolute',
                               top: sv.top,
