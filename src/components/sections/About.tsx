@@ -1,5 +1,5 @@
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { useRef, useCallback } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { FadeText } from '../shared/FadeText';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -25,6 +25,69 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
         {label}
       </span>
     </div>
+  );
+}
+
+function TiltPhoto({ y }: { y: ReturnType<typeof useTransform> }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const { left, top, width, height } = el.getBoundingClientRect();
+    const px = (e.clientX - left) / width - 0.5;
+    const py = (e.clientY - top) / height - 0.5;
+    rotX.set(-py * 7);
+    rotY.set(px * 7);
+  }, [rotX, rotY]);
+
+  const onLeave = useCallback(() => {
+    rotX.set(0);
+    rotY.set(0);
+  }, [rotX, rotY]);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ y, zIndex: 2, rotateX: rotX, rotateY: rotY, transformPerspective: 800 }}
+      className="relative w-full"
+      initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
+      whileInView={{ opacity: 1, scale: 1, rotate: -1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      <div className="overflow-hidden" style={{ borderRadius: '1rem', aspectRatio: '3/4' }}>
+        <motion.img
+          src="/kevin.png"
+          alt="Kevin Robin"
+          className="w-full h-full object-cover object-top"
+          whileHover={{ scale: 1.04 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, rgb(var(--bg) / 0.35) 0%, transparent 45%)',
+            borderRadius: '1rem',
+          }}
+        />
+      </div>
+
+      <motion.div
+        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline rounded-full backdrop-blur-sm"
+        style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
+        initial={{ opacity: 0, y: 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        Full-Stack Dev
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -84,48 +147,8 @@ function PhotoFrame() {
         }}
       />
 
-      {/* Photo with parallax */}
-      <motion.div
-        style={{ y, zIndex: 2 }}
-        className="relative w-full"
-        initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
-        whileInView={{ opacity: 1, scale: 1, rotate: -1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div
-          className="overflow-hidden"
-          style={{ borderRadius: '1rem', aspectRatio: '3/4' }}
-        >
-          <motion.img
-            src="/kevin.png"
-            alt="Kevin Robin"
-            className="w-full h-full object-cover object-top"
-            whileHover={{ scale: 1.04 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          />
-          {/* Subtle gradient overlay at bottom */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to top, rgb(var(--bg) / 0.35) 0%, transparent 45%)',
-              borderRadius: '1rem',
-            }}
-          />
-        </div>
-
-        {/* Floating tag */}
-        <motion.div
-          className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline rounded-full backdrop-blur-sm"
-          style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          Full-Stack Dev
-        </motion.div>
-      </motion.div>
+      {/* Photo with parallax + 3D tilt */}
+      <TiltPhoto y={y} />
     </div>
   );
 }

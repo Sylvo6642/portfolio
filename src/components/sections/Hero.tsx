@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, LayoutGroup } from 'framer-motion';
 import { useMemo, useCallback, useEffect } from 'react';
 import { useTypewriterSequence } from '../../hooks/useTypewriter';
 import { ConnectingDots } from '../layout/ConnectingDots';
@@ -179,6 +179,7 @@ export function Hero() {
           <span className="text-accent">●</span> available for select work
         </motion.p>
 
+        <LayoutGroup>
         <motion.h1
           layout
           transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
@@ -195,18 +196,20 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
+          layout
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
+          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }, duration: 0.6, delay: 0.6 }}
           className="mt-6 max-w-2xl text-lg md:text-xl text-fg/80"
         >
           Full-Stack Developer
         </motion.p>
 
         <motion.div
+          layout
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.85 }}
+          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }, duration: 0.6, delay: 0.85 }}
           className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-3"
         >
           <MagneticButton
@@ -241,6 +244,7 @@ export function Hero() {
             </MagneticAnchor>
           )}
         </motion.div>
+        </LayoutGroup>
 
         <motion.div
           initial={{ opacity: 0 }}
