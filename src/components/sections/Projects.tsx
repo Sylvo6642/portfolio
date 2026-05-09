@@ -58,32 +58,13 @@ export function Projects() {
                   <div className="block">
                     {p.skilldash && (
                       <>
-                        {/* dark mode: caramel/honey-brown */}
+                        {/* dark mode: twilight plum gradient (mid intensity, base #4b3a70) */}
                         <div
                           aria-hidden
                           className="absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 80% 0%, rgb(217 145 36 / 0.28), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(159 99 24 / 0.16), transparent 60%), linear-gradient(135deg, rgb(48 30 12), rgb(28 18 8))',
-                          }}
-                        />
-                        {/* light mode: honey-gold parchment */}
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 -z-10 block dark:hidden"
-                          style={{
-                            background:
-                              'radial-gradient(ellipse at 80% 0%, rgb(238 178 64 / 0.55), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(206 137 51 / 0.30), transparent 60%), linear-gradient(135deg, rgb(252 240 213), rgb(245 224 178))',
-                          }}
-                        />
-                        {/* dot grid */}
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-40"
-                          style={{
-                            backgroundImage:
-                              'radial-gradient(circle at 1px 1px, rgb(120 70 16 / 0.18) 1px, transparent 0)',
-                            backgroundSize: '24px 24px',
+                              'radial-gradient(ellipse at 80% 0%, rgb(132 109 168 / 0.45), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(75 58 112 / 0.55), transparent 65%), linear-gradient(135deg, rgb(75 58 112), rgb(46 34 70))',
                           }}
                         />
                         {/* Hammer icons */}
@@ -96,7 +77,7 @@ export function Projects() {
                           <div
                             key={`hammer-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-500 dark:text-amber-300"
+                            className="vv-icon text-amber-500 dark:text-[#d4c5e8]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -129,7 +110,7 @@ export function Projects() {
                           <div
                             key={`wrench-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-500 dark:text-amber-300"
+                            className="vv-icon text-amber-500 dark:text-[#d4c5e8]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -160,7 +141,7 @@ export function Projects() {
                           <div
                             key={`utensil-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-500 dark:text-amber-300"
+                            className="vv-icon text-amber-500 dark:text-[#d4c5e8]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -185,31 +166,13 @@ export function Projects() {
                     )}
                     {p.spendwise && (
                       <>
-                        {/* dark mode: faintest warm — soft cream-tinted brown */}
+                        {/* dark mode: lavender mist gradient (lightest of trio, base #b7a2c9) */}
                         <div
                           aria-hidden
                           className="absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 75% 0%, rgb(244 212 136 / 0.16), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(220 195 150 / 0.10), transparent 60%), linear-gradient(135deg, rgb(34 26 18), rgb(22 16 10))',
-                          }}
-                        />
-                        {/* light mode: lightest of trio — cream + pale amber */}
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 -z-10 block dark:hidden"
-                          style={{
-                            background:
-                              'radial-gradient(ellipse at 75% 0%, rgb(248 224 163 / 0.50), transparent 65%), radial-gradient(ellipse at 10% 100%, rgb(232 200 162 / 0.28), transparent 60%), linear-gradient(135deg, rgb(253 249 238), rgb(248 240 223))',
-                          }}
-                        />
-                        {/* paper grain */}
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-25"
-                          style={{
-                            backgroundImage:
-                              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.20 0 0 0 0.10 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                              'radial-gradient(ellipse at 75% 0%, rgb(214 197 230 / 0.40), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(183 162 201 / 0.55), transparent 65%), linear-gradient(135deg, rgb(183 162 201), rgb(140 120 162))',
                           }}
                         />
                         {/* Coin icons */}
@@ -223,7 +186,7 @@ export function Projects() {
                           <div
                             key={`coin-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-600 dark:text-amber-300"
+                            className="vv-icon text-amber-600 dark:text-[#3d2d5c]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -256,7 +219,7 @@ export function Projects() {
                           <div
                             key={`receipt-${idx}`}
                             aria-hidden
-                            className="vv-icon text-walnut-700 dark:text-amber-200"
+                            className="vv-icon text-amber-700 dark:text-[#3d2d5c]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -267,7 +230,6 @@ export function Projects() {
                               transform: `rotate(${it.rot}deg)`,
                               zIndex: 0,
                               pointerEvents: 'none',
-                              color: 'rgb(82 60 42)',
                             }}
                           >
                             <div style={{ animation: `vv-float ${it.dur}s ease-in-out ${it.delay}s infinite`, width: '100%', height: '100%' }}>
@@ -289,7 +251,7 @@ export function Projects() {
                           <div
                             key={`mark-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-700 dark:text-amber-300"
+                            className="vv-icon text-amber-700 dark:text-[#3d2d5c]"
                             style={{
                               position: 'absolute',
                               top: it.top,
@@ -314,31 +276,13 @@ export function Projects() {
                     )}
                     {p.void && (
                       <>
-                        {/* dark mode: deepest — walnut+bronze */}
+                        {/* dark mode: deepest indigo gradient (deepest of trio, base #322f42) */}
                         <div
                           aria-hidden
                           className="vv-bg absolute inset-0 -z-10 hidden dark:block"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 20% 0%, rgb(184 124 38 / 0.30), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(140 78 24 / 0.22), transparent 60%), linear-gradient(135deg, rgb(28 18 10), rgb(14 8 4))',
-                          }}
-                        />
-                        {/* light mode: warm bronze parchment — deepest of trio */}
-                        <div
-                          aria-hidden
-                          className="vv-bg absolute inset-0 -z-10 block dark:hidden"
-                          style={{
-                            background:
-                              'radial-gradient(ellipse at 20% 0%, rgb(180 113 36 / 0.40), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(149 90 26 / 0.30), transparent 60%), linear-gradient(135deg, rgb(238 215 175), rgb(220 192 145))',
-                          }}
-                        />
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-40"
-                          style={{
-                            backgroundImage:
-                              'radial-gradient(circle at 1px 1px, rgb(82 50 12 / 0.18) 1px, transparent 0)',
-                            backgroundSize: '24px 24px',
+                              'radial-gradient(ellipse at 20% 0%, rgb(75 58 112 / 0.50), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(50 47 66 / 0.65), transparent 60%), linear-gradient(135deg, rgb(50 47 66), rgb(26 24 36))',
                           }}
                         />
                         {/* Lock icons */}
@@ -357,7 +301,7 @@ export function Projects() {
                           <div
                             key={`lock-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-700 dark:text-amber-400"
+                            className="vv-icon text-amber-700 dark:text-[#b7a2c9]"
                             style={{
                               position: 'absolute',
                               top: lk.top,
@@ -394,7 +338,7 @@ export function Projects() {
                           <div
                             key={`server-${idx}`}
                             aria-hidden
-                            className="vv-icon text-amber-800 dark:text-amber-300"
+                            className="vv-icon text-amber-800 dark:text-[#b7a2c9]"
                             style={{
                               position: 'absolute',
                               top: sv.top,
