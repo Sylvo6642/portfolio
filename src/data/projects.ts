@@ -8,6 +8,7 @@ export interface PersonalProject {
   liveUrl?: string;
   void?: boolean;
   skilldash?: boolean;
+  spendwise?: boolean;
   video?: string;
 }
 
@@ -17,6 +18,17 @@ export interface ProfessionalCard {
 }
 
 export const PERSONAL_PROJECTS: PersonalProject[] = [
+  {
+    name: 'SPENDWISE',
+    tag: 'In Development',
+    description:
+      'A quieter way to track money — an editorial-warm personal expense tracker. Cream parchment palette with walnut ink, burnished amber accents, and Fraunces serif numerals. Email/password and Google OAuth via Supabase, with a Postgres trigger that auto-seeds a profile and seven default categories on signup. Animated dashboard with count-up stat cards, donut and 6-month bar charts (Recharts), expense ledger with month + category filters, category cards with budget progress bars and an over-budget pulse-glow. Row-Level Security on every table, dark mode persisted to localStorage, custom hand-drawn SVG empty-state illustrations, and Framer Motion page transitions throughout.',
+    tech: ['React', 'TypeScript', 'Vite', 'Tailwind', 'Framer Motion', 'Recharts', 'Supabase', 'Postgres', 'RLS', 'React Hook Form', 'Zod'],
+    link: 'https://github.com/Sylvo6642/SpendWise',
+    linkLabel: 'GitHub',
+    liveUrl: '/projects/SpendWise/',
+    spendwise: true,
+  },
   {
     name: 'VOID VAULT',
     tag: 'Personal Project',

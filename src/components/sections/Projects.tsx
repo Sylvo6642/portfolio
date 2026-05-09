@@ -172,6 +172,133 @@ export function Projects() {
                         ))}
                       </>
                     )}
+                    {p.spendwise && (
+                      <>
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 -z-10 hidden dark:block"
+                          style={{
+                            background:
+                              'radial-gradient(ellipse at 75% 0%, rgb(223 161 44 / 0.22), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(196 104 68 / 0.16), transparent 60%), linear-gradient(135deg, rgb(36 22 12), rgb(20 12 6))',
+                          }}
+                        />
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 -z-10 block dark:hidden"
+                          style={{
+                            background:
+                              'radial-gradient(ellipse at 75% 0%, rgb(244 212 136 / 0.45), transparent 60%), radial-gradient(ellipse at 10% 100%, rgb(220 152 118 / 0.30), transparent 60%), linear-gradient(135deg, rgb(251 247 240), rgb(246 239 225))',
+                          }}
+                        />
+                        {/* paper grain */}
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 -z-10 opacity-30 dark:opacity-25"
+                          style={{
+                            backgroundImage:
+                              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.20 0 0 0 0.10 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                          }}
+                        />
+                        {/* Coin icons */}
+                        {[
+                          { top: '10%', left: '6%',  rot: -18, size: 12, opacity: 0.30, dur: 6.5, delay: 0.2 },
+                          { top: '70%', left: '4%',  rot:  20, size: 10, opacity: 0.24, dur: 7.7, delay: 1.4 },
+                          { top: '40%', left: '85%', rot: -14, size: 13, opacity: 0.28, dur: 6.9, delay: 0.8 },
+                          { top: '88%', left: '70%', rot:  32, size: 9,  opacity: 0.22, dur: 8.2, delay: 2.3 },
+                          { top: '20%', left: '78%', rot:  10, size: 11, opacity: 0.26, dur: 7.1, delay: 3.0 },
+                        ].map((it, idx) => (
+                          <div
+                            key={`coin-${idx}`}
+                            aria-hidden
+                            className="vv-icon text-amber-600 dark:text-amber-300"
+                            style={{
+                              position: 'absolute',
+                              top: it.top,
+                              left: it.left,
+                              width: it.size,
+                              height: it.size,
+                              opacity: it.opacity,
+                              transform: `rotate(${it.rot}deg)`,
+                              zIndex: 0,
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            <div style={{ animation: `vv-float ${it.dur}s ease-in-out ${it.delay}s infinite`, width: '100%', height: '100%' }}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M14.5 9c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5 1-2.5 2s1 1.7 2.5 2 2.5 1 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5" />
+                                <path d="M12 6v1.5M12 16.5V18" />
+                              </svg>
+                            </div>
+                          </div>
+                        ))}
+                        {/* Receipt icons */}
+                        {[
+                          { top: '22%', left: '22%', rot:  8,  size: 12, opacity: 0.24, dur: 7.2, delay: 0.5 },
+                          { top: '60%', left: '38%', rot: -22, size: 11, opacity: 0.22, dur: 8.4, delay: 1.9 },
+                          { top: '15%', left: '58%', rot:  26, size: 13, opacity: 0.26, dur: 6.8, delay: 2.6 },
+                          { top: '78%', left: '52%', rot: -12, size: 10, opacity: 0.22, dur: 7.9, delay: 0.9 },
+                          { top: '48%', left: '12%', rot:  30, size: 11, opacity: 0.23, dur: 8.0, delay: 3.2 },
+                        ].map((it, idx) => (
+                          <div
+                            key={`receipt-${idx}`}
+                            aria-hidden
+                            className="vv-icon text-walnut-700 dark:text-amber-200"
+                            style={{
+                              position: 'absolute',
+                              top: it.top,
+                              left: it.left,
+                              width: it.size,
+                              height: it.size,
+                              opacity: it.opacity,
+                              transform: `rotate(${it.rot}deg)`,
+                              zIndex: 0,
+                              pointerEvents: 'none',
+                              color: 'rgb(82 60 42)',
+                            }}
+                          >
+                            <div style={{ animation: `vv-float ${it.dur}s ease-in-out ${it.delay}s infinite`, width: '100%', height: '100%' }}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                                <path d="M5 3h14v18l-3-2-3 2-3-2-3 2-2-2z" />
+                                <path d="M8 8h8M8 12h6M8 16h7" />
+                              </svg>
+                            </div>
+                          </div>
+                        ))}
+                        {/* Ledger / dollar mark icons */}
+                        {[
+                          { top: '8%',  left: '38%', rot: -10, size: 11, opacity: 0.24, dur: 7.4, delay: 0.3 },
+                          { top: '52%', left: '70%', rot:  18, size: 12, opacity: 0.26, dur: 6.6, delay: 1.6 },
+                          { top: '85%', left: '28%', rot: -28, size: 10, opacity: 0.22, dur: 8.3, delay: 2.1 },
+                          { top: '32%', left: '50%', rot:  12, size: 9,  opacity: 0.20, dur: 7.0, delay: 3.5 },
+                          { top: '68%', left: '90%', rot: -22, size: 11, opacity: 0.24, dur: 6.8, delay: 1.0 },
+                        ].map((it, idx) => (
+                          <div
+                            key={`mark-${idx}`}
+                            aria-hidden
+                            className="vv-icon text-amber-700 dark:text-amber-300"
+                            style={{
+                              position: 'absolute',
+                              top: it.top,
+                              left: it.left,
+                              width: it.size,
+                              height: it.size,
+                              opacity: it.opacity,
+                              transform: `rotate(${it.rot}deg)`,
+                              zIndex: 0,
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            <div style={{ animation: `vv-float ${it.dur}s ease-in-out ${it.delay}s infinite`, width: '100%', height: '100%' }}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                                <path d="M12 2v20" />
+                                <path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                              </svg>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
                     {p.void && (
                       <>
                         <div
@@ -179,7 +306,7 @@ export function Projects() {
                           className="vv-bg absolute inset-0 -z-10"
                           style={{
                             background:
-                              'radial-gradient(ellipse at 20% 0%, rgb(124 58 237 / 0.25), transparent 60%), linear-gradient(135deg, rgb(26 10 46), rgb(10 5 22))',
+                              'radial-gradient(ellipse at 20% 0%, rgb(223 161 44 / 0.22), transparent 60%), radial-gradient(ellipse at 90% 100%, rgb(196 104 68 / 0.14), transparent 60%), linear-gradient(135deg, rgb(26 16 8), rgb(14 8 4))',
                           }}
                         />
                         <div
@@ -187,7 +314,7 @@ export function Projects() {
                           className="absolute inset-0 -z-10 opacity-40"
                           style={{
                             backgroundImage:
-                              'radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.08) 1px, transparent 0)',
+                              'radial-gradient(circle at 1px 1px, rgb(244 212 136 / 0.08) 1px, transparent 0)',
                             backgroundSize: '24px 24px',
                           }}
                         />
@@ -207,7 +334,7 @@ export function Projects() {
                           <div
                             key={`lock-${idx}`}
                             aria-hidden
-                            className="vv-icon"
+                            className="vv-icon text-amber-500 dark:text-amber-300"
                             style={{
                               position: 'absolute',
                               top: lk.top,
@@ -244,7 +371,7 @@ export function Projects() {
                           <div
                             key={`server-${idx}`}
                             aria-hidden
-                            className="vv-icon"
+                            className="vv-icon text-amber-600 dark:text-amber-200"
                             style={{
                               position: 'absolute',
                               top: sv.top,
@@ -271,10 +398,10 @@ export function Projects() {
                     )}
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div>
-                        <span className={`font-mono text-[10px] tracking-[0.22em] uppercase ${p.void ? 'dark:text-purple-300/80 text-purple-700/80' : p.skilldash ? 'dark:text-amber-300/80 text-amber-700/80' : 'text-muted'}`}>
+                        <span className={`font-mono text-[10px] tracking-[0.22em] uppercase ${(p.void || p.skilldash || p.spendwise) ? 'dark:text-amber-300/80 text-amber-700/80' : 'text-muted'}`}>
                           {p.tag}
                         </span>
-                        <h4 className={`mt-2 text-3xl md:text-4xl font-bold tracking-tight ${(p.void || p.skilldash) ? 'dark:text-white text-fg' : ''}`}>
+                        <h4 className={`mt-2 text-3xl md:text-4xl font-bold tracking-tight ${(p.void || p.skilldash || p.spendwise) ? 'dark:text-white text-fg' : ''}`}>
                           {p.name}
                         </h4>
                       </div>
@@ -287,11 +414,7 @@ export function Projects() {
                             onKeyDown={onKey}
                             data-cursor="hover"
                             aria-label={`Watch ${p.name} demo video`}
-                            className={`inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                              p.skilldash
-                                ? 'border border-amber-500/40 bg-amber-500/15 dark:text-amber-100 text-amber-800 hover:bg-amber-500/30 hover:border-amber-500/70'
-                                : 'border border-purple-500/40 bg-purple-500/15 dark:text-purple-100 text-purple-800 hover:bg-purple-500/30 hover:border-purple-500/70'
-                            }`}
+                            className="inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent border border-amber-500/40 bg-amber-500/15 dark:text-amber-100 text-amber-800 hover:bg-amber-500/30 hover:border-amber-500/70"
                           >
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                             Watch demo
@@ -304,7 +427,7 @@ export function Projects() {
                             rel="noopener noreferrer"
                             data-cursor="hover"
                             className={`inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full transition-all ${
-                              p.skilldash
+                              (p.skilldash || p.spendwise)
                                 ? 'border border-amber-500/60 bg-amber-500/20 dark:text-amber-100 text-amber-800 hover:bg-amber-500/35 hover:border-amber-500/80'
                                 : 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70 hover:border-fg/50 dark:hover:border-white/50'
                             }`}
@@ -314,18 +437,18 @@ export function Projects() {
                           </a>
                         )}
                         {p.link ? (
-                          <a href={p.link} target="_blank" rel="noopener noreferrer" data-cursor="hover" className={`font-mono text-xs px-3 py-1 rounded-full ${(p.void || p.skilldash) ? 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70 hover:border-fg/50 dark:hover:border-white/50 hover:text-fg dark:hover:text-white' : 'hairline text-muted hover:text-fg'} transition-colors`}>
+                          <a href={p.link} target="_blank" rel="noopener noreferrer" data-cursor="hover" className={`font-mono text-xs px-3 py-1 rounded-full ${(p.void || p.skilldash || p.spendwise) ? 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70 hover:border-fg/50 dark:hover:border-white/50 hover:text-fg dark:hover:text-white' : 'hairline text-muted hover:text-fg'} transition-colors`}>
                             {p.linkLabel}
                           </a>
                         ) : (
-                          <span className={`font-mono text-xs px-3 py-1 rounded-full ${(p.void || p.skilldash) ? 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70' : 'hairline text-muted'}`}>
+                          <span className={`font-mono text-xs px-3 py-1 rounded-full ${(p.void || p.skilldash || p.spendwise) ? 'border border-fg/20 dark:border-white/20 text-fg/70 dark:text-white/70' : 'hairline text-muted'}`}>
                             {p.linkLabel}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <p className={`mt-5 max-w-3xl text-sm leading-relaxed ${(p.void || p.skilldash) ? 'dark:text-white/70 text-fg/75' : 'text-fg/75'}`}>
+                    <p className={`mt-5 max-w-3xl text-sm leading-relaxed ${(p.void || p.skilldash || p.spendwise) ? 'dark:text-white/70 text-fg/75' : 'text-fg/75'}`}>
                       {p.description}
                     </p>
 
@@ -334,7 +457,7 @@ export function Projects() {
                         <span
                           key={t}
                           className={`font-mono text-[11px] px-2.5 py-1 rounded-full ${
-                            (p.void || p.skilldash)
+                            (p.void || p.skilldash || p.spendwise)
                               ? 'border border-fg/15 dark:border-white/15 text-fg/80 dark:text-white/80'
                               : 'hairline text-fg/80'
                           }`}
