@@ -1,6 +1,5 @@
-import { motion, useMotionValue, useSpring, useTransform, LayoutGroup } from 'framer-motion';
-import { useMemo, useCallback, useEffect } from 'react';
-import { useTypewriterSequence } from '../../hooks/useTypewriter';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';
 import { ConnectingDots } from '../layout/ConnectingDots';
 import { useMagneticButton } from '../../hooks/useMagneticButton';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
@@ -8,14 +7,12 @@ import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 // Set to your CV URL to show the Download CV button, or leave empty to hide it
 const CV_URL = "";
 
-const NAME = "Hi, I'm Kevin Robin";
-
 const ROTATING = [
-  "A Full-Stack Developer",
-  "Building Scalable Web Systems",
-  "Crafting ERP & Web Solutions",
-  "Passionate About Clean, Scalable Code",
-  "Turning Ideas Into Production Code",
+  "Kevin Robin",
+  "a Full-Stack Developer",
+  "building Scalable Web Systems",
+  "crafting ERP & Web Solutions",
+  "turning Ideas Into Production Code",
 ];
 
 // Parallax layer configs: [dotsMultiplier, watermarkMultiplier, contentMultiplier]
@@ -82,17 +79,70 @@ function MagneticAnchor({
   );
 }
 
-export function Hero() {
-  const phrases = useMemo(() => [NAME, ...ROTATING.map((r) => `Hi, I'm ${r}`)], []);
-  const coarse = useIsCoarsePointer();
+const STAGGER_MS = 28;
+const EXIT_MS = 400;
 
-  const { text, done } = useTypewriterSequence(phrases, {
-    typeMs: 70,
-    eraseMs: 35,
-    holdMs: 1800,
-    finalHoldMs: 1800,
-    startDelayMs: 250,
-  });
+function SplitPhrase({ text, phase }: { text: string; phase: 'in' | 'out' | 'idle' }) {
+  const words = text.split(' ');
+  return (
+    <>
+      {words.map((word, i) => {
+        let opacity = 0;
+        let transform = 'translateY(65%) rotate(8deg)';
+        let transition = '';
+
+        if (phase === 'in') {
+          opacity = 1;
+          transform = 'translateY(0) rotate(0deg)';
+          transition = `opacity .5s cubic-bezier(.22,1,.36,1) ${i * STAGGER_MS * 4}ms, transform .75s cubic-bezier(.22,1,.36,1) ${i * STAGGER_MS * 4}ms`;
+        } else if (phase === 'out') {
+          opacity = 0;
+          transform = 'translateY(-65%) rotate(-6deg)';
+          const rev = (words.length - 1 - i) * (STAGGER_MS * 2);
+          transition = `opacity .3s cubic-bezier(.55,0,1,.45) ${rev}ms, transform .4s cubic-bezier(.55,0,1,.45) ${rev}ms`;
+        } else {
+          transition = 'none';
+        }
+
+        return (
+          <span key={i} style={{ display: 'inline-block', whiteSpace: 'nowrap', marginRight: '0.25em' }}>
+            <span style={{ display: 'inline-block', opacity, transform, transition }}>
+              {word}
+            </span>
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+export function Hero() {
+  const coarse = useIsCoarsePointer();
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [phase, setPhase] = useState<'in' | 'out' | 'idle'>('idle');
+  const HOLD_MS = 2400;
+
+  useEffect(() => {
+    // brief idle so chars start from below on mount, then fly in
+    const t0 = window.setTimeout(() => setPhase('in'), 60);
+    return () => window.clearTimeout(t0);
+  }, []);
+
+  useEffect(() => {
+    const flyInDuration = ROTATING[phraseIndex].length * STAGGER_MS + 750;
+    // after hold, fly out then advance index
+    const t1 = window.setTimeout(() => {
+      setPhase('out');
+      const t2 = window.setTimeout(() => {
+        setPhraseIndex(i => (i + 1) % ROTATING.length);
+        setPhase('idle');
+        const t3 = window.setTimeout(() => setPhase('in'), 40);
+        return () => window.clearTimeout(t3);
+      }, EXIT_MS + 100);
+      return () => window.clearTimeout(t2);
+    }, flyInDuration + HOLD_MS);
+    return () => window.clearTimeout(t1);
+  }, [phraseIndex]);
 
   // Raw mouse position (normalized -1 … 1 relative to viewport center)
   const rawX = useMotionValue(0);
@@ -179,37 +229,30 @@ export function Hero() {
           <span className="text-accent">●</span> available for select work
         </motion.p>
 
-        <LayoutGroup>
-        <motion.h1
-          layout
-          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
+        <h1
           className="font-sans font-bold tracking-tight leading-[1.05]"
           style={{ fontSize: 'clamp(2.2rem, 6vw, 4.8rem)' }}
-          aria-label={NAME}
+          aria-label={`Hi, I'm ${ROTATING[phraseIndex]}`}
         >
+          <span aria-hidden>{"Hi, I'm "}</span>
           <span aria-hidden>
-            {text}
-            <span className={`caret inline-block ml-1 ${done ? 'opacity-100' : ''}`}>
-              <span className="inline-block w-[0.1em] h-[0.85em] align-[-0.05em] bg-fg" />
-            </span>
+            <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />
           </span>
-        </motion.h1>
+        </h1>
 
         <motion.p
-          layout
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }, duration: 0.6, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.75 }}
           className="mt-6 max-w-2xl text-lg md:text-xl text-fg/80"
         >
           Full-Stack Developer
         </motion.p>
 
         <motion.div
-          layout
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] }, duration: 0.6, delay: 0.85 }}
+          transition={{ duration: 0.6, delay: 1 }}
           className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-3"
         >
           <MagneticButton
@@ -244,7 +287,6 @@ export function Hero() {
             </MagneticAnchor>
           )}
         </motion.div>
-        </LayoutGroup>
 
         <motion.div
           initial={{ opacity: 0 }}

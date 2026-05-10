@@ -421,11 +421,13 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 280, damping: 32, restDelta: 0.001 });
   const totalShift = -(PANELS.length - 1) * vw;
-  const x = useTransform(smoothProgress, [0, 1], [0, totalShift]);
+  // Use [0.12, 0.88] so sliding only starts after a full viewport of buffer
+  // at the top and ends before the last viewport of the section exits
+  const x = useTransform(smoothProgress, [0.12, 0.88], [0, totalShift]);
 
-  const dot0 = useTransform(smoothProgress, [0, 0.33], [1, 0.35]);
-  const dot1 = useTransform(smoothProgress, [0.2, 0.5, 0.8], [0.35, 1, 0.35]);
-  const dot2 = useTransform(smoothProgress, [0.67, 1], [0.35, 1]);
+  const dot0 = useTransform(smoothProgress, [0.12, 0.42], [1, 0.35]);
+  const dot1 = useTransform(smoothProgress, [0.3, 0.5, 0.7], [0.35, 1, 0.35]);
+  const dot2 = useTransform(smoothProgress, [0.58, 0.88], [0.35, 1]);
   const dot0w = useTransform(dot0, [0.35, 1], [6, 20]);
   const dot1w = useTransform(dot1, [0.35, 1], [6, 20]);
   const dot2w = useTransform(dot2, [0.35, 1], [6, 20]);
@@ -454,7 +456,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
   return (
     /* Outer — tall enough to provide scroll distance: 100vh per panel */
-    <div ref={trackRef} style={{ height: `${PANELS.length * 100}vh` }}>
+    <div ref={trackRef} style={{ height: `${PANELS.length * 100 + 150}vh` }}>
       {/* Sticky viewport — use dvh so mobile browser chrome doesn't cause jumps */}
       <div className="sticky top-0 overflow-hidden" style={{ height: '100dvh' }}>
         {/* Section label + progress dots */}
