@@ -3,6 +3,21 @@ import { FadeText } from '../shared/FadeText';
 import { useState, useEffect, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
 
+function useLocalTime() {
+  const [time, setTime] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const ist = new Date(time.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const h = ist.getHours();
+  const m = ist.getMinutes();
+  const s = ist.getSeconds();
+  const isPm = h >= 12;
+  const display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return { display, isPm };
+}
+
 const COOLDOWN_MS = 5 * 60 * 1000;
 const LS_KEY = 'contact_last_sent';
 
@@ -97,6 +112,38 @@ function FocusInput({
         </svg>
       </div>
     </label>
+  );
+}
+
+function LocationCard() {
+  const { display, isPm } = useLocalTime();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: 0.45 }}
+      className="mt-8 hairline rounded-xl p-4 flex items-center justify-between bg-fg/[0.02]"
+    >
+      <div className="flex items-center gap-3">
+        <span className="text-accent text-lg">◎</span>
+        <div>
+          <p className="text-sm font-medium">Kozhikode, Kerala</p>
+          <p className="font-mono text-[10px] text-muted tracking-wide mt-0.5">
+            UTC +5:30 · Available remotely
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col items-end">
+        <span
+          className="font-mono text-base font-bold tabular-nums"
+          style={{ color: isPm ? 'rgb(var(--accent))' : 'rgb(var(--fg))' }}
+        >
+          {display}
+        </span>
+        <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-muted mt-0.5">My time</span>
+      </div>
+    </motion.div>
   );
 }
 
@@ -201,11 +248,9 @@ export function Contact() {
                   linkedin.com/in/kevinsylvester6642
                 </a>
               </div>
-              <div className="flex items-baseline gap-3">
-                <span className="text-muted text-xs uppercase tracking-[0.2em]">Based</span>
-                <span className="text-fg">Kozhikode, Kerala · IN</span>
-              </div>
             </div>
+
+            <LocationCard />
           </div>
 
           <form onSubmit={onSubmit} className="space-y-5">
