@@ -11,39 +11,45 @@ const PURPLE_SHADES = ['#7c3aed', '#a78bfa', '#6d28d9', '#c4b5fd', '#4c1d95', '#
 function useGlitchText(target: string, forceActive: boolean) {
   const [display, setDisplay] = useState(target);
   const [glitchColor, setGlitchColor] = useState<string | null>(null);
+  const dead = useRef(false);
 
   useEffect(() => {
+    dead.current = false;
     let glitchTimeout: ReturnType<typeof setTimeout>;
     let frameInterval: ReturnType<typeof setInterval>;
 
     function runGlitch() {
+      if (dead.current) return;
       let iter = 0;
       frameInterval = setInterval(() => {
+        if (dead.current) { clearInterval(frameInterval); return; }
         setGlitchColor(PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)]);
         setDisplay(
           target.split('').map((char, i) =>
             i < iter ? char : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
           ).join('')
         );
-        iter += 0.4;
+        iter += 0.4 + Math.random() * 0.8;
         if (iter >= target.length) {
+          clearInterval(frameInterval);
+          if (dead.current) return;
           setDisplay(target);
           setGlitchColor(null);
-          clearInterval(frameInterval);
-          if (!forceActive) scheduleNext();
+          scheduleNext();
         }
-      }, 40);
+      }, 20 + Math.random() * 100);
     }
 
     function scheduleNext() {
-      const delay = 1500 + Math.random() * 3500;
+      if (dead.current) return;
+      const delay = forceActive ? 2000 + Math.random() * 1000 : 2000 + Math.random() * 4000;
       glitchTimeout = setTimeout(runGlitch, delay);
     }
 
     runGlitch();
-    if (!forceActive) scheduleNext();
 
     return () => {
+      dead.current = true;
       clearTimeout(glitchTimeout);
       clearInterval(frameInterval);
       setDisplay(target);
@@ -84,8 +90,7 @@ const stagger = {
 };
 
 export function NotFound() {
-  const [glitching, setGlitching] = useState(false);
-  const { display: glitchText, glitchColor } = useGlitchText('404', glitching);
+  const { display: glitchText, glitchColor } = useGlitchText('404', false);
 
   // Subtle parallax on the 404 watermark
   const rawX = useMotionValue(0);
@@ -151,8 +156,6 @@ export function NotFound() {
           <motion.span
             className="block text-[11vw] md:text-[9rem] font-semibold leading-none tracking-tighter cursor-default select-none transition-colors duration-75"
             style={{ color: glitchColor ?? 'rgb(var(--accent))' }}
-            onHoverStart={() => setGlitching(true)}
-            onHoverEnd={() => setGlitching(false)}
           >
             {glitchText}
           </motion.span>
