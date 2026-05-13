@@ -44,6 +44,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Suppress body transition during view transitions so it doesn't fight the clip-path reveal */
+html[data-magicui-theme-vt="active"],
+html[data-magicui-theme-vt="active"] body {
+  transition: none !important;
+}
+
 body {
   overflow-x: hidden;
 }
@@ -226,6 +232,19 @@ html.dark .proj-card-clausify::before {
 }
 .orb-drift {
   animation: orb-drift 9s ease-in-out infinite;
+}
+
+/* Animated theme toggler — view transition */
+[data-magicui-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration, 600ms);
+}
+[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  animation: none;
+  clip-path: var(--magicui-theme-vt-clip-from);
+}
+[data-magicui-theme-vt="active"]::view-transition-old(root) {
+  animation: none;
+  z-index: -1;
 }
 
 /* Reduced motion */
