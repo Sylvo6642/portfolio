@@ -8,7 +8,7 @@ export function Courses() {
       <div className="mx-auto max-w-6xl px-6">
         <SectionReveal>
           <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            05 / courses
+            06 / courses
           </p>
         </SectionReveal>
 

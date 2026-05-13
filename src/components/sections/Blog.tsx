@@ -13,7 +13,7 @@ export function Blog() {
       <div className="mx-auto max-w-6xl px-6">
         <SectionReveal>
           <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            06 / notes
+            07 / notes
           </p>
         </SectionReveal>
 

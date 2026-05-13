@@ -191,7 +191,7 @@ export function Contact() {
     <section id="contact" className="relative py-32">
       <div className="mx-auto max-w-6xl px-6">
         <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-          07 / contact
+          08 / contact
         </p>
 
         <p className="text-base text-fg/45 mb-4">
