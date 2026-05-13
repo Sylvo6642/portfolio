@@ -4,12 +4,12 @@ import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 
 const STATS = [
-  { value: 2, suffix: '+', label: 'Years Experience' },
-  { value: 5, suffix: '+', label: 'Tech Stacks' },
-  { value: 4000, suffix: '+', label: 'Hours Coded' },
-  { value: 113, suffix: '+', label: 'Bugs Squashed' },
+  { value: 2, suffix: '+', label: 'Years in Production' },
   { value: 147, suffix: '+', label: 'APIs Built' },
-  { value: null, suffix: '∞', label: 'Coffee Cups' },
+  { value: 113, suffix: '+', label: 'Bugs Squashed' },
+  { value: 3, suffix: '', label: 'Encrypted Apps Shipped' },
+  { value: 5, suffix: '+', label: 'Tech Stacks' },
+  { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
 
 const PANELS = [
@@ -165,8 +165,8 @@ function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.15]"
         >
-          Full-Stack Developer with{' '}
-          <span className="text-accent">2+ years</span> building scalable ERP and web systems.
+          A <span className="text-accent">security brain</span> and a{' '}
+          <span className="text-accent">motion brain</span>, in the same developer.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -175,7 +175,7 @@ function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
           transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="mt-4 font-mono text-sm text-fg/45 tracking-wide"
         >
-          A developer who obsesses over the details others skip.
+          Quiet. Notices a lot. Remembers what you said three conversations ago.
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -184,10 +184,11 @@ function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
           transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
           className="mt-6 text-lg text-fg/75 leading-relaxed"
         >
-          Based in Kozhikode, Kerala. Currently at{' '}
-          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> working with
-          Django, Angular, and MongoDB. Expanding into React, Node.js, Supabase, and
-          PostgreSQL — chasing the full picture from data layer to delivered pixel.
+          Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
+          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> —
+          Django, Angular, MongoDB. Currently moving into React, Node, Supabase, and
+          PostgreSQL. Every project I ship has encryption in it; I don't think that's a
+          coincidence.
         </motion.p>
         <motion.div
           ref={statsRef}
@@ -210,18 +211,18 @@ function PanelPhilosophy() {
   const principles = [
     {
       icon: '◈',
-      title: 'Detail-obsessed',
-      body: 'The gap between good and great lives in the details others skip — a 2px margin, a 12ms transition, the right word in a label.',
+      title: 'Correct at the edges',
+      body: 'The happy path is the easy part. I spend my time on the silent failures — the radio button that loaded the wrong record without an error, the count-then-insert race condition, the migration nobody noticed was lossy.',
     },
     {
       icon: '◎',
-      title: 'Systems thinker',
-      body: 'I think in layers. Every feature I build connects up to product intent and down to database schema — nothing exists in isolation.',
+      title: 'Motion as craft',
+      body: 'How a thing moves is part of what it is. Not paths and easing curves applied after the fact — physics, intent, restraint. If it can drift instead of slide, it should drift.',
     },
     {
       icon: '◐',
-      title: 'Shipping bias',
-      body: 'Perfect is the enemy of shipped. I move fast, iterate in production, and let real usage shape the next revision.',
+      title: 'Real problems over toy ones',
+      body: "I'd rather fix one production bug that nobody wants to touch than rebuild a to-do app in a new framework. The unglamorous stuff is where you actually learn the stack.",
     },
   ];
 
@@ -244,7 +245,7 @@ function PanelPhilosophy() {
         className="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-12"
       >
         I build software the way I'd want to{' '}
-        <span className="text-accent">use it</span> — fast, clear, and honest.
+        <span className="text-accent">use it</span> — correct, considered, and honest.
       </motion.h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
@@ -273,11 +274,11 @@ function PanelPhilosophy() {
         style={{ borderLeft: '2px solid rgb(var(--accent) / 0.5)' }}
       >
         <p className="text-lg md:text-xl text-fg/70 italic leading-relaxed">
-          "Any fool can write code that a computer can understand. Good programmers write code
-          that humans can understand."
+          "Don't generate sequential IDs by counting existing records. Use atomic counters.
+          The count-then-insert pattern is always a race condition waiting to happen."
         </p>
         <footer className="mt-3 font-mono text-xs tracking-[0.15em] uppercase text-muted">
-          — Martin Fowler
+          — A note to myself, after a long Monday
         </footer>
       </motion.blockquote>
     </div>
@@ -286,22 +287,43 @@ function PanelPhilosophy() {
 
 /* ─── Panel 3: Beyond Code ─── */
 function PanelBeyond() {
-  const interests = [
-    { label: 'UI/UX Design', icon: '✦' },
-    { label: 'Open Source', icon: '◈' },
-    { label: 'System Design', icon: '◎' },
-    { label: 'Tech Writing', icon: '◐' },
-    { label: 'Chess', icon: '♟' },
-    { label: 'Malayalam Music', icon: '♪' },
-    { label: 'Sci-fi novels', icon: '◉' },
-    { label: 'Long walks', icon: '◌' },
+  const offKeyboard = [
+    {
+      group: 'Body',
+      items: [
+        { label: 'Gym', icon: '◈' },
+        { label: 'Swimming', icon: '◎' },
+        { label: 'Long walks', icon: '◌' },
+      ],
+    },
+    {
+      group: 'Mind',
+      items: [
+        { label: 'Cybersecurity rabbit holes', icon: '◉' },
+        { label: 'UI/UX teardowns', icon: '✧' },
+        { label: 'Cooking', icon: '♪', note: 'keyword: attempting' },
+      ],
+    },
+    {
+      group: 'On the go',
+      items: [
+        { label: 'Travel', icon: '✦', note: 'planned months out' },
+        { label: 'Gaming', icon: '◐' },
+      ],
+    },
   ];
 
-  const currentStack = [
-    { name: 'React + Vite', note: 'this portfolio' },
-    { name: 'Supabase', note: 'backend experiments' },
-    { name: 'Framer Motion', note: 'animation layer' },
-    { name: 'Tailwind CSS', note: 'styling system' },
+  const now = [
+    { kind: 'building', label: 'This portfolio', meta: 'React · Vite · Framer Motion' },
+    { kind: 'learning', label: 'Node + Supabase', meta: 'leaving Mongo behind' },
+    { kind: 'reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
+    { kind: 'shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
+  ];
+
+  const stats = [
+    { v: 'Kozhikode', k: 'Based in' },
+    { v: 'UTC +5:30', k: 'Timezone' },
+    { v: 'Since 2022', k: 'Writing code' },
   ];
 
   return (
@@ -322,82 +344,125 @@ function PanelBeyond() {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-10"
       >
-        A person, not just a{' '}
-        <span className="text-accent">stack.</span>
+        Lost in airports,{' '}
+        <span className="text-accent">found in terminals.</span>
       </motion.h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Interests */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+        {/* Off-keyboard — grouped chips */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
+          className="md:col-span-3 flex flex-col gap-5"
         >
-          <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted mb-4">
-            Interests
+          <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
+            Off-keyboard
           </p>
-          <div className="flex flex-wrap gap-2">
-            {interests.map((item, i) => (
-              <motion.span
-                key={item.label}
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
-                className="inline-flex items-center gap-1.5 hairline rounded-full px-3 py-1.5 text-sm hover:bg-fg/5 transition-colors"
-              >
-                <span className="text-accent text-xs">{item.icon}</span>
-                {item.label}
-              </motion.span>
-            ))}
-          </div>
+          {offKeyboard.map((g, gi) => (
+            <div key={g.group} className="flex flex-col gap-2.5">
+              <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-fg/35">
+                {g.group}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {g.items.map((item, i) => (
+                  <motion.span
+                    key={item.label}
+                    initial={{ opacity: 0, y: 6 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, delay: 0.15 + gi * 0.08 + i * 0.04 }}
+                    className="inline-flex items-baseline gap-1.5 hairline rounded-full px-3 py-1.5 text-sm hover:bg-fg/5 transition-colors"
+                  >
+                    <span className="text-accent text-xs">{item.icon}</span>
+                    <span>{item.label}</span>
+                    {item.note && (
+                      <span className="font-mono text-[10px] text-fg/40 tracking-wide ml-0.5">
+                        {item.note}
+                      </span>
+                    )}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+          ))}
         </motion.div>
 
-        {/* Currently building with */}
+        {/* Now — live status card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
+          className="md:col-span-2 flex flex-col gap-6"
         >
-          <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted mb-4">
-            Currently building with
-          </p>
-          <div className="flex flex-col gap-3">
-            {currentStack.map((item, i) => (
+          <div className="hairline rounded-xl p-5 bg-fg/[0.02] flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
+                Now
+              </p>
+              <span className="relative inline-flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-60 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+              </span>
+            </div>
+            <div className="flex flex-col gap-3">
+              {now.map((item, i) => (
+                <motion.div
+                  key={item.kind}
+                  initial={{ opacity: 0, x: 12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: 0.3 + i * 0.07 }}
+                  className="flex flex-col gap-0.5"
+                >
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-[9px] tracking-[0.22em] uppercase text-accent w-[58px]">
+                      {item.kind}
+                    </span>
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-muted tracking-wide pl-[66px]">
+                    {item.meta}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Stat trio */}
+          <div className="grid grid-cols-3 gap-2">
+            {stats.map((s, i) => (
               <motion.div
-                key={item.name}
-                initial={{ opacity: 0, x: 16 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                key={s.k}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 + i * 0.07 }}
-                className="flex items-center justify-between hairline-b pb-3 last:border-0 last:pb-0"
+                transition={{ duration: 0.45, delay: 0.5 + i * 0.06 }}
+                className="hairline rounded-lg px-2.5 py-2 flex flex-col"
               >
-                <span className="text-sm font-medium">{item.name}</span>
-                <span className="font-mono text-[10px] text-muted tracking-wide">{item.note}</span>
+                <span className="text-[11px] font-semibold leading-tight">{s.v}</span>
+                <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted mt-1">
+                  {s.k}
+                </span>
               </motion.div>
             ))}
           </div>
-
-          {/* Location card */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.45 }}
-            className="mt-6 hairline rounded-xl p-4 flex items-center gap-3 bg-fg/[0.02]"
-          >
-            <span className="text-accent text-lg">◎</span>
-            <div>
-              <p className="text-sm font-medium">Kozhikode, Kerala</p>
-              <p className="font-mono text-[10px] text-muted tracking-wide mt-0.5">
-                UTC +5:30 · Available remotely
-              </p>
-            </div>
-          </motion.div>
         </motion.div>
       </div>
+
+      {/* Signature line */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.7 }}
+        className="mt-10 pt-6 hairline-t text-sm text-fg/55 italic leading-relaxed max-w-2xl"
+      >
+        I'm quiet, that's just me. I don't say much, but I notice a lot and I'm always
+        paying attention. Once I'm comfortable, though, you'll wish I'd shut up.
+      </motion.p>
     </div>
   );
 }
@@ -421,13 +486,11 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 280, damping: 32, restDelta: 0.001 });
   const totalShift = -(PANELS.length - 1) * vw;
-  // Use [0.12, 0.88] so sliding only starts after a full viewport of buffer
-  // at the top and ends before the last viewport of the section exits
-  const x = useTransform(smoothProgress, [0.12, 0.88], [0, totalShift]);
+  const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
 
-  const dot0 = useTransform(smoothProgress, [0.12, 0.42], [1, 0.35]);
-  const dot1 = useTransform(smoothProgress, [0.3, 0.5, 0.7], [0.35, 1, 0.35]);
-  const dot2 = useTransform(smoothProgress, [0.58, 0.88], [0.35, 1]);
+  const dot0 = useTransform(smoothProgress, [0.06, 0.38], [1, 0.35]);
+  const dot1 = useTransform(smoothProgress, [0.26, 0.5, 0.74], [0.35, 1, 0.35]);
+  const dot2 = useTransform(smoothProgress, [0.62, 0.94], [0.35, 1]);
   const dot0w = useTransform(dot0, [0.35, 1], [6, 20]);
   const dot1w = useTransform(dot1, [0.35, 1], [6, 20]);
   const dot2w = useTransform(dot2, [0.35, 1], [6, 20]);
