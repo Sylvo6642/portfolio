@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FadeText } from '../shared/FadeText';
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent, type ButtonHTMLAttributes } from 'react';
 import { supabase } from '../../lib/supabase';
 
 function useLocalTime() {
@@ -33,6 +33,29 @@ function formatTime(ms: number): string {
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function InteractiveHoverButton({ children, className = '', disabled, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      disabled={disabled}
+      className={`group relative w-auto cursor-pointer overflow-hidden rounded-full border border-fg/15 p-2 px-6 text-center font-semibold bg-fg text-bg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      {...props}
+    >
+      <div className="flex items-center justify-center gap-2">
+        <div className="h-2 w-2 rounded-full bg-bg transition-all duration-300 group-hover:scale-[100.8] group-disabled:scale-100" />
+        <span className="inline-block text-sm transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
+          {children}
+        </span>
+      </div>
+      <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100 text-fg text-sm">
+        <span>{children}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M5 12h14M13 5l7 7-7 7" />
+        </svg>
+      </div>
+    </button>
+  );
 }
 
 const HEADING = "Let's work together";
@@ -258,19 +281,13 @@ export function Contact() {
             <FocusInput label="Email" type="email" required value={email} onChange={setEmail} />
             <FocusInput label="Message" multiline required value={message} onChange={setMessage} />
             <div className="flex items-center gap-4 flex-wrap">
-              <button
+              <InteractiveHoverButton
                 type="submit"
                 disabled={status === 'sending' || cooldown > 0}
                 data-cursor="hover"
-                className="inline-flex items-center gap-2 rounded-full bg-fg text-bg px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.03] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {status === 'sending' ? 'Sending…' : cooldown > 0 ? `wait ${formatTime(cooldown)}` : 'Send Message'}
-                {status !== 'sending' && cooldown <= 0 && (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M13 5l7 7-7 7" />
-                  </svg>
-                )}
-              </button>
+                {status === 'sending' ? 'Sending…' : cooldown > 0 ? `Wait ${formatTime(cooldown)}` : 'Send Message'}
+              </InteractiveHoverButton>
               <AnimatePresence>
                 {status === 'sent' && (
                   <motion.span
