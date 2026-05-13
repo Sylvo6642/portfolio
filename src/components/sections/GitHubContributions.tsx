@@ -3,8 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import { SectionReveal } from '../shared/SectionReveal';
 import { FadeText } from '../shared/FadeText';
 
-const GITHUB_USERNAME = 'Sylvo6642';
-const TOKEN = import.meta.env.VITE_GITHUB_TOKEN as string;
+const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/github-contributions`;
 
 interface ContributionDay {
   date: string;
@@ -21,24 +20,6 @@ interface ContributionData {
   weeks: Week[];
 }
 
-const QUERY = `
-  query($login: String!, $from: DateTime!, $to: DateTime!) {
-    user(login: $login) {
-      contributionsCollection(from: $from, to: $to) {
-        contributionCalendar {
-          totalContributions
-          weeks {
-            contributionDays {
-              date
-              contributionCount
-              color
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 // Purple scale matching --accent: 124 58 237 (dark) / 167 139 250 (light)
 const DARK_COLORS  = ['#1a1025', '#2d1a4a', '#4a1fa8', '#7c3aed', '#a855f7'];
@@ -86,33 +67,22 @@ export function GitHubContributions() {
   }, []);
 
   useEffect(() => {
-    const to = new Date();
-    const from = new Date();
-    from.setFullYear(from.getFullYear() - 1);
-
-    fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: QUERY,
-        variables: {
-          login: GITHUB_USERNAME,
-          from: from.toISOString(),
-          to: to.toISOString(),
-        },
-      }),
-    })
+    fetch(EDGE_FN_URL)
       .then((r) => r.json())
-      .then((json) => {
-        const cal = json?.data?.user?.contributionsCollection?.contributionCalendar;
-        if (!cal) { setError(true); return; }
+      .then((cal) => {
+        if (cal?.error) { setError(true); return; }
         setData(cal);
       })
       .catch(() => setError(true));
   }, []);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (data && scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    }
+  }, [data]);
 
   const COLORS = isDark ? DARK_COLORS : LIGHT_COLORS;
   const CELL = 13; // px per cell
@@ -170,7 +140,7 @@ export function GitHubContributions() {
               </p>
 
               {/* Graph container — horizontal scroll on small screens */}
-              <div className="overflow-x-auto pb-2">
+              <div ref={scrollRef} className="overflow-x-auto pb-2">
                 {/* Day-of-week label width + gap before grid */}
                 {(() => {
                   const DAY_COL_W = 28; // px reserved for Mon/Wed/Fri labels
