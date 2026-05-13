@@ -12,8 +12,8 @@ export function CustomCursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 600, damping: 45, mass: 0.25 });
-  const sy = useSpring(y, { stiffness: 600, damping: 45, mass: 0.25 });
+  const sx = useSpring(x, { stiffness: 900, damping: 45, mass: 0.2 });
+  const sy = useSpring(y, { stiffness: 900, damping: 45, mass: 0.2 });
 
   // Center the cursor on the pointer regardless of scale
   const cx = useTransform(sx, (v) => v - SIZE / 2);
@@ -73,7 +73,7 @@ export function CustomCursor() {
         scale: { type: 'spring', stiffness: 400, damping: 30 },
         opacity: { duration: 0.15 },
       }}
-      className="pointer-events-none fixed top-0 left-0 z-[100] rounded-full bg-accent mix-blend-difference"
+      className="pointer-events-none fixed top-0 left-0 z-[100] rounded-full bg-accent"
     />
   );
 }
