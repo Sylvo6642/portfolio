@@ -9,6 +9,7 @@ export interface PersonalProject {
   void?: boolean;
   skilldash?: boolean;
   spendwise?: boolean;
+  clausify?: boolean;
   video?: string;
 }
 
@@ -39,6 +40,17 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     linkLabel: 'GitHub',
     void: true,
     video: '/media/void-vault.mp4',
+  },
+  {
+    name: 'CLAUSIFY',
+    tag: 'Personal Project',
+    description:
+      'AI-powered contract risk analyzer. Paste or upload any legal agreement and get an instant plain-English report — flagged clauses ranked by severity, plain explanations of what they mean, and why each one matters. Powered by Gemini Flash with structured JSON output via schema-constrained generation. Supports PDF extraction via pdf.js, context-aware prompting (contract type, jurisdiction, role), and PDF report export via jsPDF.',
+    tech: ['React', 'Vite', 'Gemini Flash', 'pdf.js', 'jsPDF', 'Google Generative AI'],
+    link: 'https://github.com/Sylvo6642/Clausify.git',
+    linkLabel: 'GitHub',
+    liveUrl: '/projects/Clausify/',
+    clausify: true,
   },
   {
     name: 'SKILLDASH',

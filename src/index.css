@@ -127,12 +127,14 @@ html.dark .vv-icon {
 /* Light mode — soft purple tint, dark text remains readable */
 .proj-card-spendwise,
 .proj-card-void,
-.proj-card-skilldash {
+.proj-card-skilldash,
+.proj-card-clausify {
   background: linear-gradient(135deg, #ede9fe, #ddd6fe);
 }
 .proj-card-spendwise::before,
 .proj-card-void::before,
-.proj-card-skilldash::before {
+.proj-card-skilldash::before,
+.proj-card-clausify::before {
   background: linear-gradient(135deg, #a78bfa, #7c3aed);
 }
 
@@ -156,6 +158,14 @@ html.dark .proj-card-skilldash {
 }
 html.dark .proj-card-skilldash::before {
   background: linear-gradient(to bottom right, #a78bfa, #1a0a2e);
+}
+
+/* Clausify — card-3: pitch → accent → */
+html.dark .proj-card-clausify {
+  background: linear-gradient(to right, #0d0118, #7c3aed);
+}
+html.dark .proj-card-clausify::before {
+  background: linear-gradient(to right, #7c3aed, #0d0118);
 }
 
 /* Shimmer / gloss sweep on hover */

@@ -105,10 +105,28 @@ function FloatIcon({ it, children }: { it: { top: string; left: string; rot: num
   );
 }
 
+const CLAUSIFY_ICONS = {
+  doc: [
+    { top: '10%', left: '7%',  rot: -15, size: 12, opacity: 0.26, dur: 6.5, delay: 0.2 },
+    { top: '68%', left: '4%',  rot:  22, size: 10, opacity: 0.22, dur: 7.8, delay: 1.3 },
+    { top: '40%', left: '86%', rot: -10, size: 13, opacity: 0.24, dur: 6.9, delay: 0.7 },
+    { top: '85%', left: '72%', rot:  28, size: 9,  opacity: 0.20, dur: 8.2, delay: 2.1 },
+    { top: '20%', left: '60%', rot: -20, size: 11, opacity: 0.22, dur: 7.1, delay: 3.0 },
+  ],
+  shield: [
+    { top: '22%', left: '24%', rot:  8,  size: 12, opacity: 0.24, dur: 7.2, delay: 0.5 },
+    { top: '58%', left: '40%', rot: -20, size: 11, opacity: 0.22, dur: 8.4, delay: 1.8 },
+    { top: '15%', left: '78%', rot:  25, size: 13, opacity: 0.26, dur: 6.8, delay: 2.5 },
+    { top: '80%', left: '55%', rot: -12, size: 10, opacity: 0.20, dur: 7.9, delay: 0.9 },
+    { top: '50%', left: '14%', rot:  32, size: 10, opacity: 0.21, dur: 8.0, delay: 3.3 },
+  ],
+};
+
 function cardClass(p: PersonalProject) {
   if (p.spendwise) return 'proj-card proj-card-spendwise';
   if (p.void)      return 'proj-card proj-card-void';
   if (p.skilldash) return 'proj-card proj-card-skilldash';
+  if (p.clausify)  return 'proj-card proj-card-clausify';
   return 'proj-card';
 }
 
@@ -224,6 +242,24 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                     <FloatIcon key={`d${idx}`} it={it}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
                         <path d="M12 2v20" /><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg>
+                    </FloatIcon>
+                  ))}
+                </>
+              )}
+              {p.clausify && (
+                <>
+                  {CLAUSIFY_ICONS.doc.map((it, idx) => (
+                    <FloatIcon key={`doc${idx}`} it={it}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+                      </svg>
+                    </FloatIcon>
+                  ))}
+                  {CLAUSIFY_ICONS.shield.map((it, idx) => (
+                    <FloatIcon key={`shld${idx}`} it={it}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                       </svg>
                     </FloatIcon>
                   ))}
