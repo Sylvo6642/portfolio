@@ -234,6 +234,20 @@ html.dark .proj-card-clausify::before {
   animation: orb-drift 9s ease-in-out infinite;
 }
 
+/* Slow float for profile photo */
+@keyframes photo-float {
+  0%,  100% { translate: 0px   0px; }
+  25%        { translate: 6px  -10px; }
+  50%        { translate: 0px  -16px; }
+  75%        { translate: -6px -10px; }
+}
+.photo-float {
+  animation: photo-float 7s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .photo-float { animation: none; }
+}
+
 /* Animated theme toggler — view transition */
 [data-magicui-theme-vt="active"]::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration, 600ms);

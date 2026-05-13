@@ -1,4 +1,4 @@
-import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -33,7 +33,7 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
   );
 }
 
-function TiltPhoto({ y }: { y: MotionValue<number> }) {
+function TiltPhoto() {
   const ref = useRef<HTMLDivElement>(null);
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
@@ -56,8 +56,8 @@ function TiltPhoto({ y }: { y: MotionValue<number> }) {
   return (
     <motion.div
       ref={ref}
-      style={{ y, zIndex: 2, rotateX: rotX, rotateY: rotY, transformPerspective: 800 }}
-      className="relative w-full"
+      style={{ zIndex: 2, rotateX: rotX, rotateY: rotY, transformPerspective: 800 }}
+      className="relative w-full photo-float"
       initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
       whileInView={{ opacity: 1, scale: 1, rotate: -1 }}
       viewport={{ once: true }}
@@ -96,12 +96,8 @@ function TiltPhoto({ y }: { y: MotionValue<number> }) {
 }
 
 function PhotoFrame() {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: frameRef, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], [-30, 30]);
-
   return (
-    <div ref={frameRef} className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center">
       <span
         className="pointer-events-none absolute font-mono font-bold select-none"
         style={{
@@ -117,22 +113,6 @@ function PhotoFrame() {
       >
         KR
       </span>
-      <motion.div
-        className="absolute rounded-2xl"
-        style={{
-          inset: 0,
-          top: 14,
-          left: 14,
-          background: 'transparent',
-          border: '1.5px solid rgb(var(--accent) / 0.4)',
-          borderRadius: '1rem',
-          zIndex: 1,
-        }}
-        initial={{ opacity: 0, scale: 0.92 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, delay: 0.2 }}
-      />
       <div
         className="absolute pointer-events-none"
         style={{
@@ -145,7 +125,7 @@ function PhotoFrame() {
           filter: 'blur(24px)',
         }}
       />
-      <TiltPhoto y={y} />
+      <TiltPhoto />
     </div>
   );
 }
@@ -154,7 +134,7 @@ function PhotoFrame() {
 function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 items-center h-full">
-      <div className="max-w-sm mx-auto md:mx-0 w-full">
+      <div className="max-w-[200px] md:max-w-sm mx-auto md:mx-0 w-full">
         <PhotoFrame />
       </div>
       <div className="flex flex-col">
