@@ -6,9 +6,11 @@ import { useMagneticButton } from '../hooks/useMagneticButton';
 const SPRING_CFG = { stiffness: 60, damping: 18 };
 
 const GLITCH_CHARS = '!@#$%^&*<>?/\\|[]{}~';
+const PURPLE_SHADES = ['#7c3aed', '#a78bfa', '#6d28d9', '#c4b5fd', '#4c1d95', '#ddd6fe'];
 
 function useGlitchText(target: string, forceActive: boolean) {
   const [display, setDisplay] = useState(target);
+  const [glitchColor, setGlitchColor] = useState<string | null>(null);
 
   useEffect(() => {
     let glitchTimeout: ReturnType<typeof setTimeout>;
@@ -17,6 +19,7 @@ function useGlitchText(target: string, forceActive: boolean) {
     function runGlitch() {
       let iter = 0;
       frameInterval = setInterval(() => {
+        setGlitchColor(PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)]);
         setDisplay(
           target.split('').map((char, i) =>
             i < iter ? char : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
@@ -25,6 +28,7 @@ function useGlitchText(target: string, forceActive: boolean) {
         iter += 0.4;
         if (iter >= target.length) {
           setDisplay(target);
+          setGlitchColor(null);
           clearInterval(frameInterval);
           if (!forceActive) scheduleNext();
         }
@@ -43,10 +47,11 @@ function useGlitchText(target: string, forceActive: boolean) {
       clearTimeout(glitchTimeout);
       clearInterval(frameInterval);
       setDisplay(target);
+      setGlitchColor(null);
     };
   }, [forceActive, target]);
 
-  return display;
+  return { display, glitchColor };
 }
 
 function MagneticButton({ children, onClick, className }: {
@@ -80,7 +85,7 @@ const stagger = {
 
 export function NotFound() {
   const [glitching, setGlitching] = useState(false);
-  const glitchText = useGlitchText('404', glitching);
+  const { display: glitchText, glitchColor } = useGlitchText('404', glitching);
 
   // Subtle parallax on the 404 watermark
   const rawX = useMotionValue(0);
@@ -144,7 +149,8 @@ export function NotFound() {
         {/* Glitch 404 */}
         <motion.div variants={stagger.item} className="relative mb-6">
           <motion.span
-            className="block text-[11vw] md:text-[9rem] font-semibold leading-none tracking-tighter text-fg cursor-default select-none"
+            className="block text-[11vw] md:text-[9rem] font-semibold leading-none tracking-tighter cursor-default select-none transition-colors duration-75"
+            style={{ color: glitchColor ?? 'rgb(var(--accent))' }}
             onHoverStart={() => setGlitching(true)}
             onHoverEnd={() => setGlitching(false)}
           >
