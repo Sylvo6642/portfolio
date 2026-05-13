@@ -91,13 +91,7 @@ body {
   width: 100%;
 }
 
-/* Void Vault card */
-.vv-bg {
-  display: none;
-}
-html.dark .vv-bg {
-  display: block;
-}
+/* Void Vault floating icons */
 .vv-icon {
   color: rgb(10 10 11);
 }
@@ -105,10 +99,63 @@ html.dark .vv-icon {
   color: white;
 }
 
-/* Void Vault floating lock icons */
 @keyframes vv-float {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-7px); }
+}
+
+/* Project cards — gradient backgrounds + gradient borders */
+.proj-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.proj-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Light mode — soft purple tint, dark text remains readable */
+.proj-card-spendwise,
+.proj-card-void,
+.proj-card-skilldash {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+}
+.proj-card-spendwise::before,
+.proj-card-void::before,
+.proj-card-skilldash::before {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+}
+
+/* Dark mode — your gradient cards */
+html.dark .proj-card-spendwise {
+  background: linear-gradient(to right, #1a0a2e, #a78bfa);
+}
+html.dark .proj-card-spendwise::before {
+  background: linear-gradient(to bottom, #a78bfa, #1a0a2e);
+}
+
+html.dark .proj-card-void {
+  background: linear-gradient(135deg, #1a0a2e, #4c1d95, #7c3aed);
+}
+html.dark .proj-card-void::before {
+  background: linear-gradient(135deg, #a78bfa, #4c1d95, #1a0a2e);
+}
+
+html.dark .proj-card-skilldash {
+  background: linear-gradient(to bottom right, #1a0a2e, #a78bfa);
+}
+html.dark .proj-card-skilldash::before {
+  background: linear-gradient(to bottom right, #a78bfa, #1a0a2e);
 }
 
 /* Shimmer / gloss sweep on hover */
