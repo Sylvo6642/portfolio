@@ -64,15 +64,16 @@ export function GitHubContributions() {
           )}
 
           {data && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <p className="text-sm text-muted mb-4">
+            <>
+              <motion.p
+                className="text-sm text-muted mb-4"
+                initial={{ opacity: 0, y: 16 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 <span className="text-fg font-semibold">{data.totalContributions.toLocaleString()}</span>{' '}
                 contributions in the last year
-              </p>
+              </motion.p>
 
               <GitHubContributionsGraph
                 data={data}
@@ -81,7 +82,7 @@ export function GitHubContributions() {
                 theme="auto"
                 showTotal={false}
               />
-            </motion.div>
+            </>
           )}
         </div>
       </div>
