@@ -16,8 +16,8 @@ export function useCountUp(target: number, durationMs = 1400, start = false) {
     let raf = 0;
     const tick = (now: number) => {
       const t = Math.min(1, (now - t0) / durationMs);
-      // easeOutCubic
-      const eased = 1 - Math.pow(1 - t, 3);
+      // easeOutQuint — strong deceleration visible even on small counts
+      const eased = 1 - Math.pow(1 - t, 5);
       setValue(target * eased);
       if (t < 1) raf = requestAnimationFrame(tick);
     };

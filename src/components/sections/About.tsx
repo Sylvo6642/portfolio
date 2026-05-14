@@ -19,7 +19,7 @@ const PANELS = [
 ];
 
 function Stat({ value, suffix, label, start }: { value: number | null; suffix: string; label: string; start: boolean }) {
-  const v = useCountUp(value ?? 0, 1500, start);
+  const v = useCountUp(value ?? 0, 2200, start);
   return (
     <div className="flex flex-col">
       <span className="text-4xl md:text-5xl font-bold tracking-tight tabular-nums">

@@ -110,12 +110,6 @@ export function NotFound() {
     return () => window.removeEventListener('mousemove', onMove);
   }, [rawX, rawY]);
 
-  // Trigger glitch on mount
-  useEffect(() => {
-    const t = setTimeout(() => setGlitching(true), 600);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
     <div ref={wrapRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6">
 
