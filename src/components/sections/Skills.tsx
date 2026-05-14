@@ -1,5 +1,48 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+
+const DELIVERABLES = [
+  {
+    icon: '🔌',
+    title: 'REST APIs & Microservices',
+    description: 'Building and consuming APIs, service architecture, and clean endpoint design.',
+  },
+  {
+    icon: '🔐',
+    title: 'Auth & Authorization',
+    description: 'OAuth, JWT, RBAC, SSO — secure login flows and role-based access control.',
+  },
+  {
+    icon: '🗄️',
+    title: 'Database Design',
+    description: 'Schema design, query optimization, indexing, and migrations across SQL and NoSQL.',
+  },
+  {
+    icon: '⚙️',
+    title: 'CI/CD & DevOps',
+    description: 'Pipelines, Docker, and deployment automation for reliable, repeatable releases.',
+  },
+  {
+    icon: '🎨',
+    title: 'Frontend UI/UX',
+    description: 'Component libraries, responsive layouts, animations, and accessible interfaces.',
+  },
+  {
+    icon: '⚡',
+    title: 'Real-time Features',
+    description: 'WebSockets, live updates, presence indicators, and push notifications.',
+  },
+  {
+    icon: '🔗',
+    title: 'Third-party Integrations',
+    description: 'Payment gateways, external APIs, webhooks, and automation workflows.',
+  },
+  {
+    icon: '🧪',
+    title: 'Testing & Code Quality',
+    description: 'Unit, integration, and e2e tests. Code review, linting, and maintainable patterns.',
+  },
+];
 import { SectionReveal } from '../shared/SectionReveal';
 import { FadeText } from '../shared/FadeText';
 import { SKILL_GROUPS } from '../../data/skills';
@@ -186,6 +229,32 @@ export function Skills() {
             <span>● familiar — worked with before</span>
           </div>
         </SectionReveal>
+      </div>
+
+      {/* What I Deliver */}
+      <div className="mx-auto max-w-6xl px-6 mt-24">
+        <SectionReveal delay={0.1}>
+          <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-10">
+            What I Deliver.
+          </h3>
+        </SectionReveal>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {DELIVERABLES.map((item, i) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              className="rounded-2xl hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2"
+            >
+              <span className="text-xl">{item.icon}</span>
+              <h4 className="font-semibold text-sm tracking-tight">{item.title}</h4>
+              <p className="text-xs text-fg/55 leading-relaxed">{item.description}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
