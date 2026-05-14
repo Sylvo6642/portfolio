@@ -134,13 +134,15 @@ html.dark .vv-icon {
 .proj-card-spendwise,
 .proj-card-void,
 .proj-card-skilldash,
-.proj-card-clausify {
+.proj-card-clausify,
+.proj-card-commitgrid {
   background: linear-gradient(135deg, #ede9fe, #ddd6fe);
 }
 .proj-card-spendwise::before,
 .proj-card-void::before,
 .proj-card-skilldash::before,
-.proj-card-clausify::before {
+.proj-card-clausify::before,
+.proj-card-commitgrid::before {
   background: linear-gradient(135deg, #a78bfa, #7c3aed);
 }
 
@@ -172,6 +174,14 @@ html.dark .proj-card-clausify {
 }
 html.dark .proj-card-clausify::before {
   background: linear-gradient(to right, #7c3aed, #0d0118);
+}
+
+/* CommitGrid — emerald/teal grid vibe */
+html.dark .proj-card-commitgrid {
+  background: linear-gradient(135deg, #0d1117, #0e4429, #26a641);
+}
+html.dark .proj-card-commitgrid::before {
+  background: linear-gradient(135deg, #39d353, #0e4429, #0d1117);
 }
 
 /* Shimmer / gloss sweep on hover */

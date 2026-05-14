@@ -122,11 +122,28 @@ const CLAUSIFY_ICONS = {
   ],
 };
 
+const COMMITGRID_ICONS = {
+  grid: [
+    { top: '10%', left: '6%',  rot: -10, size: 12, opacity: 0.24, dur: 6.8, delay: 0.2 },
+    { top: '70%', left: '4%',  rot:  18, size: 10, opacity: 0.20, dur: 7.6, delay: 1.4 },
+    { top: '40%', left: '85%', rot: -14, size: 11, opacity: 0.22, dur: 6.9, delay: 0.8 },
+    { top: '85%', left: '70%', rot:  25, size: 9,  opacity: 0.18, dur: 8.2, delay: 2.3 },
+    { top: '20%', left: '75%', rot:  10, size: 12, opacity: 0.22, dur: 7.1, delay: 3.0 },
+  ],
+  square: [
+    { top: '22%', left: '22%', rot:  8,  size: 11, opacity: 0.20, dur: 7.2, delay: 0.5 },
+    { top: '58%', left: '38%', rot: -20, size: 10, opacity: 0.18, dur: 8.4, delay: 1.9 },
+    { top: '15%', left: '58%', rot:  22, size: 12, opacity: 0.22, dur: 6.8, delay: 2.6 },
+    { top: '78%', left: '50%', rot: -12, size: 9,  opacity: 0.18, dur: 7.9, delay: 0.9 },
+  ],
+};
+
 function cardClass(p: PersonalProject) {
-  if (p.spendwise) return 'proj-card proj-card-spendwise';
-  if (p.void)      return 'proj-card proj-card-void';
-  if (p.skilldash) return 'proj-card proj-card-skilldash';
-  if (p.clausify)  return 'proj-card proj-card-clausify';
+  if (p.spendwise)   return 'proj-card proj-card-spendwise';
+  if (p.void)        return 'proj-card proj-card-void';
+  if (p.skilldash)   return 'proj-card proj-card-skilldash';
+  if (p.clausify)    return 'proj-card proj-card-clausify';
+  if (p.commitgrid)  return 'proj-card proj-card-commitgrid';
   return 'proj-card';
 }
 
@@ -260,6 +277,24 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                     <FloatIcon key={`shld${idx}`} it={it}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      </svg>
+                    </FloatIcon>
+                  ))}
+                </>
+              )}
+              {p.commitgrid && (
+                <>
+                  {COMMITGRID_ICONS.grid.map((it, idx) => (
+                    <FloatIcon key={`cg${idx}`} it={it}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+                        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+                      </svg>
+                    </FloatIcon>
+                  ))}
+                  {COMMITGRID_ICONS.square.map((it, idx) => (
+                    <FloatIcon key={`cs${idx}`} it={it}>
+                      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '100%', height: '100%' }}>
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
                       </svg>
                     </FloatIcon>
                   ))}
