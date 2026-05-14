@@ -24,7 +24,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     name: 'COMMITGRID',
     tag: 'Open Source · npm',
     description:
-      'An animated GitHub-style contributions heatmap React component. Spring-scale entry animation, count-up total, animated ping on today\'s cell, and a pulsing glow on high-activity days. Fully themeable — pass a 5-step color scale per theme or a single seed color and let the component derive both. Published on npm as commitgrid.',
+      'An animated GitHub-style contributions heatmap React component. Spring-scale entry animation, count-up total, animated ping on today\'s cell, and a pulsing glow on high-activity days. Fully themeable. Pass a 5-step color scale per theme or a single seed color and let the component derive both. Published on npm as CommitGrid.',
     tech: ['React', 'TypeScript', 'Framer Motion', 'tsup', 'npm'],
     link: 'https://github.com/Sylvo6642/CommitGrid',
     linkLabel: 'GitHub',

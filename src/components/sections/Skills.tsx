@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const DELIVERABLES = [
   {
@@ -63,6 +62,7 @@ const SKILL_COLORS: Record<string, string> = {
   PostgreSQL:   '#4169E1',
   MongoDB:      '#47A248',
   Supabase:     '#66bb6a',
+  Redis:        '#DC382D',
   HTML:         '#e65100',
   CSS:          '#7e57c2',
   Bootstrap:    '#7952B3',
@@ -72,36 +72,12 @@ const SKILL_COLORS: Record<string, string> = {
   n8n:          '#EA4B71',
 };
 
-// Flatten all skills into one array with their group label
-const ALL_SKILLS = SKILL_GROUPS.flatMap((g) =>
-  g.items.map((name) => ({ name, group: g.title }))
-);
-
-// Split into 3 rows, cycling through all skills
-function chunk(arr: typeof ALL_SKILLS, rows: number) {
-  const result: (typeof ALL_SKILLS)[] = Array.from({ length: rows }, () => []);
-  arr.forEach((item, i) => result[i % rows].push(item));
-  return result;
-}
-
-const ROWS = chunk(ALL_SKILLS, 3);
-
-// Duplicate items for seamless loop
-function doubled(arr: typeof ALL_SKILLS) {
-  return [...arr, ...arr, ...arr];
-}
-
-const SPEEDS = ['38s', '45s', '32s'];
-const DIRS = ['normal', 'reverse', 'normal'] as const;
-
-function SkillPill({ name, group }: { name: string; group: string }) {
+function SkillPill({ name, color }: { name: string; color: string }) {
   const icon = SKILL_ICONS[name];
-  const color = SKILL_COLORS[name] ?? 'rgb(var(--accent))';
-  const label = group === 'Currently Working With' ? 'active' : group === 'Expanding Into' ? 'learning' : 'familiar';
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium hairline shrink-0 cursor-default select-none"
+      className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium hairline cursor-default select-none"
       style={{
         background: 'rgb(var(--bg) / 0.6)',
         backdropFilter: 'blur(8px)',
@@ -118,57 +94,15 @@ function SkillPill({ name, group }: { name: string; group: string }) {
         el.style.borderColor = '';
       }}
     >
-      {icon && <span className="shrink-0 scale-75 sm:scale-100">{icon}</span>}
+      {icon && <span className="shrink-0">{icon}</span>}
       <span style={{ color: 'rgb(var(--fg) / 0.85)' }}>{name}</span>
-      <span
-        className="font-mono text-[9px] tracking-[0.15em] uppercase"
-        style={{ color: 'rgb(var(--fg) / 0.3)' }}
-      >
-        {label}
-      </span>
     </span>
   );
 }
 
-function MarqueeRow({ items, speed, direction, paused }: {
-  items: typeof ALL_SKILLS;
-  speed: string;
-  direction: 'normal' | 'reverse';
-  paused: boolean;
-}) {
-  const list = doubled(items);
-  return (
-    <div className="relative flex overflow-hidden">
-      <div
-        className="flex gap-3 items-center"
-        style={{
-          animation: `marquee ${speed} linear infinite ${direction}`,
-          animationPlayState: paused ? 'paused' : 'running',
-          willChange: 'transform',
-        }}
-      >
-        {list.map((s, i) => (
-          <SkillPill key={`${s.name}-${i}`} name={s.name} group={s.group} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function Skills() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: false, amount: 0.1 });
-
   return (
     <section id="skills" className="relative py-32 hairline-b">
-      {/* keyframes injected once */}
-      <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-33.333%); }
-        }
-      `}</style>
-
       <div className="mx-auto max-w-6xl px-6 mb-16">
         <SectionReveal>
           <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
@@ -187,48 +121,37 @@ export function Skills() {
         </p>
       </div>
 
-      {/* Marquee rows — contained to max-w-6xl */}
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="relative overflow-hidden">
-          {/* Fade edges inside container */}
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 sm:w-12"
-            style={{ background: 'linear-gradient(to right, rgb(var(--bg)), transparent)' }}
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 sm:w-12"
-            style={{ background: 'linear-gradient(to left, rgb(var(--bg)), transparent)' }}
-          />
+      {/* Grouped skill layout */}
+      <div className="mx-auto max-w-6xl px-6 flex flex-col gap-10">
+        {SKILL_GROUPS.map((group, gi) => (
           <motion.div
-            ref={ref}
-            className="flex flex-col gap-4"
-            initial={{ opacity: 0, y: 24 }}
+            key={group.title}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: gi * 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            {ROWS.map((row, i) => (
-              <MarqueeRow
-                key={i}
-                items={row}
-                speed={SPEEDS[i]}
-                direction={DIRS[i]}
-                paused={!inView}
-              />
-            ))}
+            <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted mb-4">
+              {group.title}
+            </p>
+            <div className="flex flex-wrap gap-2.5">
+              {group.items.map((name, i) => (
+                <motion.div
+                  key={name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: gi * 0.08 + i * 0.04 }}
+                >
+                  <SkillPill
+                    name={name}
+                    color={SKILL_COLORS[name] ?? 'rgb(var(--accent))'}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="mx-auto max-w-6xl px-6 mt-14">
-        <SectionReveal delay={0.2}>
-          <div className="flex flex-wrap gap-6 font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
-            <span>● active — currently using</span>
-            <span>● learning — expanding into</span>
-            <span>● familiar — worked with before</span>
-          </div>
-        </SectionReveal>
+        ))}
       </div>
 
       {/* What I Deliver */}

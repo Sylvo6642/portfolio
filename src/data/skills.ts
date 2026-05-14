@@ -9,6 +9,6 @@ export const SKILL_GROUPS: { title: string; items: string[] }[] = [
   },
   {
     title: 'Also Familiar With',
-    items: ['HTML', 'CSS', 'Bootstrap', 'GitHub', 'GitLab', 'Bash', 'Supabase', 'n8n'],
+    items: ['HTML', 'CSS', 'Bootstrap', 'GitHub', 'GitLab', 'Supabase', 'n8n', 'Redis'],
   },
 ];
