@@ -64,25 +64,23 @@ export function GitHubContributions() {
           )}
 
           {data && (
-            <>
-              <motion.p
-                className="text-sm text-muted mb-4"
-                initial={{ opacity: 0, y: 16 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <span className="text-fg font-semibold">{data.totalContributions.toLocaleString()}</span>{' '}
-                contributions in the last year
-              </motion.p>
-
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               <GitHubContributionsGraph
                 data={data}
                 darkColors={DARK_COLORS}
                 lightColors={LIGHT_COLORS}
                 theme="auto"
-                showTotal={false}
+                cellShape="rounded"
+                pulseIntensity={0.5}
+                pulseDuration={2.4}
+                pulseColor="#c48cf8"
+                todayIndicatorColor="#c48cf8"
               />
-            </>
+            </motion.div>
           )}
         </div>
       </div>
