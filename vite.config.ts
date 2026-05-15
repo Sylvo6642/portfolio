@@ -10,5 +10,7 @@ export default defineConfig({
       '/projects/SpendWise': 'http://localhost:5175',
       '/projects/SkillDash': 'http://localhost:5176',
     },
+    // Note: /api/analyze is served by Vercel serverless in prod.
+    // For local dev, run: vercel dev (instead of npm run dev)
   },
 });
