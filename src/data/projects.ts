@@ -61,7 +61,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     tech: ['React', 'Vite', 'Gemini Flash', 'Supabase', 'Razorpay', 'pdf.js', 'jsPDF', 'Tailwind CSS'],
     link: 'https://github.com/Sylvo6642/Clausify',
     linkLabel: 'GitHub',
-    liveUrl: 'https://clausify.app',
+    liveUrl: '/projects/Clausify/',
     clausify: true,
   },
   {
