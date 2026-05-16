@@ -115,6 +115,7 @@ html.dark .vv-icon {
   position: relative;
   border-radius: 14px;
   overflow: hidden;
+  background-color: rgb(var(--bg));
 }
 .proj-card::before {
   content: '';
@@ -130,14 +131,7 @@ html.dark .vv-icon {
   z-index: 1;
 }
 
-/* Light mode — soft purple tint, dark text remains readable */
-.proj-card-spendwise,
-.proj-card-void,
-.proj-card-skilldash,
-.proj-card-clausify,
-.proj-card-commitgrid {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-}
+/* Light mode — border only, no fill */
 .proj-card-spendwise::before,
 .proj-card-void::before,
 .proj-card-skilldash::before,
@@ -146,40 +140,25 @@ html.dark .vv-icon {
   background: linear-gradient(135deg, #a78bfa, #7c3aed);
 }
 
-/* Dark mode — your gradient cards */
-html.dark .proj-card-spendwise {
-  background: linear-gradient(to right, #1a0a2e, #a78bfa);
-}
+/* Dark mode — border only, no fill */
 html.dark .proj-card-spendwise::before {
   background: linear-gradient(to bottom, #a78bfa, #1a0a2e);
 }
 
-html.dark .proj-card-void {
-  background: linear-gradient(135deg, #1a0a2e, #4c1d95, #7c3aed);
-}
 html.dark .proj-card-void::before {
   background: linear-gradient(135deg, #a78bfa, #4c1d95, #1a0a2e);
 }
 
-html.dark .proj-card-skilldash {
-  background: linear-gradient(to bottom right, #1a0a2e, #a78bfa);
-}
 html.dark .proj-card-skilldash::before {
   background: linear-gradient(to bottom right, #a78bfa, #1a0a2e);
 }
 
-/* Clausify — card-3: pitch → accent → */
-html.dark .proj-card-clausify {
-  background: linear-gradient(to right, #0d0118, #7c3aed);
-}
+/* Clausify */
 html.dark .proj-card-clausify::before {
   background: linear-gradient(to right, #7c3aed, #0d0118);
 }
 
-/* CommitGrid — emerald/teal grid vibe */
-html.dark .proj-card-commitgrid {
-  background: linear-gradient(135deg, #0d1117, #0e4429, #26a641);
-}
+/* CommitGrid */
 html.dark .proj-card-commitgrid::before {
   background: linear-gradient(135deg, #39d353, #0e4429, #0d1117);
 }
