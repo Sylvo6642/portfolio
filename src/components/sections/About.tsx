@@ -294,8 +294,8 @@ function PanelBeyond() {
   ];
 
   const now = [
-    { kind: 'building', label: 'This portfolio', meta: 'React · Vite · Framer Motion' },
-    { kind: 'learning', label: 'Node + Supabase', meta: 'leaving Mongo behind' },
+    { kind: 'building', label: 'Clausify', meta: 'React · Vite · Framer Motion' },
+    { kind: 'learning', label: 'Docker + AWS', meta: 'getting serious about infra' },
     { kind: 'reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
     { kind: 'shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
   ];
