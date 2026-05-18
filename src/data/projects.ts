@@ -55,7 +55,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
   },
   {
     name: 'CLAUSIFY',
-    tag: 'Personal Project',
+    tag: 'Personal SaaS Project',
     description:
       'AI-powered contract risk analyzer. Paste or upload any legal agreement and get an instant plain-English report — flagged clauses ranked by severity, plain explanations of what they mean, and why each one matters. Powered by Gemini Flash with structured JSON output via schema-constrained generation. Supports PDF extraction via pdf.js, context-aware prompting (contract type, jurisdiction, role), and PDF report export via jsPDF. Includes Google OAuth, Razorpay payments, and Supabase for auth, billing, and report history.',
     tech: ['React', 'Vite', 'Gemini Flash', 'Supabase', 'Razorpay', 'pdf.js', 'jsPDF', 'Tailwind CSS'],

@@ -185,8 +185,8 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
           {p.tag}
         </span>
 
-        {/* Tech pills — hide overflow gracefully */}
-        <div className="flex gap-1.5 flex-wrap overflow-hidden max-h-6 ml-1">
+        {/* Tech pills — hidden on mobile, visible on sm+ */}
+        <div className="hidden sm:flex gap-1.5 flex-wrap overflow-hidden max-h-6 ml-1">
           {p.tech.slice(0, 6).map((t) => (
             <span key={t} className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent shrink-0">
               {t}

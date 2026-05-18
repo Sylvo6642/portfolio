@@ -114,6 +114,7 @@ html.dark .vv-icon {
 .proj-card {
   position: relative;
   border-radius: 14px;
+  overflow: hidden;
   background-color: rgb(var(--bg));
 }
 .proj-card::before {
