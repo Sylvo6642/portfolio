@@ -5,7 +5,6 @@ import { Navbar } from './components/layout/Navbar';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
 import { CustomCursor } from './components/layout/CustomCursor';
-import { FloatingDots } from './components/layout/FloatingDots';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { About } from './components/sections/About';
@@ -58,7 +57,6 @@ export default function App() {
         </AnimatePresence>
         <ScrollProgress />
         <CustomCursor />
-        <FloatingDots hideOverSelector="#hero" />
         <Navbar />
         <main className="relative" style={{ zIndex: 1 }}>
           <Hero />
