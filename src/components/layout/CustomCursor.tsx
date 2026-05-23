@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 
@@ -12,12 +12,10 @@ export function CustomCursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 900, damping: 45, mass: 0.2 });
-  const sy = useSpring(y, { stiffness: 900, damping: 45, mass: 0.2 });
 
   // Center the cursor on the pointer regardless of scale
-  const cx = useTransform(sx, (v) => v - SIZE / 2);
-  const cy = useTransform(sy, (v) => v - SIZE / 2);
+  const cx = useTransform(x, (v) => v - SIZE / 2);
+  const cy = useTransform(y, (v) => v - SIZE / 2);
 
   useEffect(() => {
     const m = window.matchMedia('(prefers-reduced-motion: reduce)');

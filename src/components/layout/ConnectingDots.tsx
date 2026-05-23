@@ -156,11 +156,23 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
       raf = requestAnimationFrame(tick);
     };
 
-    const onMove = (e: MouseEvent) => {
+    let lastClientX = -1;
+    let lastClientY = -1;
+
+    const updateFromClient = () => {
+      if (lastClientX < 0) return;
       const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
+      mouseX = lastClientX - rect.left;
+      mouseY = lastClientY - rect.top;
     };
+
+    const onMove = (e: MouseEvent) => {
+      lastClientX = e.clientX;
+      lastClientY = e.clientY;
+      updateFromClient();
+    };
+
+    const onScroll = () => updateFromClient();
 
     // Gyroscope for coarse-pointer (mobile) devices
     // gamma: left/right tilt (-90..90), beta: front/back tilt (-180..180)
@@ -205,6 +217,7 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
 
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMove);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     // Re-read accent if theme toggles (HTML class change → recompute on next resize)
     const themeObserver = new MutationObserver(() => {
@@ -216,6 +229,7 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('deviceorientation', onOrient);
       themeObserver.disconnect();
     };
