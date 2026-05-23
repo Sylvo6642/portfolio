@@ -62,12 +62,23 @@ export function Admin() {
     e.preventDefault();
     setSigningIn(true);
     setError('');
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    setSigningIn(false);
-    if (err) {
-      setError('incorrect credentials');
-      setPassword('');
+    try {
+      const res = await fetch('https://wxtacfflftsahpubrani.supabase.co/functions/v1/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? 'incorrect credentials');
+        setPassword('');
+      } else {
+        await supabase.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
+      }
+    } catch {
+      setError('network error, try again');
     }
+    setSigningIn(false);
   }
 
   async function handleSignOut() {
