@@ -27,7 +27,9 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
         initial={{ scale: 0 }}
         animate={inView ? { scale: 1 } : { scale: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="absolute left-[14px] md:left-1/2 top-2 -translate-x-1/2 h-3 w-3 rounded-full bg-accent ring-4 ring-bg"
+        className={`absolute top-2 h-3 w-3 rounded-full bg-accent ring-4 ring-bg
+          left-[14px] -translate-x-1/2
+          ${isLeft ? 'md:left-auto md:right-[calc(50%-6px)] md:translate-x-0' : 'md:left-[calc(50%-6px)] md:translate-x-0'}`}
       />
 
       {/* Date side */}
