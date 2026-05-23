@@ -117,7 +117,7 @@ export function Skills() {
         </SectionReveal>
 
         <p className="mt-4 text-base text-fg/50">
-          <FadeText text="My stack — from backend logic to delivered pixel." delay={0.2} />
+          <FadeText text="My stack, from backend logic to delivered pixel." delay={0.2} />
         </p>
       </div>
 

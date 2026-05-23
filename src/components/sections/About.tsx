@@ -4,10 +4,10 @@ import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 
 const STATS = [
-  { value: 2, suffix: '+', label: 'Years in Production' },
+  { value: 3, suffix: '+', label: 'Years in Production' },
   { value: 147, suffix: '+', label: 'APIs Built' },
   { value: 113, suffix: '+', label: 'Bugs Squashed' },
-  { value: 3, suffix: '', label: 'Encrypted Apps Shipped' },
+  { value: 5, suffix: '', label: 'Encrypted Apps Shipped' },
   { value: 5, suffix: '+', label: 'Tech Stacks' },
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
@@ -165,7 +165,7 @@ function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
           className="mt-6 text-lg text-fg/75 leading-relaxed"
         >
           Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
-          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> —
+          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> 
           Django, Angular, MongoDB. Currently moving into React, Node, Supabase, and
           PostgreSQL. Every project I ship has encryption in it; I don't think that's a
           coincidence.
@@ -192,12 +192,12 @@ function PanelPhilosophy() {
     {
       icon: '◈',
       title: 'Correct at the edges',
-      body: 'The happy path is the easy part. I spend my time on the silent failures — the radio button that loaded the wrong record without an error, the count-then-insert race condition, the migration nobody noticed was lossy.',
+      body: 'The happy path is the easy part. I spend my time on the silent failures the radio button that loaded the wrong record without an error, the count-then-insert race condition, the migration nobody noticed was lossy.',
     },
     {
       icon: '◎',
       title: 'Motion as craft',
-      body: 'How a thing moves is part of what it is. Not paths and easing curves applied after the fact — physics, intent, restraint. If it can drift instead of slide, it should drift.',
+      body: 'How a thing moves is part of what it is. Not paths and easing curves applied after the fact physics, intent, restraint. If it can drift instead of slide, it should drift.',
     },
     {
       icon: '◐',
@@ -225,7 +225,7 @@ function PanelPhilosophy() {
         className="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-12"
       >
         I build software the way I'd want to{' '}
-        <span className="text-accent">use it</span> — correct, considered, and honest.
+        <span className="text-accent">use it</span> correct, considered, and honest.
       </motion.h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
