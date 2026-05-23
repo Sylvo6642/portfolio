@@ -108,15 +108,21 @@ export const SKILL_ICONS: Record<string, ReactNode> = {
   ),
 
   'Claude API': (
-    <svg viewBox="0 0 28 24" className="w-3.5 h-3.5 shrink-0" fill="#d97706" xmlns="http://www.w3.org/2000/svg">
-      {/* A */}
-      <path d="M9.5 2H7.5L1 22H4.2L5.7 17.5H11.3L12.8 22H16L9.5 2ZM6.6 14.8L8.5 8.8L10.4 14.8H6.6Z" />
-      {/* I */}
-      <rect x="19" y="2" width="3.5" height="20" />
-    </svg>
+    <img
+      src="https://simpleicons.org/icons/anthropic.svg"
+      className="w-3.5 h-3.5 shrink-0"
+      style={{ filter: 'invert(60%) sepia(80%) saturate(500%) hue-rotate(10deg)' }}
+      alt="Anthropic"
+    />
   ),
 
-  'Ollama': sc('M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 3a7 7 0 1 1 0 14A7 7 0 0 1 12 5zm-1 3v8l6-4-6-4z'),
+  'Ollama': (
+    <img
+      src="https://simpleicons.org/icons/ollama.svg"
+      className="w-3.5 h-3.5 shrink-0 dark:invert"
+      alt="Ollama"
+    />
+  ),
 
   'Hugging Face': (
     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" xmlns="http://www.w3.org/2000/svg">
