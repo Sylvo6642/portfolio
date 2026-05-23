@@ -503,7 +503,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
       {/* Sticky viewport — use dvh so mobile browser chrome doesn't cause jumps */}
       <div className="sticky top-0 overflow-hidden" style={{ height: '100dvh' }}>
         {/* Section label + progress dots */}
-        <div className="absolute top-8 left-6 right-6 z-20 flex items-center justify-between pointer-events-none">
+        <div className="absolute top-20 left-6 right-6 z-20 flex items-center justify-between pointer-events-none">
           <SectionReveal>
             <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted">
               01 / about
