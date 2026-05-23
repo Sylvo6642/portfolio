@@ -9,7 +9,7 @@ const DELIVERABLES = [
   {
     icon: '🔐',
     title: 'Auth & Authorization',
-    description: 'OAuth, JWT, RBAC, SSO — secure login flows and role-based access control.',
+    description: 'OAuth, JWT, RBAC, SSO secure login flows and role-based access control.',
   },
   {
     icon: '🗄️',
@@ -172,7 +172,6 @@ export function Skills() {
               transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               className="rounded-2xl hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2"
             >
-              <span className="text-xl">{item.icon}</span>
               <h4 className="font-semibold text-sm tracking-tight">{item.title}</h4>
               <p className="text-xs text-fg/55 leading-relaxed">{item.description}</p>
             </motion.div>
