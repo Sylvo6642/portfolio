@@ -107,12 +107,7 @@ export const SKILL_ICONS: Record<string, ReactNode> = {
     </svg>
   ),
 
-  'Claude API': (
-    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="#d97706" opacity="0.15" />
-      <path fill="#d97706" d="M8.5 16.5L12 7.5l3.5 9H14l-.75-2h-2.5L10 16.5H8.5zm3.5-7l-.95 3.5h1.9L12 9.5z" />
-    </svg>
-  ),
+  'Claude API': s('#d97706', 'M12.8316 4.00013H11.1694L4 20.0001H7.47656L9.0466 16.3171H14.9535L16.5234 20.0001H20L12.8316 4.00013ZM10.3135 13.2972L12.0005 9.23777L13.6875 13.2972H10.3135Z'),
 
   'Ollama': sc('M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 3a7 7 0 1 1 0 14A7 7 0 0 1 12 5zm-1 3v8l6-4-6-4z'),
 
