@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 
-const ADMIN_PASSWORD = 'papparobin36';
-
 type Visitor = {
   id: string;
   ip: string | null;
@@ -40,22 +38,40 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 export function Admin() {
   const [authed, setAuthed] = useState(false);
-  const [input, setInput] = useState('');
-  const [error, setError] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [tab, setTab] = useState<'visitors' | 'messages'>('visitors');
   const [loading, setLoading] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
 
-  function handleLogin(e: React.FormEvent) {
+  // Restore session on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setAuthed(true);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthed(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (input === ADMIN_PASSWORD) {
-      setAuthed(true);
-      setError(false);
-    } else {
-      setError(true);
-      setInput('');
+    setSigningIn(true);
+    setError('');
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    setSigningIn(false);
+    if (err) {
+      setError('incorrect credentials');
+      setPassword('');
     }
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
   }
 
   useEffect(() => {
@@ -86,11 +102,20 @@ export function Admin() {
           <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
-              type="password"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Password"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email"
               autoFocus
+              required
+              className="w-full bg-transparent px-4 py-3 text-sm outline-none rounded-lg border border-fg/10 focus:border-accent placeholder:text-muted/60"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Password"
+              required
               className="w-full bg-transparent px-4 py-3 text-sm outline-none rounded-lg border border-fg/10 focus:border-accent placeholder:text-muted/60"
             />
             <AnimatePresence>
@@ -101,15 +126,16 @@ export function Admin() {
                   exit={{ opacity: 0 }}
                   className="font-mono text-xs text-red-400"
                 >
-                  incorrect password
+                  {error}
                 </motion.p>
               )}
             </AnimatePresence>
             <button
               type="submit"
-              className="w-full rounded-full bg-fg text-bg px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.02]"
+              disabled={signingIn}
+              className="w-full rounded-full bg-fg text-bg px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.02] disabled:opacity-50"
             >
-              Enter
+              {signingIn ? 'Signing in…' : 'Enter'}
             </button>
           </form>
         </motion.div>
@@ -125,7 +151,7 @@ export function Admin() {
           <h1 className="text-3xl font-semibold">Dashboard</h1>
         </div>
         <button
-          onClick={() => setAuthed(false)}
+          onClick={handleSignOut}
           className="font-mono text-xs text-muted hover:text-fg transition-colors"
         >
           sign out
