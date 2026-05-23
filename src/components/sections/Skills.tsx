@@ -70,6 +70,11 @@ const SKILL_COLORS: Record<string, string> = {
   GitLab:       '#FC6D26',
   Bash:         '#4EAA25',
   n8n:          '#EA4B71',
+  'OpenAI API':   '#10a37f',
+  'Gemini API':   '#4285F4',
+  'Claude API':   '#d97706',
+  'Ollama':       '#ffffff',
+  'Hugging Face': '#FFD21E',
 };
 
 function SkillPill({ name, color }: { name: string; color: string }) {
