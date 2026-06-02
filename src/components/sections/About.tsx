@@ -1,5 +1,5 @@
 import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
-import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
+import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent, type ReactNode } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 
@@ -134,8 +134,8 @@ function PhotoFrame() {
 /* ─── Panel 1: Intro ─── */
 function PanelIntro() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center md:h-full">
-      <div className="max-w-[200px] md:max-w-sm mx-auto md:mx-0 w-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <div className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
         <PhotoFrame />
       </div>
       <div className="flex flex-col">
@@ -144,7 +144,7 @@ function PanelIntro() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.15]"
+          className="text-2xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.15]"
         >
           A <span className="text-accent">security brain</span> and a{' '}
           <span className="text-accent">motion brain</span>, in the same developer.
@@ -154,7 +154,7 @@ function PanelIntro() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-4 font-mono text-sm text-fg/45 tracking-wide"
+          className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide"
         >
           Quiet. Notices a lot. Remembers what you said three conversations ago.
         </motion.p>
@@ -163,7 +163,7 @@ function PanelIntro() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 text-lg text-fg/75 leading-relaxed"
+          className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed"
         >
           Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
           <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> 
@@ -179,7 +179,7 @@ function PanelIntro() {
 /* ─── Panel: Stats ─── */
 function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   return (
-    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
+    <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -194,7 +194,7 @@ function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-10"
+        className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-10 flex-1 content-center md:flex-none md:content-start"
       >
         {STATS.map((s) => (
           <Stat key={s.label} {...s} start={inView} />
@@ -495,10 +495,67 @@ function ProgressDot({ progress, index, count }: { progress: MotionValue<number>
   );
 }
 
+/* ─── Fit-to-viewport wrapper ───
+   On phones, measures content vs. available height and scales it down so the
+   whole panel always fits one screen — no inner scrolling, on any device.
+   On md+ it's a no-op (content renders at full size). */
+function FitPanel({ enabled, children }: { enabled: boolean; children: ReactNode }) {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    if (!enabled) {
+      setScale(1);
+      return;
+    }
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+
+    const measure = () => {
+      const avail = outer.clientHeight;
+      // Natural (unscaled) content height.
+      const natural = inner.scrollHeight;
+      if (natural <= 0 || avail <= 0) return;
+      // Leave a little breathing room top/bottom.
+      const next = Math.min(1, (avail - 8) / natural);
+      setScale(next);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(outer);
+    ro.observe(inner);
+    window.addEventListener('orientationchange', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('orientationchange', measure);
+    };
+  }, [enabled]);
+
+  if (!enabled) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div ref={outerRef} className="h-full w-full flex items-stretch justify-center overflow-hidden">
+      <div
+        ref={innerRef}
+        style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
+        className="w-full"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Horizontal scroll container ─── */
 function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440));
+  const isMobile = vw < 768;
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -541,30 +598,38 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
           className="flex h-full"
         >
           {/* Panel 1 — Intro */}
-          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
-              <PanelIntro />
+          <div className="flex-shrink-0 w-screen h-full">
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
+              <FitPanel enabled={isMobile}>
+                <PanelIntro />
+              </FitPanel>
             </div>
           </div>
 
           {/* Panel 2 — Stats */}
-          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
-              <PanelStats statsRef={statsRef} inView={inView} />
+          <div className="flex-shrink-0 w-screen h-full">
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
+              <FitPanel enabled={isMobile}>
+                <PanelStats statsRef={statsRef} inView={inView} />
+              </FitPanel>
             </div>
           </div>
 
           {/* Panel 3 — Philosophy */}
-          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
-              <PanelPhilosophy />
+          <div className="flex-shrink-0 w-screen h-full">
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
+              <FitPanel enabled={isMobile}>
+                <PanelPhilosophy />
+              </FitPanel>
             </div>
           </div>
 
           {/* Panel 4 — Beyond */}
-          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
-              <PanelBeyond />
+          <div className="flex-shrink-0 w-screen h-full">
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
+              <FitPanel enabled={isMobile}>
+                <PanelBeyond />
+              </FitPanel>
             </div>
           </div>
         </motion.div>
