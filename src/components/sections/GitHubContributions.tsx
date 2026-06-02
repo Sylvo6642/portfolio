@@ -13,6 +13,7 @@ export function GitHubContributions() {
   const [data, setData] = useState<ContributionData | null>(null);
   const [error, setError] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
 
   useEffect(() => {
@@ -24,6 +25,19 @@ export function GitHubContributions() {
       })
       .catch(() => setError(true));
   }, []);
+
+  // commitgrid pins its scroll container to the right on data load, but that
+  // can run before layout/fonts settle (and our right-padding changes the
+  // width), leaving it scrolled to the oldest month. Re-pin to the end across
+  // a few frames once the graph has rendered so it always opens on "today".
+  useEffect(() => {
+    if (!data) return;
+    const scroller = wrapRef.current?.querySelector<HTMLElement>(':scope > div > div');
+    if (!scroller) return;
+    const pin = () => { scroller.scrollLeft = scroller.scrollWidth; };
+    const frames = [0, 100, 300, 600].map((ms) => window.setTimeout(pin, ms));
+    return () => frames.forEach(clearTimeout);
+  }, [data]);
 
   const CELL = 13;
 
@@ -65,10 +79,16 @@ export function GitHubContributions() {
 
           {data && (
             <motion.div
+              ref={wrapRef}
+              className="commitgrid-wrap"
               initial={{ opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
+              {/* commitgrid's scroll container has overflow-x:auto, which clips
+                  the today-indicator ping ring on the rightmost column. Pad the
+                  scroll content so the ring has room inside the scrollable area. */}
+              <style>{`.commitgrid-wrap > div > div { padding-right: ${Math.ceil(CELL * 0.8)}px; }`}</style>
               <GitHubContributionsGraph
                 data={data}
                 darkColors={DARK_COLORS}
