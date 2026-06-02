@@ -150,16 +150,6 @@ export function Loader({ onDone }: { onDone: () => void }) {
         }}
       />
 
-      {/* Top-left label */}
-      <motion.div
-        className="absolute top-8 left-8 font-mono text-[10px] tracking-[0.25em] uppercase"
-        style={{ color: 'rgb(var(--fg) / 0.35)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-      >
-        portfolio / {new Date().getFullYear()}
-      </motion.div>
 
       {/* Top-right label */}
       <motion.div
