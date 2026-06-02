@@ -1,4 +1,4 @@
-import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -14,6 +14,7 @@ const STATS = [
 
 const PANELS = [
   { id: 'intro' },
+  { id: 'stats' },
   { id: 'philosophy' },
   { id: 'beyond' },
 ];
@@ -131,9 +132,9 @@ function PhotoFrame() {
 }
 
 /* ─── Panel 1: Intro ─── */
-function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
+function PanelIntro() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 items-center h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center md:h-full">
       <div className="max-w-[200px] md:max-w-sm mx-auto md:mx-0 w-full">
         <PhotoFrame />
       </div>
@@ -170,18 +171,35 @@ function PanelIntro({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
           PostgreSQL. Every project I ship has encryption in it; I don't think that's a
           coincidence.
         </motion.p>
-        <motion.div
-          ref={statsRef}
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-8 hairline-t pt-8"
-        >
-          {STATS.map((s) => (
-            <Stat key={s.label} {...s} start={inView} />
-          ))}
-        </motion.div>
       </div>
+    </div>
+  );
+}
+
+/* ─── Panel: Stats ─── */
+function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
+  return (
+    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
+      <motion.p
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-8"
+      >
+        By the numbers
+      </motion.p>
+      <motion.div
+        ref={statsRef}
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-10"
+      >
+        {STATS.map((s) => (
+          <Stat key={s.label} {...s} start={inView} />
+        ))}
+      </motion.div>
     </div>
   );
 }
@@ -207,13 +225,13 @@ function PanelPhilosophy() {
   ];
 
   return (
-    <div className="flex flex-col justify-center h-full max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-6"
+        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6"
       >
         How I work
       </motion.p>
@@ -222,13 +240,13 @@ function PanelPhilosophy() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-12"
+        className="text-2xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-6 md:mb-12"
       >
         I build software the way I'd want to{' '}
         <span className="text-accent">use it</span> correct, considered, and honest.
       </motion.h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8 mb-6 md:mb-14">
         {principles.map((p, i) => (
           <motion.div
             key={p.title}
@@ -236,11 +254,11 @@ function PanelPhilosophy() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="hairline rounded-xl p-6 flex flex-col gap-3 hover:bg-fg/[0.03] transition-colors"
+            className="hairline rounded-xl p-4 md:p-6 flex flex-col gap-2 md:gap-3 hover:bg-fg/[0.03] transition-colors"
           >
-            <span className="text-accent text-2xl leading-none">{p.icon}</span>
-            <span className="font-semibold text-base">{p.title}</span>
-            <span className="text-sm text-fg/65 leading-relaxed">{p.body}</span>
+            <span className="text-accent text-xl md:text-2xl leading-none">{p.icon}</span>
+            <span className="font-semibold text-sm md:text-base">{p.title}</span>
+            <span className="text-[13px] md:text-sm text-fg/65 leading-relaxed">{p.body}</span>
           </motion.div>
         ))}
       </div>
@@ -250,14 +268,14 @@ function PanelPhilosophy() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="relative pl-6"
+        className="relative pl-4 md:pl-6"
         style={{ borderLeft: '2px solid rgb(var(--accent) / 0.5)' }}
       >
-        <p className="text-lg md:text-xl text-fg/70 italic leading-relaxed">
+        <p className="text-base md:text-xl text-fg/70 italic leading-relaxed">
           "Don't generate sequential IDs by counting existing records. Use atomic counters.
           The count-then-insert pattern is always a race condition waiting to happen."
         </p>
-        <footer className="mt-3 font-mono text-xs tracking-[0.15em] uppercase text-muted">
+        <footer className="mt-2 md:mt-3 font-mono text-[10px] md:text-xs tracking-[0.15em] uppercase text-muted">
           — A note to myself, after a long Monday
         </footer>
       </motion.blockquote>
@@ -307,13 +325,13 @@ function PanelBeyond() {
   ];
 
   return (
-    <div className="flex flex-col justify-center h-full max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-6"
+        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6"
       >
         Beyond the code
       </motion.p>
@@ -322,26 +340,26 @@ function PanelBeyond() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-10"
+        className="text-2xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-6 md:mb-10"
       >
         Lost in airports,{' '}
         <span className="text-accent">found in terminals.</span>
       </motion.h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10">
         {/* Off-keyboard — grouped chips */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="md:col-span-3 flex flex-col gap-5"
+          className="md:col-span-3 flex flex-col gap-3 md:gap-5"
         >
           <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
             Off-keyboard
           </p>
           {offKeyboard.map((g, gi) => (
-            <div key={g.group} className="flex flex-col gap-2.5">
+            <div key={g.group} className="flex flex-col gap-1.5 md:gap-2.5">
               <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-fg/35">
                 {g.group}
               </p>
@@ -353,7 +371,7 @@ function PanelBeyond() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.35, delay: 0.15 + gi * 0.08 + i * 0.04 }}
-                    className="inline-flex items-baseline gap-1.5 hairline rounded-full px-3 py-1.5 text-sm hover:bg-fg/5 transition-colors"
+                    className="inline-flex items-baseline gap-1.5 hairline rounded-full px-2.5 py-1 md:px-3 md:py-1.5 text-[13px] md:text-sm hover:bg-fg/5 transition-colors"
                   >
                     <span className="text-accent text-xs">{item.icon}</span>
                     <span>{item.label}</span>
@@ -375,9 +393,9 @@ function PanelBeyond() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="md:col-span-2 flex flex-col gap-6"
+          className="md:col-span-2 flex flex-col gap-3 md:gap-6"
         >
-          <div className="hairline rounded-xl p-5 bg-fg/[0.02] flex flex-col gap-4">
+          <div className="hairline rounded-xl p-4 md:p-5 bg-fg/[0.02] flex flex-col gap-3 md:gap-4">
             <div className="flex items-center justify-between">
               <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
                 Now
@@ -438,7 +456,7 @@ function PanelBeyond() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.7 }}
-        className="mt-10 pt-6 hairline-t text-sm text-fg/55 italic leading-relaxed max-w-2xl"
+        className="mt-6 pt-4 md:mt-10 md:pt-6 hairline-t text-[13px] md:text-sm text-fg/55 italic leading-relaxed max-w-2xl"
       >
         I'm quiet, that's just me. I don't say much, but I notice a lot and I'm always
         paying attention. Once I'm comfortable, though, you'll wish I'd shut up.
@@ -447,11 +465,40 @@ function PanelBeyond() {
   );
 }
 
-/* ─── Horizontal scroll container (desktop only) ─── */
+/* ─── Progress dot — derives its own active range from its index ─── */
+function ProgressDot({ progress, index, count }: { progress: MotionValue<number>; index: number; count: number }) {
+  // Map overall scroll progress (within the 0.06–0.94 travel window) to this dot's band.
+  const start = 0.06;
+  const end = 0.94;
+  const span = (end - start) / count;
+  const lo = start + index * span;
+  const hi = lo + span;
+  const mid = (lo + hi) / 2;
+
+  const opacity = useTransform(
+    progress,
+    [lo - span * 0.5, mid, hi + span * 0.5],
+    [0.35, 1, 0.35],
+  );
+  const width = useTransform(opacity, [0.35, 1], [6, 20]);
+
+  return (
+    <motion.div
+      style={{
+        opacity,
+        width,
+        height: 6,
+        borderRadius: 9999,
+        backgroundColor: 'rgb(var(--fg))',
+      }}
+    />
+  );
+}
+
+/* ─── Horizontal scroll container ─── */
 function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440));
-  const isMobile = vw < 768;
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -468,35 +515,6 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   const totalShift = -(PANELS.length - 1) * vw;
   const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
 
-  const dot0 = useTransform(smoothProgress, [0.06, 0.38], [1, 0.35]);
-  const dot1 = useTransform(smoothProgress, [0.26, 0.5, 0.74], [0.35, 1, 0.35]);
-  const dot2 = useTransform(smoothProgress, [0.62, 0.94], [0.35, 1]);
-  const dot0w = useTransform(dot0, [0.35, 1], [6, 20]);
-  const dot1w = useTransform(dot1, [0.35, 1], [6, 20]);
-  const dot2w = useTransform(dot2, [0.35, 1], [6, 20]);
-  const dotOpacities = [dot0, dot1, dot2];
-  const dotWidths = [dot0w, dot1w, dot2w];
-
-  /* ── Mobile: stack panels vertically ── */
-  if (isMobile) {
-    return (
-      <div className="py-24 px-6 flex flex-col gap-24">
-        <div>
-          <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-10">
-            01 / about
-          </p>
-          <PanelIntro statsRef={statsRef} inView={inView} />
-        </div>
-        <div className="hairline-t pt-16">
-          <PanelPhilosophy />
-        </div>
-        <div className="hairline-t pt-16">
-          <PanelBeyond />
-        </div>
-      </div>
-    );
-  }
-
   return (
     /* Outer — tall enough to provide scroll distance: 100vh per panel */
     <div ref={trackRef} style={{ height: `${PANELS.length * 100 + 150}vh` }}>
@@ -512,16 +530,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
           <div className="flex items-center gap-2">
             {PANELS.map((_, i) => (
-              <motion.div
-                key={i}
-                style={{
-                  opacity: dotOpacities[i],
-                  width: dotWidths[i],
-                  height: 6,
-                  borderRadius: 9999,
-                  backgroundColor: 'rgb(var(--fg))',
-                }}
-              />
+              <ProgressDot key={i} progress={smoothProgress} index={i} count={PANELS.length} />
             ))}
           </div>
         </div>
@@ -531,23 +540,30 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
           style={{ x }}
           className="flex h-full"
         >
-          {/* Panel 1 */}
-          <div className="flex-shrink-0 w-screen h-full flex items-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-20 pb-10">
-              <PanelIntro statsRef={statsRef} inView={inView} />
+          {/* Panel 1 — Intro */}
+          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
+            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
+              <PanelIntro />
             </div>
           </div>
 
-          {/* Panel 2 */}
-          <div className="flex-shrink-0 w-screen h-full flex items-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-20 pb-10">
+          {/* Panel 2 — Stats */}
+          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
+            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
+              <PanelStats statsRef={statsRef} inView={inView} />
+            </div>
+          </div>
+
+          {/* Panel 3 — Philosophy */}
+          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
+            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
               <PanelPhilosophy />
             </div>
           </div>
 
-          {/* Panel 3 */}
-          <div className="flex-shrink-0 w-screen h-full flex items-center">
-            <div className="mx-auto max-w-6xl px-6 w-full pt-20 pb-10">
+          {/* Panel 4 — Beyond */}
+          <div className="flex-shrink-0 w-screen h-full overflow-y-auto flex flex-col justify-start md:justify-center">
+            <div className="mx-auto max-w-6xl px-6 w-full pt-24 pb-10 md:pt-20 md:pb-10 my-auto">
               <PanelBeyond />
             </div>
           </div>
