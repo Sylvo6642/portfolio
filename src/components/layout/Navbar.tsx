@@ -45,11 +45,11 @@ export function Navbar() {
       animate={{
         paddingTop: compact ? 8 : 18,
         paddingBottom: compact ? 8 : 18,
-        backdropFilter: compact ? 'blur(12px)' : 'blur(0px)',
-        backgroundColor: compact ? 'rgb(var(--bg) / 0.7)' : 'rgb(var(--bg) / 0)',
+        backdropFilter: compact || open ? 'blur(12px)' : 'blur(0px)',
+        backgroundColor: compact || open ? 'rgb(var(--bg) / 0.7)' : 'rgb(var(--bg) / 0)',
       }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed inset-x-0 top-0 z-40 ${compact ? 'hairline-b' : ''}`}
+      className={`fixed inset-x-0 top-0 z-40 ${compact || open ? 'hairline-b' : ''}`}
     >
       <div className="mx-auto max-w-6xl flex items-center justify-between px-6">
         <button
