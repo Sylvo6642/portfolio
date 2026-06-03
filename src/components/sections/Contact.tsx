@@ -153,7 +153,7 @@ function LocationCard() {
         <div>
           <p className="text-sm font-medium">Kozhikode, Kerala</p>
           <p className="font-mono text-[10px] text-muted tracking-wide mt-0.5">
-            UTC +5:30 · Available remotely
+            UTC +5:30
           </p>
         </div>
       </div>
