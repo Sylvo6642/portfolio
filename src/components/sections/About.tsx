@@ -318,11 +318,6 @@ function PanelBeyond() {
     { kind: 'shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
   ];
 
-  const stats = [
-    { v: 'Kozhikode', k: 'Based in' },
-    { v: 'UTC +5:30', k: 'Timezone' },
-    { v: 'Since 2022', k: 'Writing code' },
-  ];
 
   return (
     <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
@@ -429,24 +424,6 @@ function PanelBeyond() {
             </div>
           </div>
 
-          {/* Stat trio */}
-          <div className="grid grid-cols-3 gap-2">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.k}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: 0.5 + i * 0.06 }}
-                className="hairline rounded-lg px-2.5 py-2 flex flex-col"
-              >
-                <span className="text-[11px] font-semibold leading-tight">{s.v}</span>
-                <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted mt-1">
-                  {s.k}
-                </span>
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
       </div>
 
@@ -568,7 +545,10 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
     offset: ['start start', 'end end'],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 280, damping: 32, restDelta: 0.001 });
+  const springConfig = isMobile
+    ? { stiffness: 500, damping: 38, restDelta: 0.001 }
+    : { stiffness: 280, damping: 32, restDelta: 0.001 };
+  const smoothProgress = useSpring(scrollYProgress, springConfig);
   const totalShift = -(PANELS.length - 1) * vw;
   const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
 
