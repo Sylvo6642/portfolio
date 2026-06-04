@@ -48,6 +48,8 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     description:
       'Personal cloud storage app using Discord as a file backend. Files are client-encrypted in the browser via AES-256-GCM (PBKDF2 key derivation), then server-encrypted with a second AES-256-GCM layer before being split into 25MB chunks and uploaded across up to 5 Discord bots in parallel for maximum throughput. Metadata stored in MongoDB. Features JWT auth with silent refresh, httpOnly cookie refresh tokens, Google OAuth, shareable links with expiry and password protection, and a Next.js frontend with upload, browse, download, rename, and delete.',
     tech: ['Next.js', 'Node.js', 'Express', 'MongoDB', 'Discord.js', 'AES-256-GCM', 'JWT'],
+    link: null,
+    linkLabel: 'Private',
     void: true,
     video: '/media/void-vault.mp4',
   },
@@ -57,6 +59,8 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     description:
       'Contract risk analyzer. Paste or upload any legal agreement and get a plain-English breakdown — clauses flagged by severity, with clear explanations of what each one actually means. Uses structured JSON output via schema-constrained AI generation. Supports PDF extraction via pdf.js, context-aware analysis (contract type, jurisdiction, role), and PDF report export via jsPDF. Includes Google OAuth, Razorpay payments, and Supabase for auth, billing, and report history.',
     tech: ['React', 'Vite', 'Supabase', 'Razorpay', 'pdf.js', 'jsPDF', 'Tailwind CSS'],
+    link: null,
+    linkLabel: 'Private',
     liveUrl: '/projects/Clausify/',
     clausify: true,
   },
