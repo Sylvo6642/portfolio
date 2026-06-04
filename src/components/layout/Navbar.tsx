@@ -1,5 +1,5 @@
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 
@@ -28,7 +28,19 @@ export function Navbar() {
   const { scrollY } = useScroll();
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
+  const [logoArmed, setLogoArmed] = useState(false);
   const activeId = useScrollSpy(NAV.map((n) => n.id));
+
+  useEffect(() => {
+    const onArm = () => setLogoArmed(true);
+    const onDisarm = () => setLogoArmed(false);
+    document.addEventListener('secret:arm', onArm);
+    document.addEventListener('secret:disarm', onDisarm);
+    return () => {
+      document.removeEventListener('secret:arm', onArm);
+      document.removeEventListener('secret:disarm', onDisarm);
+    };
+  }, []);
 
   useMotionValueEvent(scrollY, 'change', (v) => setCompact(v > 20));
 
@@ -54,11 +66,18 @@ export function Navbar() {
       <div className="mx-auto max-w-6xl flex items-center justify-between px-6">
         <button
           type="button"
+          data-secret-logo
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}
           data-cursor="hover"
-          className="font-mono text-sm tracking-tight"
+          className="font-mono text-sm tracking-tight relative"
         >
-          <span className="text-accent">~/</span>kevin-robin
+          <motion.span
+            animate={logoArmed ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
+            transition={logoArmed ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } : {}}
+          >
+            <span className="text-accent">~/</span>kevin-robin
+          </motion.span>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">

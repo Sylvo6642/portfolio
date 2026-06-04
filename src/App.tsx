@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
+import { useKonamiCode } from './hooks/useKonamiCode';
+import { useMobileSecret } from './hooks/useMobileSecret';
+import { TerminalGlitch } from './components/layout/TerminalGlitch';
 import { Navbar } from './components/layout/Navbar';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
@@ -26,6 +30,10 @@ const isNotFound = !KNOWN_PATHS.includes(path);
 export default function App() {
   useVisitorTracking();
   const { done, dismiss } = useLoader();
+  const [glitch, setGlitch] = useState(false);
+  const activate = () => { if (!glitch) setGlitch(true); };
+  useKonamiCode(activate);
+  useMobileSecret(activate);
 
   if (isAdmin) {
     return (
@@ -52,6 +60,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <MotionConfig reducedMotion="user">
+        {glitch && <TerminalGlitch onDone={() => setGlitch(false)} />}
         <AnimatePresence>
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
