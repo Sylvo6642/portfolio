@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase';
 
 export function useVisitorTracking() {
   useEffect(() => {
+    if (window.location.pathname === '/admin') return;
+
     async function log() {
       let ip: string | null = null;
       let country: string | null = null;

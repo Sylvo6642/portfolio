@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
+import { ConnectingDots } from '../layout/ConnectingDots';
 
 type Visitor = {
   id: string;
@@ -19,6 +20,43 @@ type Message = {
   message: string;
   created_at: string;
 };
+
+function parseBrowser(ua: string | null): string {
+  if (!ua) return '—';
+  const u = ua.toLowerCase();
+
+  let browser = 'Unknown';
+  if (u.includes('edg/') || u.includes('edgios') || u.includes('edga/')) browser = 'Edge';
+  else if (u.includes('opr/') || u.includes('opera')) browser = 'Opera';
+  else if (u.includes('chrome') && !u.includes('chromium')) browser = 'Chrome';
+  else if (u.includes('chromium')) browser = 'Chromium';
+  else if (u.includes('firefox') || u.includes('fxios')) browser = 'Firefox';
+  else if (u.includes('safari') && !u.includes('chrome')) browser = 'Safari';
+  else if (u.includes('msie') || u.includes('trident')) browser = 'IE';
+
+  let os = 'Unknown';
+
+  const iosMatch = ua.match(/\(iPhone.*?CPU iPhone OS ([\d_]+)/i) || ua.match(/\(iPad.*?CPU OS ([\d_]+)/i);
+  const androidMatch = ua.match(/Android ([\d.]+)/i);
+  const windowsMatch = ua.match(/Windows NT ([\d.]+)/i);
+  const macMatch = ua.match(/Mac OS X ([\d_]+)/i);
+
+  if (iosMatch) {
+    const ver = iosMatch[1].replace(/_/g, '.');
+    os = u.includes('ipad') ? `iPadOS ${ver}` : `iOS ${ver}`;
+  } else if (androidMatch) {
+    os = `Android ${androidMatch[1]}`;
+  } else if (windowsMatch) {
+    const ntMap: Record<string, string> = { '10.0': 'Win 10/11', '6.3': 'Win 8.1', '6.2': 'Win 8', '6.1': 'Win 7' };
+    os = ntMap[windowsMatch[1]] ?? `Windows NT ${windowsMatch[1]}`;
+  } else if (macMatch) {
+    os = `macOS ${macMatch[1].replace(/_/g, '.')}`;
+  } else if (u.includes('linux')) {
+    os = 'Linux';
+  }
+
+  return `${browser} · ${os}`;
+}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-IN', {
@@ -103,11 +141,12 @@ export function Admin() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="relative min-h-screen flex items-center justify-center px-4">
+        <ConnectingDots className="opacity-30" />
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-sm"
+          className="relative z-10 w-full max-w-sm"
         >
           <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-2">Admin</p>
           <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
@@ -224,7 +263,7 @@ export function Admin() {
                           {v.city && v.country ? `${v.city}, ${v.country}` : v.country ?? '—'}
                         </td>
                         <td className="py-3 pr-6 font-mono text-xs">{v.page ?? '/'}</td>
-                        <td className="py-3 pr-6 text-xs text-muted max-w-[200px] truncate">{v.user_agent ?? '—'}</td>
+                        <td className="py-3 pr-6 text-xs text-muted whitespace-nowrap">{parseBrowser(v.user_agent)}</td>
                         <td className="py-3 text-xs text-muted whitespace-nowrap">{formatDate(v.visited_at)}</td>
                       </tr>
                     ))}

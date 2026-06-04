@@ -192,9 +192,16 @@ export function Contact() {
     if (cooldown > 0) return;
     setStatus('sending');
 
-    const { error } = await supabase
-      .from('messages')
-      .insert([{ name, email, message }]);
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+
+    const [{ error }] = await Promise.all([
+      supabase.from('messages').insert([{ name, email, message }]),
+      fetch(`${supabaseUrl}/functions/v1/send-contact-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message }),
+      }).catch(() => null),
+    ]);
 
     if (error) {
       setStatus('error');

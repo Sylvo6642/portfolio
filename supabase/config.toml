@@ -1,0 +1,16 @@
+
+[functions.send-contact-email]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/send-contact-email/index.ts"
+
+[functions.github-contributions]
+enabled = true
+verify_jwt = true
+import_map = "./functions/github-contributions/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/github-contributions/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/github-contributions/*.html" ]
