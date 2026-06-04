@@ -143,6 +143,11 @@ export function Admin() {
     return (
       <div className="relative min-h-screen flex items-center justify-center px-4">
         <ConnectingDots className="opacity-30" />
+        <a href="/" className="absolute top-6 left-6 z-10 text-muted hover:text-fg transition-colors" aria-label="Back to home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </a>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -196,9 +201,16 @@ export function Admin() {
   return (
     <div className="min-h-screen px-6 py-16 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-10">
-        <div>
-          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-1">Admin</p>
-          <h1 className="text-3xl font-semibold">Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <a href="/" className="text-muted hover:text-fg transition-colors" aria-label="Back to home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </a>
+          <div>
+            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-1">Admin</p>
+            <h1 className="text-3xl font-semibold">Dashboard</h1>
+          </div>
         </div>
         <button
           onClick={handleSignOut}
