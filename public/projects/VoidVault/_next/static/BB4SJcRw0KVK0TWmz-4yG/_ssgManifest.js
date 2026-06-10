@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002Fshare\u002F[shareToken]","\u002Fshare\u002Fbulk\u002F[shareToken]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
