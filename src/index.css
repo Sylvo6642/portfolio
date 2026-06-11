@@ -65,12 +65,6 @@ body {
   overflow-x: hidden;
 }
 
-@media (pointer: fine) {
-  body.has-custom-cursor,
-  body.has-custom-cursor * {
-    cursor: none !important;
-  }
-}
 
 ::selection {
   background: rgb(var(--fg));

@@ -10,7 +10,6 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
-import { CustomCursor } from './components/layout/CustomCursor';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { About } from './components/sections/About';
@@ -45,7 +44,6 @@ export default function App() {
     return (
       <ThemeProvider>
         <MotionConfig reducedMotion="user">
-          <CustomCursor />
           <Admin />
         </MotionConfig>
       </ThemeProvider>
@@ -56,7 +54,6 @@ export default function App() {
     return (
       <ThemeProvider>
         <MotionConfig reducedMotion="user">
-          <CustomCursor />
           <NotFound />
         </MotionConfig>
       </ThemeProvider>
@@ -71,20 +68,24 @@ export default function App() {
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
         <ScrollProgress />
-        <CustomCursor />
         <Navbar />
         {/* main scrolls over the fixed footer (curtain reveal) — its bottom
             margin must match the footer height */}
         <main className="relative bg-bg mb-[55vh] md:mb-[60vh]" style={{ zIndex: 1 }}>
-          <Hero />
-          <About />
-          <Skills />
-          <Experience />
-          <Projects />
-          <GitHubContributions />
-          <Courses />
-          <Blog />
-          <Contact />
+          {/* Hero is sticky so About slides up over it like a curtain */}
+          <div className="sticky top-0" style={{ zIndex: 0 }}>
+            <Hero />
+          </div>
+          <div className="relative bg-bg" style={{ zIndex: 1 }}>
+            <About />
+            <Skills />
+            <Experience />
+            <Projects />
+            <GitHubContributions />
+            <Courses />
+            <Blog />
+            <Contact />
+          </div>
         </main>
         <Footer />
         <BackToTop />

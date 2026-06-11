@@ -615,7 +615,7 @@ export function About() {
   const inView = useInView(statsRef, { once: true, amount: 0.4 });
 
   return (
-    <section id="about" className="hairline-b">
+    <section id="about" className="hairline-b bg-bg">
       <HorizontalAbout statsRef={statsRef} inView={inView} />
     </section>
   );
