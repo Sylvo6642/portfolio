@@ -5,3 +5,6 @@ dist
 .claude/
 .mcp.json
 .vscode/
+supabase/.temp/
+*.png
+scroll-shot.mjs
