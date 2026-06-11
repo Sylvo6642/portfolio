@@ -5,9 +5,9 @@ import { useCountUp } from '../../hooks/useCountUp';
 
 const STATS = [
   { value: 3, suffix: '+', label: 'Years in Production' },
-  { value: 147, suffix: '+', label: 'APIs Built' },
-  { value: 113, suffix: '+', label: 'Bugs Squashed' },
-  { value: 5, suffix: '', label: 'Encrypted Apps Shipped' },
+  { value: 400, suffix: '+', label: 'APIs Built' },
+  { value: 700, suffix: '+', label: 'Bugs Squashed' },
+  { value: 10, suffix: '+', label: 'Apps Shipped' },
   { value: 5, suffix: '+', label: 'Tech Stacks' },
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
