@@ -43,7 +43,7 @@ const DELIVERABLES = [
   },
 ];
 import { SectionReveal } from '../shared/SectionReveal';
-import { FadeText } from '../shared/FadeText';
+import { SectionHeader } from '../shared/SectionHeader';
 import { SKILL_GROUPS } from '../../data/skills';
 import { SKILL_ICONS } from '../../data/skillIcons';
 
@@ -110,21 +110,12 @@ export function Skills() {
   return (
     <section id="skills" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6 mb-16">
-        <SectionReveal>
-          <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            02 / skills
-          </p>
-        </SectionReveal>
-
-        <SectionReveal delay={0.1}>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
-            What I work with.
-          </h2>
-        </SectionReveal>
-
-        <p className="mt-4 text-base text-fg/50">
-          <FadeText text="My stack, from backend logic to delivered pixel." delay={0.2} />
-        </p>
+        <SectionHeader
+          index="02"
+          label="Skills"
+          title="What I work with"
+          sub="My stack, from backend logic to delivered pixel."
+        />
       </div>
 
       {/* Grouped skill layout */}
@@ -163,8 +154,8 @@ export function Skills() {
       {/* What I Deliver */}
       <div className="mx-auto max-w-6xl px-6 mt-24">
         <SectionReveal delay={0.1}>
-          <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-10">
-            What I Deliver.
+          <h3 className="display-type text-3xl md:text-5xl mb-10">
+            What I Deliver
           </h3>
         </SectionReveal>
 
@@ -176,9 +167,9 @@ export function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-              className="rounded-2xl hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2"
+              className="hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2 hover:bg-fg/[0.04] transition-colors"
             >
-              <h4 className="font-semibold text-sm tracking-tight">{item.title}</h4>
+              <h4 className="font-bold text-sm tracking-tight uppercase">{item.title}</h4>
               <p className="text-xs text-fg/55 leading-relaxed">{item.description}</p>
             </motion.div>
           ))}

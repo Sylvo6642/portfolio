@@ -1,7 +1,6 @@
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { SectionReveal } from '../shared/SectionReveal';
-import { FadeText } from '../shared/FadeText';
+import { SectionHeader } from '../shared/SectionHeader';
 import { EXPERIENCE, durationMonths, formatDuration, type Experience as Exp } from '../../data/experience';
 import { useCountUp } from '../../hooks/useCountUp';
 
@@ -55,9 +54,9 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
         transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         className={`pl-10 md:pl-8 ${isLeft ? 'md:order-2' : 'md:order-1 md:pl-0 md:pr-8'}`}
       >
-        <div className="hairline rounded-xl p-6 bg-bg/40 backdrop-blur-sm transition-all duration-200 hover:border-l-2 hover:border-l-accent hover:bg-fg/[0.02]">
-          <h3 className="text-xl font-semibold tracking-tight">{entry.role}</h3>
-          <p className="mt-1 font-mono text-sm text-accent">{entry.company}</p>
+        <div className="hairline p-6 bg-bg/40 backdrop-blur-sm transition-all duration-200 hover:border-l-2 hover:border-l-fg hover:bg-fg/[0.03]">
+          <h3 className="text-xl font-bold tracking-tight uppercase">{entry.role}</h3>
+          <p className="mt-1 font-mono text-xs tracking-[0.15em] uppercase text-muted">{entry.company}</p>
           <ul className="mt-4 space-y-2 text-sm text-fg/75">
             {entry.bullets.map((b) => (
               <li key={b} className="flex gap-3">
@@ -83,21 +82,12 @@ export function Experience() {
   return (
     <section id="experience" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6">
-        <SectionReveal>
-          <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            03 / experience
-          </p>
-        </SectionReveal>
-
-        <SectionReveal delay={0.1}>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
-            Where I've shipped.
-          </h2>
-        </SectionReveal>
-
-        <p className="mt-4 text-base text-fg/50">
-          <FadeText text="Two years in. Still just getting started." delay={0.2} />
-        </p>
+        <SectionHeader
+          index="03"
+          label="Experience"
+          title="Where I've shipped"
+          sub="Two years in. Still just getting started."
+        />
 
         <div ref={containerRef} className="relative mt-16">
           {/* Background guide line */}

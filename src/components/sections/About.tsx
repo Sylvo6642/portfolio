@@ -22,7 +22,7 @@ const PANELS = [
 function Stat({ value, suffix, label, start }: { value: number | null; suffix: string; label: string; start: boolean }) {
   const v = useCountUp(value ?? 0, 2200, start);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center text-center">
       <span className="text-4xl md:text-5xl font-bold tracking-tight tabular-nums">
         {value === null ? '' : Math.round(v)}
         <span className="text-accent">{suffix}</span>
@@ -36,6 +36,9 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
 
 function TiltPhoto() {
   const ref = useRef<HTMLDivElement>(null);
+  // Observe the unclipped wrapper — the clipped frame itself reports zero
+  // visible area while hidden, so it can never trigger its own reveal.
+  const revealed = useInView(ref, { once: true, amount: 0.25 });
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
 
@@ -59,36 +62,40 @@ function TiltPhoto() {
       ref={ref}
       style={{ zIndex: 2, rotateX: rotX, rotateY: rotY, transformPerspective: 800 }}
       className="relative w-full photo-float"
-      initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
-      whileInView={{ opacity: 1, scale: 1, rotate: -1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
-      <div className="overflow-hidden" style={{ borderRadius: '1rem', aspectRatio: '3/4' }}>
+      {/* Clip-path wipe: frame opens bottom-up while the image settles from a zoom */}
+      <motion.div
+        className="overflow-hidden"
+        style={{ aspectRatio: '3/4' }}
+        initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
+        animate={revealed ? { clipPath: 'inset(0% 0% 0% 0%)' } : undefined}
+        transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+      >
         <motion.img
           src="/kevin.png"
           alt="Kevin Robin"
           className="w-full h-full object-cover object-top"
+          initial={{ scale: 1.25 }}
+          animate={revealed ? { scale: 1 } : undefined}
           whileHover={{ scale: 1.04 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(to top, rgb(var(--bg) / 0.35) 0%, transparent 45%)',
-            borderRadius: '1rem',
           }}
         />
-      </div>
+      </motion.div>
       <motion.div
-        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline rounded-full backdrop-blur-sm"
+        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline backdrop-blur-sm"
         style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ delay: 0.6, duration: 0.5 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
       >
         Full-Stack Dev
       </motion.div>
@@ -99,21 +106,6 @@ function TiltPhoto() {
 function PhotoFrame() {
   return (
     <div className="relative flex items-center justify-center">
-      <span
-        className="pointer-events-none absolute font-mono font-bold select-none"
-        style={{
-          fontSize: 'clamp(8rem, 18vw, 16rem)',
-          color: 'rgb(var(--accent) / 0.05)',
-          lineHeight: 1,
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -52%)',
-          letterSpacing: '-0.06em',
-          zIndex: 0,
-        }}
-      >
-        KR
-      </span>
       <div
         className="absolute pointer-events-none"
         style={{
@@ -144,10 +136,10 @@ function PanelIntro() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-2xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.15]"
+          className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]"
         >
-          A <span className="text-accent">security brain</span> and a{' '}
-          <span className="text-accent">motion brain</span>, in the same developer.
+          A <span className="stroke-text">security brain</span> and a{' '}
+          <span className="stroke-text">motion brain</span>, in the same developer.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -179,13 +171,13 @@ function PanelIntro() {
 /* ─── Panel: Stats ─── */
 function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   return (
-    <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center items-center h-full max-w-3xl mx-auto w-full">
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-8"
+        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-10 text-center"
       >
         By the numbers
       </motion.p>
@@ -194,7 +186,7 @@ function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-10 flex-1 content-center md:flex-none md:content-start"
+        className="grid grid-cols-2 sm:grid-cols-3 gap-x-12 md:gap-x-16 gap-y-10 content-center justify-items-center w-full"
       >
         {STATS.map((s) => (
           <Stat key={s.label} {...s} start={inView} />
@@ -240,10 +232,10 @@ function PanelPhilosophy() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="text-2xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-6 md:mb-12"
+        className="display-type text-2xl md:text-4xl leading-[1.02] mb-6 md:mb-12"
       >
         I build software the way I'd want to{' '}
-        <span className="text-accent">use it</span> correct, considered, and honest.
+        <span className="stroke-text">use it</span> correct, considered, and honest.
       </motion.h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8 mb-6 md:mb-14">
@@ -335,10 +327,10 @@ function PanelBeyond() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="text-2xl md:text-4xl font-semibold tracking-tight leading-[1.2] mb-6 md:mb-10"
+        className="display-type text-2xl md:text-4xl leading-[1.02] mb-6 md:mb-10"
       >
         Lost in airports,{' '}
-        <span className="text-accent">found in terminals.</span>
+        <span className="stroke-text">found in terminals.</span>
       </motion.h3>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10">
@@ -560,8 +552,8 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
         {/* Section label + progress dots */}
         <div className="absolute top-20 left-6 right-6 z-20 flex items-center justify-between pointer-events-none">
           <SectionReveal>
-            <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted">
-              01 / about
+            <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted">
+              (01) — About
             </p>
           </SectionReveal>
 

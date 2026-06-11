@@ -63,7 +63,7 @@ export function FloatingDots({ className = '', hideOverSelector }: { className?:
     let dots: Dot[] = [];
     let raf = 0;
     let accent = readAccent();
-    const accentMix = { r: 255, g: 90, b: 160 };
+    const accentMix = { r: 128, g: 126, b: 120 };
 
     const resize = () => {
       cssW = wrap.clientWidth;

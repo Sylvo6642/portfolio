@@ -77,7 +77,7 @@ export function VideoModal({
                 </svg>
               </button>
             </div>
-            <div className="rounded-xl overflow-hidden border border-white/15 bg-black shadow-[0_30px_80px_-20px_rgba(124,58,237,0.4)]">
+            <div className="rounded-xl overflow-hidden border border-white/15 bg-black shadow-[0_30px_80px_-20px_rgba(194,65,12,0.4)]">
               <video
                 ref={videoRef}
                 src={src}

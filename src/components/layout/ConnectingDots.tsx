@@ -53,7 +53,7 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
     let mouseX = cssW / 2;
     let mouseY = cssH / 2;
     let accent = readAccent();
-    let accentMix = { r: 255, g: 90, b: 160 }; // pink secondary, ~15% of dots
+    let accentMix = { r: 128, g: 126, b: 120 }; // neutral gray secondary, ~15% of dots
 
     const resize = () => {
       cssW = wrap.clientWidth;

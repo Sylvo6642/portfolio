@@ -1,6 +1,7 @@
-import { motion, useMotionValue, useSpring, useTransform, LayoutGroup } from 'framer-motion';
-import { useCallback, useEffect, useState } from 'react';
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConnectingDots } from '../layout/ConnectingDots';
+import { scrollToId } from '../../lib/scroll';
 import { useMagneticButton } from '../../hooks/useMagneticButton';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 
@@ -8,12 +9,12 @@ import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 const CV_URL = "";
 
 const ROTATING = [
-  "Kevin Robin",
-  "a Full-Stack Developer",
-  "building Scalable Web Systems",
-  "crafting ERP & Web Solutions",
-  "turning Ideas Into Production Code",
+  "Full-Stack Developer",
+  "Building Scalable Web Systems",
+  "Crafting ERP & Web Solutions",
+  "Turning Ideas Into Production Code",
 ];
+
 
 // Parallax layer configs: [dotsMultiplier, watermarkMultiplier, contentMultiplier]
 // Each value is how much the layer shifts relative to mouse (in px per half-screen)
@@ -174,13 +175,25 @@ export function Hero() {
   const textY  = useTransform(my, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    scrollToId(id);
   };
+
+  // Exit transition — as the hero scrolls away, the content recedes:
+  // drifts up at half speed, shrinks slightly, and fades out.
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: exitProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const exitY = useTransform(exitProgress, [0, 1], [0, -110]);
+  const exitScale = useTransform(exitProgress, [0, 1], [1, 0.93]);
+  const exitOpacity = useTransform(exitProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center overflow-hidden hairline-b"
+      ref={sectionRef}
+      className="relative min-h-screen flex flex-col justify-end overflow-hidden hairline-b"
     >
       {/* Layer 1 — particles (slowest) */}
       <motion.div
@@ -208,87 +221,117 @@ export function Hero() {
         style={coarse ? {} : { x: markX, y: markY }}
       >
         <span
-          className="font-sans font-extrabold tracking-tighter text-fg/[0.035]"
-          style={{ fontSize: 'clamp(3.5rem, 16vw, 16rem)', lineHeight: 1 }}
+          className="display-type stroke-text opacity-[0.07]"
+          style={{ fontSize: 'clamp(3.5rem, 16vw, 16rem)' }}
         >
           DEVELOPER
         </span>
       </motion.div>
 
-      {/* Layer 3 — content (subtle, just enough to feel depth) */}
-      <LayoutGroup>
+      {/* Layer 3 — content (exit transforms on the outer layer, mouse parallax inside) */}
       <motion.div
-        layout
-        className="relative mx-auto max-w-6xl px-6 py-24 w-full"
-        style={coarse ? {} : { x: textX, y: textY }}
+        className="relative mx-auto max-w-[1400px] px-6 pt-32 pb-10 md:pb-14 w-full flex-1 flex flex-col justify-center"
+        style={{ y: exitY, scale: exitScale, opacity: exitOpacity }}
       >
-
-        <motion.h1
-          layout
-          className="font-sans font-bold tracking-tight leading-[1.05]"
-          style={{ fontSize: 'clamp(2.2rem, 6vw, 4.8rem)' }}
-          transition={{ layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
-          aria-label={`Hi, I'm ${ROTATING[phraseIndex]}`}
-        >
-          <span aria-hidden>{"Hi, I'm "}</span>
-          <span aria-hidden>
-            <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />
-          </span>
-        </motion.h1>
-
-        <motion.p
-          layout
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.75, layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
-          className="mt-6 max-w-2xl text-lg md:text-xl text-fg/80"
-        >
-          Full-Stack Developer
-        </motion.p>
-
+      <motion.div style={coarse ? {} : { x: textX, y: textY }}>
+        {/* Meta row */}
         <motion.div
-          layout
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1, layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
-          className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
+          className="flex items-center justify-between font-mono text-[10px] md:text-[11px] tracking-[0.22em] uppercase text-muted mb-6 md:mb-10"
         >
-          <MagneticButton
-            onClick={() => scrollTo('experience')}
-            className="group relative inline-flex items-center gap-2 rounded-full bg-fg text-bg px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.03]"
-          >
-            View My Work
-            <svg className="transition-transform group-hover:translate-x-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M13 5l7 7-7 7" />
-            </svg>
-          </MagneticButton>
-
-          <MagneticButton
-            onClick={() => scrollTo('contact')}
-            className="inline-flex items-center gap-2 rounded-full hairline px-6 py-3 text-sm transition-all hover:scale-[1.03] hover:bg-fg/5"
-          >
-            Get In Touch
-          </MagneticButton>
-
-          {CV_URL && (
-            <MagneticAnchor
-              href={CV_URL}
-              download
-              className="group inline-flex items-center gap-2 rounded-full hairline px-6 py-3 text-sm transition-all hover:scale-[1.03] hover:bg-fg/5"
-            >
-              Download CV
-              <svg className="transition-transform group-hover:translate-y-0.5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            </MagneticAnchor>
-          )}
+          <span>(Based in Kozhikode, Kerala)</span>
+          <span className="hidden sm:inline-flex items-center gap-2">
+            <span className="relative inline-flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-fg opacity-60 animate-ping" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fg" />
+            </span>
+            Available for work
+          </span>
         </motion.div>
 
-      </motion.div>
-      </LayoutGroup>
+        {/* Giant stacked name */}
+        <h1
+          className="display-type"
+          style={{ fontSize: 'clamp(4rem, 14.5vw, 13rem)' }}
+          aria-label="Kevin Robin — Full-Stack Developer"
+        >
+          <span className="block overflow-hidden pb-[0.06em] -mb-[0.06em]" aria-hidden>
+            <motion.span
+              initial={{ y: '110%' }}
+              animate={{ y: '0%' }}
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
+              className="block"
+            >
+              Kevin
+            </motion.span>
+          </span>
+          <span className="block overflow-hidden pb-[0.06em] -mb-[0.06em]" aria-hidden>
+            <motion.span
+              initial={{ y: '110%' }}
+              animate={{ y: '0%' }}
+              transition={{ duration: 0.9, delay: 0.28, ease: [0.76, 0, 0.24, 1] }}
+              className="block stroke-text"
+            >
+              Robin
+            </motion.span>
+          </span>
+        </h1>
 
+        {/* Rotating role line + CTAs */}
+        <div className="mt-8 md:mt-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="font-mono text-xs md:text-sm tracking-[0.18em] uppercase text-fg/70 max-w-md"
+            aria-label={ROTATING[phraseIndex]}
+          >
+            <span className="text-muted mr-3" aria-hidden>—</span>
+            <span aria-hidden>
+              <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />
+            </span>
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="flex flex-wrap items-center gap-3"
+          >
+            <MagneticButton
+              onClick={() => scrollTo('experience')}
+              className="group inline-flex items-center gap-3 bg-fg text-bg px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-transform hover:scale-[1.02]"
+            >
+              View Work
+              <svg className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </MagneticButton>
+
+            <MagneticButton
+              onClick={() => scrollTo('contact')}
+              className="inline-flex items-center gap-3 hairline px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:bg-fg hover:text-bg"
+            >
+              Get in Touch
+            </MagneticButton>
+
+            {CV_URL && (
+              <MagneticAnchor
+                href={CV_URL}
+                download
+                className="inline-flex items-center gap-3 hairline px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:bg-fg hover:text-bg"
+              >
+                Download CV
+              </MagneticAnchor>
+            )}
+          </motion.div>
+        </div>
+      </motion.div>
+      </motion.div>
+
+      {/* Scroll cue */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

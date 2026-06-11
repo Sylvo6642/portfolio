@@ -1,35 +1,28 @@
 import { SectionReveal } from '../shared/SectionReveal';
-import { FadeText } from '../shared/FadeText';
+import { SectionHeader } from '../shared/SectionHeader';
 import { COURSES } from '../../data/courses';
 
 export function Courses() {
   return (
     <section id="courses" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6">
-        <SectionReveal>
-          <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            06 / courses
-          </p>
-        </SectionReveal>
-
-        <SectionReveal delay={0.1}>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
-            Always learning.
-          </h2>
-        </SectionReveal>
-
-        <p className="mt-4 text-base text-fg/50">
-          <FadeText text="What I've studied. What stuck." delay={0.2} />
-        </p>
+        <SectionHeader
+          index="06"
+          label="Courses"
+          title="Always learning"
+          sub="What I've studied. What stuck."
+        />
 
         <div className="mt-12 hairline-t">
           {COURSES.map((c, i) => (
             <SectionReveal key={c.title} delay={i * 0.05}>
-              <div className="hairline-b py-6 grid grid-cols-12 gap-4 items-baseline">
+              <div className="hairline-b py-6 grid grid-cols-12 gap-4 items-baseline group hover:bg-fg/[0.03] transition-colors px-2">
                 <span className="col-span-12 md:col-span-1 font-mono text-xs text-muted">
-                  /0{i + 1}
+                  ({String(i + 1).padStart(2, '0')})
                 </span>
-                <h3 className="col-span-12 md:col-span-6 text-lg font-medium">{c.title}</h3>
+                <h3 className="col-span-12 md:col-span-6 text-lg font-bold tracking-tight uppercase transition-transform duration-300 group-hover:translate-x-2">
+                  {c.title}
+                </h3>
                 <p className="col-span-7 md:col-span-3 text-sm text-fg/70">{c.org}</p>
                 <p className="col-span-5 md:col-span-2 font-mono text-xs text-muted text-right">
                   {c.period}

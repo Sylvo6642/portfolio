@@ -50,6 +50,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     tech: ['Next.js', 'Node.js', 'Express', 'MongoDB', 'Discord.js', 'AES-256-GCM', 'JWT'],
     link: null,
     linkLabel: 'Private',
+    liveUrl: '/projects/VoidVault/',
     void: true,
     video: '/media/void-vault.mp4',
   },

@@ -39,16 +39,16 @@ function InteractiveHoverButton({ children, className = '', disabled, ...props }
   return (
     <button
       disabled={disabled}
-      className={`group relative w-auto cursor-pointer overflow-hidden rounded-full border border-fg/15 p-2 px-6 text-center font-semibold bg-fg text-bg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`group relative w-auto cursor-pointer overflow-hidden border border-fg/15 p-2.5 px-7 text-center font-mono text-[11px] uppercase tracking-[0.2em] bg-fg text-bg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       {...props}
     >
       <div className="flex items-center justify-center gap-2">
         <div className="h-2 w-2 rounded-full bg-bg transition-all duration-300 group-hover:scale-[100.8] group-disabled:scale-100" />
-        <span className="inline-block text-sm transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
+        <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
           {children}
         </span>
       </div>
-      <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100 text-fg text-sm">
+      <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100 text-fg">
         <span>{children}</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M5 12h14M13 5l7 7-7 7" />
@@ -94,7 +94,7 @@ function FocusInput({
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
             data-cursor="hover"
-            className="w-full bg-transparent px-4 py-3 text-sm outline-none resize-none rounded-lg border border-fg/10 placeholder:text-muted/60"
+            className="w-full bg-transparent px-0 py-3 text-sm outline-none resize-none rounded-none border-0 border-b border-fg/20 placeholder:text-muted/60"
             placeholder=" "
           />
         ) : (
@@ -107,32 +107,18 @@ function FocusInput({
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
             data-cursor="hover"
-            className="w-full bg-transparent px-4 py-3 text-sm outline-none rounded-lg border border-fg/10 placeholder:text-muted/60"
+            className="w-full bg-transparent px-0 py-3 text-sm outline-none rounded-none border-0 border-b border-fg/20 placeholder:text-muted/60"
             placeholder=" "
           />
         )}
-        <svg
+        <motion.span
           aria-hidden
-          className="pointer-events-none absolute inset-0 w-full h-full"
-          preserveAspectRatio="none"
-        >
-          <motion.rect
-            x={0.5}
-            y={0.5}
-            width="calc(100% - 1px)"
-            height="calc(100% - 1px)"
-            rx={8}
-            ry={8}
-            fill="none"
-            stroke="rgb(var(--accent))"
-            strokeWidth={1.5}
-            pathLength={1}
-            initial={false}
-            animate={{ pathLength: focus ? 1 : 0, opacity: focus ? 1 : 0 }}
-            transition={{ pathLength: { duration: 0.5, ease: 'easeInOut' }, opacity: { duration: 0.2 } }}
-            style={{ pathOffset: 0.625 }}
-          />
-        </svg>
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1.5px] bg-fg"
+          initial={false}
+          animate={{ scaleX: focus ? 1 : 0 }}
+          transition={{ duration: 0.45, ease: [0.76, 0, 0.24, 1] }}
+          style={{ transformOrigin: 'left' }}
+        />
       </div>
     </label>
   );
@@ -146,7 +132,7 @@ function LocationCard() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.45 }}
-      className="mt-8 hairline rounded-xl p-4 flex items-center justify-between bg-fg/[0.02]"
+      className="mt-8 hairline p-4 flex items-center justify-between bg-fg/[0.02]"
     >
       <div className="flex items-center gap-3">
         <span className="text-accent text-lg">◎</span>
@@ -218,29 +204,37 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="relative py-32">
+    <section id="contact" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-          08 / contact
-        </p>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
+          className="hairline-t flex items-baseline justify-between pt-4 mb-8 md:mb-12"
+        >
+          <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">(08)</span>
+          <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">Contact</span>
+        </motion.div>
 
-        <p className="text-base text-fg/45 mb-4">
+        <p className="font-mono text-xs tracking-[0.18em] uppercase text-muted mb-4">
           <FadeText text="Have an idea? Let's build it." delay={0.1} />
         </p>
 
         <h2
-          className="text-4xl md:text-7xl font-semibold tracking-tight leading-[1.05]"
+          className="display-type"
+          style={{ fontSize: 'clamp(2.8rem, 9vw, 8rem)' }}
           aria-label={HEADING}
         >
-          <span className="inline-flex flex-wrap gap-x-[0.25em]" aria-hidden>
+          <span className="inline-flex flex-wrap gap-x-[0.22em]" aria-hidden>
             {HEADING.split(' ').map((word, i) => (
-              <span key={i} className="overflow-hidden inline-block">
+              <span key={i} className="overflow-hidden inline-block pb-[0.08em] -mb-[0.08em]">
                 <motion.span
-                  initial={{ y: '110%', opacity: 0 }}
-                  whileInView={{ y: '0%', opacity: 1 }}
+                  initial={{ y: '110%' }}
+                  whileInView={{ y: '0%' }}
                   viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className="inline-block"
+                  transition={{ duration: 0.8, delay: i * 0.07, ease: [0.76, 0, 0.24, 1] }}
+                  className={`inline-block ${i === HEADING.split(' ').length - 1 ? 'stroke-text' : ''}`}
                 >
                   {word}
                 </motion.span>
@@ -331,9 +325,6 @@ export function Contact() {
           </form>
         </div>
 
-        <footer className="mt-32 hairline-t pt-8 flex items-center justify-center text-xs text-muted">
-          <span className="font-mono">© {new Date().getFullYear()} Kevin Robin</span>
-        </footer>
       </div>
     </section>
   );

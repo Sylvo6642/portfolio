@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
+import { initSmoothScroll } from './lib/scroll';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { useKonamiCode } from './hooks/useKonamiCode';
 import { useMobileSecret } from './hooks/useMobileSecret';
 import { TerminalGlitch } from './components/layout/TerminalGlitch';
 import { Navbar } from './components/layout/Navbar';
+import { Footer } from './components/layout/Footer';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { BackToTop } from './components/layout/BackToTop';
 import { CustomCursor } from './components/layout/CustomCursor';
@@ -34,6 +36,10 @@ export default function App() {
   const activate = () => { if (!glitch) setGlitch(true); };
   useKonamiCode(activate);
   useMobileSecret(activate);
+
+  useEffect(() => {
+    initSmoothScroll();
+  }, []);
 
   if (isAdmin) {
     return (
@@ -67,7 +73,9 @@ export default function App() {
         <ScrollProgress />
         <CustomCursor />
         <Navbar />
-        <main className="relative" style={{ zIndex: 1 }}>
+        {/* main scrolls over the fixed footer (curtain reveal) — its bottom
+            margin must match the footer height */}
+        <main className="relative bg-bg mb-[55vh] md:mb-[60vh]" style={{ zIndex: 1 }}>
           <Hero />
           <About />
           <Skills />
@@ -78,6 +86,7 @@ export default function App() {
           <Blog />
           <Contact />
         </main>
+        <Footer />
         <BackToTop />
       </MotionConfig>
     </ThemeProvider>

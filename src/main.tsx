@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-const a = 'color:#a78bfa;font-weight:600';
+const a = 'color:#e8762c;font-weight:600';
 const b = 'color:#6b6b7a;font-weight:400';
 const c = 'color:#f5f5f5;font-weight:500';
 console.log(

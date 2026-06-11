@@ -1,7 +1,15 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+  useReducedMotion,
+} from 'framer-motion';
 import { useState } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
-import { FadeText } from '../shared/FadeText';
+import { SectionHeader } from '../shared/SectionHeader';
 import { TiltCard } from '../shared/TiltCard';
 import { VideoModal } from '../shared/VideoModal';
 import { PERSONAL_PROJECTS, PROFESSIONAL_CARDS, type PersonalProject } from '../../data/projects';
@@ -157,47 +165,41 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl hairline overflow-hidden"
+      className="hairline-t overflow-hidden"
     >
       {/* Collapsed row — always visible */}
       <button
         onClick={() => setOpen((o) => !o)}
         data-cursor="hover"
         aria-expanded={open}
-        className="w-full text-left px-6 py-4 flex items-center gap-4 transition-colors hover:bg-accent/5 group"
+        data-open={open}
+        className="ink-row w-full text-left px-2 md:px-4 py-6 md:py-8 flex items-center gap-4 md:gap-8 transition-colors duration-300"
       >
-        {/* Chevron */}
-        <motion.svg
-          animate={{ rotate: open ? 90 : 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-          className="shrink-0 text-muted group-hover:text-accent transition-colors"
-        >
-          <path d="M9 18l6-6-6-6" />
-        </motion.svg>
+        {/* Index */}
+        <span className="ink-row-muted font-mono text-[10px] md:text-xs tracking-[0.2em] text-muted shrink-0 transition-colors duration-300">
+          ({String(i + 1).padStart(2, '0')})
+        </span>
 
         {/* Name */}
-        <span className="font-semibold tracking-tight text-base shrink-0">{p.name}</span>
+        <span className="display-type text-2xl md:text-4xl flex-1 min-w-0 truncate">
+          {p.name}
+        </span>
 
-        {/* Tag pill */}
-        <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted border border-fg/15 rounded-full px-2 py-0.5 shrink-0">
+        {/* Tag */}
+        <span className="ink-row-pill hidden sm:inline font-mono text-[10px] tracking-[0.18em] uppercase text-muted border border-fg/20 px-2.5 py-1 shrink-0 transition-colors duration-300">
           {p.tag}
         </span>
 
-        {/* Tech pills — hidden on mobile, visible on sm+ */}
-        <div className="hidden sm:flex gap-1.5 flex-wrap overflow-hidden max-h-6 ml-1">
-          {p.tech.slice(0, 6).map((t) => (
-            <span key={t} className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent shrink-0">
-              {t}
-            </span>
-          ))}
-          {p.tech.length > 6 && (
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded-full text-muted shrink-0">
-              +{p.tech.length - 6}
-            </span>
-          )}
-        </div>
+        {/* Plus → × toggle */}
+        <motion.svg
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+          className="shrink-0"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </motion.svg>
       </button>
 
       {/* Expanded panel */}
@@ -323,10 +325,10 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
               <div className="relative z-10">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <span className="font-mono text-[10px] tracking-[0.22em] uppercase dark:text-white/55 text-violet-700">
+                    <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-muted">
                       {p.tag}
                     </span>
-                    <h4 className="mt-1.5 text-2xl md:text-3xl font-bold tracking-tight dark:text-white text-fg">
+                    <h4 className="mt-1.5 display-type text-2xl md:text-3xl text-fg">
                       {p.name}
                     </h4>
                   </div>
@@ -335,7 +337,7 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                       <button
                         onClick={() => onVideoOpen(p)}
                         data-cursor="hover"
-                        className="inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full border dark:border-white/30 border-violet-400/50 dark:bg-white/10 bg-violet-500/10 dark:text-white text-violet-900 dark:hover:bg-white/20 hover:bg-violet-500/20 transition-colors"
+                        className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
                       >
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                         Watch demo
@@ -347,32 +349,32 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                         target="_blank"
                         rel="noopener noreferrer"
                         data-cursor="hover"
-                        className="inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-full border dark:border-white/30 border-violet-400/50 dark:bg-white/10 bg-violet-500/10 dark:text-white text-violet-900 dark:hover:bg-white/20 hover:bg-violet-500/20 transition-colors"
+                        className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
                       >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                         View Project
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M7 7h10v10" /></svg>
                       </a>
                     )}
                     {p.link ? (
                       <a href={p.link} target="_blank" rel="noopener noreferrer" data-cursor="hover"
-                        className="font-mono text-xs px-3 py-1 rounded-full border dark:border-white/25 border-violet-400/40 dark:text-white/70 text-violet-800 dark:hover:border-white/50 hover:border-violet-500/60 dark:hover:text-white hover:text-fg transition-colors">
+                        className="font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/25 text-fg/70 hover:border-fg/60 hover:text-fg transition-colors">
                         {p.linkLabel}
                       </a>
                     ) : (
-                      <span className="font-mono text-xs px-3 py-1 rounded-full border dark:border-white/20 border-violet-400/30 dark:text-white/50 text-violet-700/60">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/15 text-fg/45">
                         {p.linkLabel}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <p className="mt-5 max-w-3xl text-sm leading-relaxed dark:text-white/75 text-fg/75">
+                <p className="mt-5 max-w-3xl text-sm leading-relaxed text-fg/75">
                   {p.description}
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   {p.tech.map((t) => (
-                    <span key={t} className="font-mono text-[11px] px-2.5 py-1 rounded-full border dark:border-white/20 border-violet-400/30 dark:text-white/80 text-fg/80">
+                    <span key={t} className="font-mono text-[11px] px-2.5 py-1 border border-fg/20 text-fg/80">
                       {t}
                     </span>
                   ))}
@@ -388,25 +390,23 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
 
 export function Projects() {
   const [active, setActive] = useState<PersonalProject | null>(null);
+  const reduced = useReducedMotion();
+
+  // Elastic skew: fast scrolling shears the project list, springing back on stop
+  const { scrollY } = useScroll();
+  const velocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
+  const skewY = useTransform(smoothVelocity, [-1500, 0, 1500], [-2.5, 0, 2.5]);
 
   return (
     <section id="projects" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6">
-        <SectionReveal>
-          <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted mb-6">
-            04 / projects
-          </p>
-        </SectionReveal>
-
-        <SectionReveal delay={0.1}>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
-            Things I've built.
-          </h2>
-        </SectionReveal>
-
-        <p className="mt-4 text-base text-fg/50">
-          <FadeText text="Side projects, client work, and everything in between." delay={0.2} />
-        </p>
+        <SectionHeader
+          index="04"
+          label="Projects"
+          title="Things I've built"
+          sub="Side projects, client work, and everything in between."
+        />
 
         {/* Personal projects — accordion rows */}
         <SectionReveal delay={0.15}>
@@ -415,11 +415,14 @@ export function Projects() {
           </h3>
         </SectionReveal>
 
-        <div className="flex flex-col gap-2">
+        <motion.div
+          className="flex flex-col hairline-b"
+          style={reduced ? undefined : { skewY }}
+        >
           {PERSONAL_PROJECTS.map((p, i) => (
             <PersonalProjectRow key={p.name} p={p} i={i} onVideoOpen={setActive} />
           ))}
-        </div>
+        </motion.div>
 
         {/* Professional work */}
         <SectionReveal delay={0.1}>
@@ -437,14 +440,14 @@ export function Projects() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
             >
-              <TiltCard className="shimmer h-full rounded-2xl p-7 hairline bg-bg/40 backdrop-blur-sm">
+              <TiltCard className="shimmer h-full p-7 hairline bg-bg/40 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-fg" />
                   <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted">
                     Professional
                   </span>
                 </div>
-                <h4 className="mt-3 text-xl font-semibold tracking-tight">{c.title}</h4>
+                <h4 className="mt-3 text-xl font-bold tracking-tight uppercase">{c.title}</h4>
                 <p className="mt-3 text-sm text-fg/75 leading-relaxed">{c.description}</p>
               </TiltCard>
             </motion.div>

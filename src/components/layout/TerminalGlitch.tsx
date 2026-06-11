@@ -100,7 +100,7 @@ const SCRIPT: LineConfig[] = [
   { text: '  > curl kevinsylvester.xyz ................... 200 OK', color: '#00cc33', delay: 400, typeSpeed: 12 },
   { text: '  > check availability ........................ OPEN', color: '#00ff41', delay: 500, typeSpeed: 12, pauseAfter: 600 },
   { text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#2a2a3a', delay: 0, typeSpeed: 5 },
-  { text: '  YOU FOUND THE SECRET. NICE.', color: '#a78bfa', delay: 200, typeSpeed: 35, pauseAfter: 300 },
+  { text: '  YOU FOUND THE SECRET. NICE.', color: '#f0a05c', delay: 200, typeSpeed: 35, pauseAfter: 300 },
   { text: '  status   : available for hire ✓', color: '#00ff41', delay: 100, typeSpeed: 22 },
   { text: '  location : Kozhikode, Kerala — UTC+5:30', color: '#00cc33', delay: 80, typeSpeed: 22 },
   { text: '  email    : robinkevin648@gmail.com', color: '#00cc33', delay: 80, typeSpeed: 22, pauseAfter: 400 },

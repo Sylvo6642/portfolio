@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useState } from 'react';
+import { scrollToTop } from '../../lib/scroll';
 
 export function BackToTop() {
   const { scrollY } = useScroll();
@@ -16,7 +17,7 @@ export function BackToTop() {
           type="button"
           data-cursor="hover"
           aria-label="Back to top"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => scrollToTop()}
           initial={{ rotate: -180, opacity: 0, scale: 0.6 }}
           animate={{ rotate: 0, opacity: 1, scale: 1 }}
           exit={{ rotate: 180, opacity: 0, scale: 0.6 }}

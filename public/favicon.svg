@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0a0a0b"/>
-  <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle"
-        font-family="DM Sans, sans-serif" font-weight="700" font-size="28" fill="#f5f5f5">KR</text>
+  <!-- Brand mark: K solid + R outlined, matching the hero wordmark.
+       No background — letters flip with the browser's color scheme. -->
+  <style>
+    .k { fill: #111111; }
+    .r { stroke: #111111; }
+    @media (prefers-color-scheme: dark) {
+      .k { fill: #EBE9E4; }
+      .r { stroke: #EBE9E4; }
+    }
+  </style>
+  <g transform="translate(-1 0)">
+    <!-- K — solid -->
+    <path class="k" d="M9 14 H16 V28.5 L25.5 14 H33 L22.5 31 L33 50 H25 L16 36.5 V50 H9 Z"/>
+    <!-- R — outline (stroke only, like the hero's stroked text) -->
+    <path class="r" fill="none" stroke-width="2.5"
+          d="M36 14 H50 Q57 14 57 23 Q57 31 51 32.5 L57.5 50 H50.5 L44.5 33.5 H43 V50 H36 Z
+             M43 20.5 H49.5 Q51 20.5 51 23.25 Q51 26 49.5 26 H43 Z"/>
+  </g>
 </svg>

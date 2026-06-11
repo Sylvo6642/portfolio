@@ -2,6 +2,7 @@ import { motion, useMotionValueEvent, useScroll, AnimatePresence } from 'framer-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
+import { scrollToId, scrollToTop } from '../../lib/scroll';
 
 const NAV = [
   { id: 'about', label: 'About' },
@@ -45,9 +46,7 @@ export function Navbar() {
   useMotionValueEvent(scrollY, 'change', (v) => setCompact(v > 20));
 
   const go = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth' });
+    scrollToId(id);
     setOpen(false);
   };
 
@@ -63,24 +62,24 @@ export function Navbar() {
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-40 ${compact || open ? 'hairline-b' : ''}`}
     >
-      <div className="mx-auto max-w-6xl flex items-center justify-between px-6">
+      <div className="mx-auto max-w-[1400px] flex items-center justify-between px-6">
         <button
           type="button"
           data-secret-logo
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => scrollToTop()}
           onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}
           data-cursor="hover"
-          className="font-mono text-sm tracking-tight relative"
+          className="font-display font-extrabold uppercase tracking-tight text-sm relative"
         >
           <motion.span
             animate={logoArmed ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
             transition={logoArmed ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } : {}}
           >
-            <span className="text-accent">~/</span>kevin-robin
+            Kevin Robin<span className="align-super text-[0.6em]">®</span>
           </motion.span>
         </button>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-5">
           {NAV.map((item) => {
             const isActive = activeId === item.id;
             return (
@@ -89,18 +88,18 @@ export function Navbar() {
                 type="button"
                 onClick={() => go(item.id)}
                 data-cursor="hover"
-                className="nav-link relative rounded-full px-3 py-1.5 text-sm transition-colors"
+                className="nav-link relative py-1.5 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors"
               >
-                {isActive && (
-                  <motion.span
-                    layoutId="navPill"
-                    transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                    className="absolute inset-0 rounded-full bg-fg/10"
-                  />
-                )}
-                <span className={`relative ${isActive ? 'text-fg' : 'text-fg/70'}`}>
+                <span className={`relative ${isActive ? 'text-fg' : 'text-fg/55 hover:text-fg'}`}>
                   <HoverChars text={item.label} />
                 </span>
+                {isActive && (
+                  <motion.span
+                    layoutId="navUnderline"
+                    transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                    className="absolute -bottom-0.5 left-0 right-0 h-px bg-fg"
+                  />
+                )}
               </button>
             );
           })}
@@ -113,7 +112,7 @@ export function Navbar() {
             data-cursor="hover"
             aria-label={open ? 'Close menu' : 'Open menu'}
             onClick={() => setOpen((o) => !o)}
-            className="md:hidden h-9 w-9 rounded-full hairline grid place-items-center"
+            className="md:hidden h-9 w-9 hairline grid place-items-center"
           >
             <motion.span animate={{ rotate: open ? 90 : 0 }} className="block">
               {open ? (
@@ -133,20 +132,26 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden mx-auto max-w-6xl px-6 pb-4 pt-2 flex flex-col gap-1"
+            className="md:hidden mx-auto max-w-[1400px] px-6 pb-6 pt-2 flex flex-col"
           >
-            {NAV.map((item) => (
-              <button
+            {NAV.map((item, i) => (
+              <motion.button
                 key={item.id}
                 type="button"
                 onClick={() => go(item.id)}
                 data-cursor="hover"
-                className={`text-left px-3 py-2 rounded-md text-sm ${
-                  activeId === item.id ? 'bg-fg/10 text-fg' : 'text-fg/70'
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                className={`text-left py-2.5 hairline-b flex items-baseline gap-4 ${
+                  activeId === item.id ? 'text-fg' : 'text-fg/60'
                 }`}
               >
-                {item.label}
-              </button>
+                <span className="font-mono text-[10px] tracking-[0.2em] text-muted">
+                  ({String(i + 1).padStart(2, '0')})
+                </span>
+                <span className="display-type text-2xl">{item.label}</span>
+              </motion.button>
             ))}
           </motion.nav>
         )}
