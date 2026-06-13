@@ -68,7 +68,7 @@ export default function App() {
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
         <ScrollProgress />
-        <Navbar />
+        <Navbar loaderDone={done} />
         {/* main scrolls over the fixed footer (curtain reveal) — its bottom
             margin must match the footer height */}
         <main className="relative bg-bg mb-[55vh] md:mb-[60vh]" style={{ zIndex: 1 }}>

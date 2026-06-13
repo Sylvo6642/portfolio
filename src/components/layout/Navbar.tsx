@@ -26,13 +26,22 @@ function HoverChars({ text }: { text: string }) {
   );
 }
 
-export function Navbar() {
+export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
   const { scrollY } = useScroll();
   const { theme } = useTheme();
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
   const [logoArmed, setLogoArmed] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
   const activeId = useScrollSpy(NAV.map((n) => n.id));
+
+  useEffect(() => {
+    if (!loaderDone) return;
+    if (!isDesktop) { setEntered(true); return; }
+    const t = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(t);
+  }, [loaderDone, isDesktop]);
 
   useEffect(() => {
     const onArm = () => setLogoArmed(true);
@@ -54,14 +63,15 @@ export function Navbar() {
 
   return (
     <motion.header
-      initial={false}
+      initial={{ y: '-100%' }}
       animate={{
+        y: entered ? 0 : '-100%',
         paddingTop: compact ? 8 : 18,
         paddingBottom: compact ? 8 : 18,
         backdropFilter: compact || open ? 'blur(12px)' : 'blur(0px)',
         backgroundColor: compact || open ? 'rgb(var(--bg) / 0.7)' : 'rgb(var(--bg) / 0)',
       }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ y: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: isDesktop ? 0.5 : 0 }, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-40 ${compact || open ? 'hairline-b' : ''}`}
     >
       <div className="mx-auto max-w-[1400px] flex items-center justify-between px-6">
@@ -78,21 +88,29 @@ export function Navbar() {
             alt="Kevin Robin"
             width={48}
             height={48}
-            animate={logoArmed ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
-            transition={logoArmed ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } : {}}
+            initial={{ opacity: 0, y: -8 }}
+            animate={logoArmed
+              ? { opacity: [1, 0.3, 1], y: 0 }
+              : entered ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+            transition={logoArmed
+              ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' }
+              : { duration: 0.35, ease: [0.22, 1, 0.36, 1], delay: isDesktop ? 1.1 : 0 }}
             className="h-12 w-12 object-contain"
           />
         </button>
 
         <nav className="hidden md:flex items-center gap-5">
-          {NAV.map((item) => {
+          {NAV.map((item, i) => {
             const isActive = activeId === item.id;
             return (
-              <button
+              <motion.button
                 key={item.id}
                 type="button"
                 onClick={() => go(item.id)}
                 data-cursor="hover"
+                initial={{ opacity: 0, y: -8 }}
+                animate={entered ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1], delay: isDesktop ? 1.1 + i * 0.05 : 0 }}
                 className="nav-link relative py-1.5 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors"
               >
                 <span className={`relative ${isActive ? 'text-fg' : 'text-fg/55 hover:text-fg'}`}>
@@ -105,7 +123,7 @@ export function Navbar() {
                     className="absolute -bottom-0.5 left-0 right-0 h-px bg-fg"
                   />
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </nav>

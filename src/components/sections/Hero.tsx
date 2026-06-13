@@ -18,7 +18,6 @@ const ROTATING = [
 // Parallax layer configs: [dotsMultiplier, watermarkMultiplier, contentMultiplier]
 // Each value is how much the layer shifts relative to mouse (in px per half-screen)
 const LAYER_DOTS = 0.012;
-const LAYER_MARK = 0.022;
 const LAYER_TEXT = 0.008;
 
 const SPRING_CFG = { stiffness: 60, damping: 18 };
@@ -158,9 +157,7 @@ export function Hero() {
   const half = typeof window !== 'undefined' ? window.innerWidth / 2 : 768;
   const dotsX = useTransform(mx, [-1, 1], [-half * LAYER_DOTS, half * LAYER_DOTS]);
   const dotsY = useTransform(my, [-1, 1], [-half * LAYER_DOTS, half * LAYER_DOTS]);
-  const markX  = useTransform(mx, [-1, 1], [-half * LAYER_MARK,  half * LAYER_MARK]);
-  const markY  = useTransform(my, [-1, 1], [-half * LAYER_MARK,  half * LAYER_MARK]);
-  const textX  = useTransform(mx, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
+const textX  = useTransform(mx, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
   const textY  = useTransform(my, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
 
   const scrollTo = (id: string) => {
@@ -203,21 +200,7 @@ export function Hero() {
         }}
       />
 
-      {/* Layer 2 — watermark (medium) */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
-        style={coarse ? {} : { x: markX, y: markY }}
-      >
-        <span
-          className="display-type stroke-text opacity-[0.07]"
-          style={{ fontSize: 'clamp(3.5rem, 16vw, 16rem)' }}
-        >
-          DEVELOPER
-        </span>
-      </motion.div>
-
-      {/* Layer 3 — content (exit transforms on the outer layer, mouse parallax inside) */}
+{/* Layer 3 — content (exit transforms on the outer layer, mouse parallax inside) */}
       <motion.div
         className="relative mx-auto max-w-[1400px] px-6 pt-32 pb-10 md:pb-14 w-full flex-1 flex flex-col justify-center"
         style={{ y: exitY, scale: exitScale, opacity: exitOpacity }}
@@ -247,6 +230,7 @@ export function Hero() {
               animate={{ y: '0%' }}
               transition={{ duration: 0.9, delay: 0.28, ease: [0.76, 0, 0.24, 1] }}
               className="block stroke-text"
+              style={{ color: 'rgb(var(--bg))', paintOrder: 'stroke fill' }}
             >
               Robin
             </motion.span>
