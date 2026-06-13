@@ -7,4 +7,6 @@ dist
 .vscode/
 supabase/.temp/
 *.png
+!public/KR_dark.png
+!public/KR_light.png
 scroll-shot.mjs

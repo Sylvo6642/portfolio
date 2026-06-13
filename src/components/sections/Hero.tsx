@@ -2,7 +2,6 @@ import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'fram
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConnectingDots } from '../layout/ConnectingDots';
 import { scrollToId } from '../../lib/scroll';
-import { useMagneticButton } from '../../hooks/useMagneticButton';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 
 // Set to your CV URL to show the Download CV button, or leave empty to hide it
@@ -35,20 +34,15 @@ function MagneticButton({
   onClick?: () => void;
   type?: 'button' | 'submit';
 }) {
-  const { ref, x, y, onMove, onLeave } = useMagneticButton(0.42);
   return (
-    <motion.button
-      ref={ref as React.Ref<HTMLButtonElement>}
+    <button
       type={type ?? 'button'}
       onClick={onClick}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ x, y }}
       data-cursor="hover"
       className={className}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }
 
@@ -63,20 +57,15 @@ function MagneticAnchor({
   download?: boolean;
   className: string;
 }) {
-  const { ref, x, y, onMove, onLeave } = useMagneticButton(0.42);
   return (
-    <motion.a
-      ref={ref as React.Ref<HTMLAnchorElement>}
+    <a
       href={href}
       download={download}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ x, y }}
       data-cursor="hover"
       className={className}
     >
       {children}
-    </motion.a>
+    </a>
   );
 }
 
@@ -235,21 +224,6 @@ export function Hero() {
       >
       <motion.div style={coarse ? {} : { x: textX, y: textY }}>
         {/* Meta row */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="flex items-center justify-between font-mono text-[10px] md:text-[11px] tracking-[0.22em] uppercase text-muted mb-6 md:mb-10"
-        >
-          <span>(Based in Kozhikode, Kerala)</span>
-          <span className="hidden sm:inline-flex items-center gap-2">
-            <span className="relative inline-flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-fg opacity-60 animate-ping" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fg" />
-            </span>
-            Available for work
-          </span>
-        </motion.div>
 
         {/* Giant stacked name */}
         <h1

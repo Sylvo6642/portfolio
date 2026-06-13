@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { scrollToId, scrollToTop } from '../../lib/scroll';
+import { useTheme } from '../../theme/ThemeProvider';
 
 const NAV = [
   { id: 'about', label: 'About' },
@@ -27,6 +28,7 @@ function HoverChars({ text }: { text: string }) {
 
 export function Navbar() {
   const { scrollY } = useScroll();
+  const { theme } = useTheme();
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
   const [logoArmed, setLogoArmed] = useState(false);
@@ -71,12 +73,15 @@ export function Navbar() {
           data-cursor="hover"
           className="font-display font-extrabold uppercase tracking-tight text-sm relative"
         >
-          <motion.span
+          <motion.img
+            src={theme === 'dark' ? '/KR_dark.png' : '/KR_light.png'}
+            alt="Kevin Robin"
+            width={48}
+            height={48}
             animate={logoArmed ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
             transition={logoArmed ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } : {}}
-          >
-            Kevin Robin<span className="align-super text-[0.6em]">®</span>
-          </motion.span>
+            className="h-12 w-12 object-contain"
+          />
         </button>
 
         <nav className="hidden md:flex items-center gap-5">
