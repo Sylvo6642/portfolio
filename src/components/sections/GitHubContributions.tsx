@@ -40,7 +40,12 @@ export function GitHubContributions() {
   const inView = useInView(ref, { once: true, amount: 0.2 });
 
   useEffect(() => {
-    fetch(EDGE_FN_URL)
+    fetch(EDGE_FN_URL, {
+      headers: {
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+    })
       .then((r) => r.json())
       .then((cal) => {
         if (!cal?.error) setData(boostContributions(cal));

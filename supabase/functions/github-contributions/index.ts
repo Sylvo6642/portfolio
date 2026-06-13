@@ -1,5 +1,11 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 const QUERY = `
   query {
     viewer {
@@ -18,10 +24,17 @@ const QUERY = `
   }
 `
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS })
+  }
+
   const token = Deno.env.get('GITHUB_TOKEN')
   if (!token) {
-    return new Response(JSON.stringify({ error: 'Missing GITHUB_TOKEN' }), { status: 500 })
+    return new Response(JSON.stringify({ error: 'Missing GITHUB_TOKEN' }), {
+      status: 500,
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
   }
 
   const res = await fetch('https://api.github.com/graphql', {
@@ -37,13 +50,13 @@ Deno.serve(async () => {
   const cal = json?.data?.viewer?.contributionsCollection?.contributionCalendar
 
   if (!cal) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch contributions' }), { status: 502 })
+    return new Response(JSON.stringify({ error: 'Failed to fetch contributions' }), {
+      status: 502,
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
   }
 
   return new Response(JSON.stringify(cal), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
+    headers: { ...CORS, 'Content-Type': 'application/json' },
   })
 })
