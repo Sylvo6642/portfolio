@@ -3,6 +3,7 @@
     { "source": "/projects/SkillDash/(.*)", "destination": "/projects/SkillDash/index.html" },
     { "source": "/projects/SpendWise/(.*)", "destination": "/projects/SpendWise/index.html" },
     { "source": "/projects/Clausify/(.*)", "destination": "/projects/Clausify/index.html" },
+    { "source": "/concepts/PashaSarayi/(.*)", "destination": "/concepts/PashaSarayi/index.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
