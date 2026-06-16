@@ -4,55 +4,96 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pasha Sarayi — Turkish Restaurant &amp; Café, Dubai</title>
+<link rel="icon" type="image/png" href="/concepts/PashaSarayi/assets/logo.png">
+<link rel="apple-touch-icon" href="/concepts/PashaSarayi/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#FAF7F2;--text:#1C1814;--muted:#7A6F63;--accent:#B5804A;--surface:#F0EBE3;--border:#DDD5C8;--dark:#1C1814;--dark-text:#FAF7F2;}
+:root{
+  --bg:#FAF7F2;--text:#1C1814;--muted:#7A6F63;--accent:#B5804A;--accent-deep:#9A6A38;
+  --surface:#F0EBE3;--border:#DDD5C8;--dark:#1C1814;--dark-2:#141009;--dark-text:#FAF7F2;
+  --ease:cubic-bezier(.25,.46,.45,.94);--ease-out:cubic-bezier(.16,1,.3,1);
+}
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;}
 input,button{font-family:inherit;}
 img{display:block;}
-@keyframes kenburns{from{transform:scale(1.08);}to{transform:scale(1);}}
+
+/* ---------- KEYFRAMES ---------- */
+@keyframes kenburns{from{transform:scale(1.12);}to{transform:scale(1.02);}}
 @keyframes pashaBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
 @keyframes loaderWipe{from{clip-path:inset(0 100% 0 0);}to{clip-path:inset(0 0 0 0);}}
 @keyframes loaderFadeOut{from{opacity:1;}to{opacity:0;}}
-@keyframes stripIn{from{transform:translateY(-10px);}to{transform:translateY(0);}}
-.loader{position:fixed;inset:0;z-index:300;background:#1C1814;display:flex;align-items:center;justify-content:center;}
-.loader.hide{animation:loaderFadeOut .5s ease forwards;pointer-events:none;}
+@keyframes loaderZoom{from{transform:scale(1);opacity:1;}to{transform:scale(2.4);opacity:0;}}
+@keyframes loaderBarGrow{from{width:0;}to{width:120px;}}
+@keyframes heroRise{from{transform:translateY(28px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes stripIn{from{transform:translateY(-12px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes navDrop{from{transform:translateY(-100%);}to{transform:translateY(0);}}
+@keyframes shimmer{from{background-position:-200% 0;}to{background-position:200% 0;}}
+@keyframes floatOrn{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-10px) rotate(2deg);}}
+
+/* ---------- LOADER ---------- */
+.loader{position:fixed;inset:0;z-index:300;background:var(--dark);display:flex;align-items:center;justify-content:center;}
+.loader.hide{animation:loaderFadeOut .55s ease .55s forwards;pointer-events:none;}
+.loader.hide .loader-logo{animation:loaderZoom .85s cubic-bezier(.7,0,.84,0) forwards;}
 .loader.gone{display:none;}
-.loader-logo{animation:loaderWipe 1.2s cubic-bezier(.45,0,.15,1) .25s forwards;}
-[data-reveal].in{animation:revUp .7s cubic-bezier(.25,.46,.45,.94) forwards;}
-[data-reveal="left"].in{animation-name:revLeft;}
-[data-reveal="right"].in{animation-name:revRight;}
-[data-reveal="scale"].in{animation-name:revScale;}
-@keyframes revUp{from{transform:translateY(24px);}to{transform:none;}}
-@keyframes revLeft{from{transform:translateX(-24px);}to{transform:none;}}
-@keyframes revRight{from{transform:translateX(24px);}to{transform:none;}}
-@keyframes revScale{from{transform:scale(.965);}to{transform:none;}}
-.hero.ready .hero-item{animation:heroRise .8s cubic-bezier(.25,.46,.45,.94) forwards;}
-@keyframes heroRise{from{transform:translateY(22px);}to{transform:none;}}
-.hero.ready .info-strip{animation:stripIn .8s cubic-bezier(.25,.46,.45,.94) 1.5s forwards;}
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:transparent;border-bottom:0.5px solid transparent;}
-.nav.scrolled{background:var(--bg);border-bottom:0.5px solid var(--border);}
-.nav .logo{color:#FAF7F2;}
-.nav.scrolled .logo{color:var(--text);}
-.nav-link{font-family:'Inter',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;color:#FAF7F2;padding-bottom:3px;border-bottom:1px solid transparent;}
-.nav.scrolled .nav-link{color:#7A6F63;}
+.loader-logo{transform-origin:center;animation:loaderWipe 1.15s cubic-bezier(.45,0,.15,1) .25s forwards;}
+.loader-bar{height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:18px auto 0;animation:loaderBarGrow 1.6s var(--ease-out) .3s forwards;width:0;}
+
+/* ---------- REVEALS ---------- */
+[data-reveal]{opacity:0;will-change:transform,opacity;transition:opacity .8s var(--ease-out),transform .8s var(--ease-out);transform:translateY(28px);}
+[data-reveal="left"]{transform:translateX(-32px);}
+[data-reveal="right"]{transform:translateX(32px);}
+[data-reveal="scale"]{transform:scale(.94);}
+[data-reveal].in{opacity:1;transform:none;}
+
+/* ---------- HERO ---------- */
+.hero.ready .hero-item{animation:heroRise .9s var(--ease-out) forwards;}
+.hero.ready .info-strip-inner{animation:stripIn .8s var(--ease-out) 1.6s forwards;}
+.hero-item{opacity:0;}
+.hero-ornament{position:absolute;opacity:.10;pointer-events:none;}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:transparent;border-bottom:0.5px solid transparent;transition:background .4s var(--ease),padding .4s var(--ease),border-color .4s var(--ease),box-shadow .4s var(--ease);}
+.nav.drop{animation:navDrop .7s var(--ease-out) forwards;}
+.nav.scrolled{background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border);padding:12px 48px;box-shadow:0 8px 30px -16px rgba(28,24,20,0.25);}
+.nav .logo img{transition:height .4s var(--ease);}
+.nav.scrolled .logo img{height:38px;}
+.nav-link{position:relative;font-size:12px;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;color:#FAF7F2;padding-bottom:4px;transition:color .25s ease;}
+.nav.scrolled .nav-link{color:var(--muted);}
+.nav-link::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:right;transition:transform .35s var(--ease-out);}
 .nav-link:hover{color:var(--accent);}
-.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link:hover::after,.nav-link.active::after{transform:scaleX(1);transform-origin:left;}
+.nav-link.active{color:var(--accent);}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;}
-.hamburger span{display:block;width:24px;height:1.5px;background:#FAF7F2;}
+.nav-spacer{display:none;}
+.hamburger span{display:block;width:24px;height:1.5px;background:#FAF7F2;transition:background .3s ease;}
 .nav.scrolled .hamburger span{background:var(--text);}
-.btn{display:inline-flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;padding:13px 28px;cursor:pointer;text-decoration:none;border:1px solid transparent;transition:background .25s ease,color .25s ease,border-color .25s ease;}
-.btn-dark{background:var(--text);color:var(--bg);}
-.btn-dark:hover{background:#2c2620;}
-.btn-gold{background:var(--accent);color:#FAF7F2;}
-.btn-gold:hover{background:#a5713f;}
+
+/* ---------- BUTTONS ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;padding:13px 28px;cursor:pointer;text-decoration:none;border:1px solid transparent;overflow:hidden;transition:transform .35s var(--ease-out),box-shadow .35s var(--ease-out),color .3s ease,border-color .3s ease;z-index:0;}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateY(101%);transition:transform .45s var(--ease-out);}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(0);}
+.btn-dark{background:var(--text);color:var(--bg);box-shadow:0 6px 20px -10px rgba(28,24,20,0.6);}
+.btn-dark::before{background:#2c2620;}
+.btn-dark:hover::before{transform:translateY(0);}
+.btn-dark:hover{box-shadow:0 12px 28px -10px rgba(28,24,20,0.55);}
+.btn-gold{background:var(--accent);color:#FAF7F2;box-shadow:0 6px 20px -10px rgba(181,128,74,0.8);}
+.btn-gold::before{background:var(--accent-deep);}
+.btn-gold:hover::before{transform:translateY(0);}
+.btn-gold:hover{box-shadow:0 14px 30px -10px rgba(181,128,74,0.65);}
 .btn-ghost{background:transparent;border:1px solid rgba(250,247,242,0.45);color:#FAF7F2;}
-.btn-ghost:hover{border-color:#FAF7F2;background:rgba(250,247,242,0.08);}
-.sec-pad{padding:100px 80px;}
+.btn-ghost::before{background:rgba(250,247,242,0.12);}
+.btn-ghost:hover{border-color:#FAF7F2;}
+.btn-ghost:hover::before{transform:translateY(0);}
+.btn .btn-arrow{transition:transform .35s var(--ease-out);}
+.btn:hover .btn-arrow{transform:translateX(4px);}
+
+/* ---------- LAYOUT ---------- */
+.sec-pad{padding:110px 80px;}
 .about-grid{display:grid;grid-template-columns:55% 45%;gap:64px;align-items:center;}
 .pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);}
 .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -61,26 +102,75 @@ img{display:block;}
 .insta-grid{display:grid;grid-template-columns:repeat(4,1fr);}
 .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:48px;}
 .footer-bottom{display:flex;align-items:center;justify-content:space-between;}
-.menu-card .menu-img{transition:transform .45s ease;}
-.menu-card:hover .menu-img{transform:scale(1.04);}
-.insta-tile img{filter:brightness(0.82);transition:filter .35s ease;}
-.insta-tile:hover img{filter:brightness(1);}
-.foot-link{color:rgba(250,247,242,0.50);text-decoration:none;transition:color .2s ease;}
-.foot-link:hover{color:rgba(250,247,242,0.90);}
-.social-ic{color:rgba(250,247,242,0.35);transition:color .2s ease;}
-.social-ic:hover{color:rgba(250,247,242,0.80);}
+
+/* ---------- CARDS / TILES ---------- */
+.menu-card{position:relative;background:var(--bg);border:0.5px solid var(--border);border-radius:3px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:transform .45s var(--ease-out),box-shadow .45s var(--ease-out),border-color .45s var(--ease-out);}
+.menu-card:hover{transform:translateY(-6px);box-shadow:0 24px 50px -24px rgba(28,24,20,0.4);border-color:var(--accent);}
+.menu-card .menu-img{transition:transform .7s var(--ease-out);}
+.menu-card:hover .menu-img{transform:scale(1.07);}
+.menu-card .menu-fade{position:absolute;top:0;left:0;right:0;height:210px;background:linear-gradient(to top,rgba(28,24,20,0.35),transparent 55%);opacity:0;transition:opacity .45s ease;}
+.menu-card:hover .menu-fade{opacity:1;}
+
+.pillar{position:relative;padding:44px 26px;text-align:center;transition:background .4s var(--ease);overflow:hidden;}
+.pillar::after{content:"";position:absolute;left:50%;bottom:0;width:0;height:2px;background:var(--accent);transform:translateX(-50%);transition:width .45s var(--ease-out);}
+.pillar:hover{background:var(--surface);}
+.pillar:hover::after{width:60%;}
+.pillar svg{transition:transform .45s var(--ease-out);}
+.pillar:hover svg{transform:translateY(-4px) scale(1.06);}
+
+.insta-tile img{filter:brightness(0.82) saturate(.95);transition:filter .5s var(--ease),transform .7s var(--ease-out);}
+.insta-tile:hover img{filter:brightness(1) saturate(1.05);transform:scale(1.06);}
+.insta-tile{position:relative;overflow:hidden;}
+.insta-tile::after{content:"";position:absolute;inset:0;background:rgba(181,128,74,0.0);transition:background .4s ease;}
+.insta-tile:hover::after{background:rgba(181,128,74,0.12);}
+
+.foot-link{position:relative;color:rgba(250,247,242,0.50);text-decoration:none;transition:color .25s ease;}
+.foot-link:hover{color:rgba(250,247,242,0.95);}
+.social-ic{color:rgba(250,247,242,0.35);transition:color .25s ease,transform .25s var(--ease-out);}
+.social-ic:hover{color:var(--accent);transform:translateY(-2px);}
 .insta-h2{color:var(--text);text-decoration:none;transition:color .25s ease;}
 .insta-h2:hover{color:var(--accent);}
-.res-input{background:rgba(255,255,255,0.06);border:0.5px solid rgba(250,247,242,0.18);color:#FAF7F2;padding:14px 16px;border-radius:2px;font-family:'Inter',sans-serif;font-size:13px;width:100%;color-scheme:dark;transition:border-color .3s ease;}
+
+.res-input{background:rgba(255,255,255,0.06);border:0.5px solid rgba(250,247,242,0.18);color:#FAF7F2;padding:14px 16px;border-radius:2px;font-size:13px;width:100%;color-scheme:dark;transition:border-color .3s ease,background .3s ease,box-shadow .3s ease;}
 .res-input::placeholder{color:rgba(250,247,242,0.38);}
-.res-input:focus{border-color:var(--accent);outline:none;}
-.mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:#1C1814;flex-direction:column;align-items:center;justify-content:center;gap:30px;opacity:0;visibility:hidden;pointer-events:none;}
-.mobile-menu.open{display:flex;opacity:1;visibility:visible;pointer-events:auto;}
-.res-confirm{display:none;font-family:'Inter',sans-serif;font-size:13px;color:var(--accent);letter-spacing:.04em;margin-top:4px;}
-.res-confirm.show{display:block;}
-.hero-h1{font-size:76px;}
+.res-input:focus{border-color:var(--accent);outline:none;background:rgba(255,255,255,0.09);box-shadow:0 0 0 3px rgba(181,128,74,0.18);}
+
+/* divider with diamond */
+.divider{display:flex;align-items:center;justify-content:center;gap:14px;}
+.divider .ln{height:0.5px;width:46px;background:var(--accent);opacity:.55;}
+.divider .dot{width:5px;height:5px;background:var(--accent);transform:rotate(45deg);}
+
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:500;}
+.h-display{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15;color:var(--text);}
+
+/* mobile menu */
+.mobile-menu{display:flex;position:fixed;inset:0;z-index:200;background:var(--dark);flex-direction:column;align-items:center;justify-content:center;gap:30px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease-out,visibility .35s ease-out;}
+.mobile-menu.open{opacity:1;visibility:visible;pointer-events:auto;}
+.mobile-menu .mob-link{opacity:0;transform:translateY(16px);transition:opacity .4s var(--ease-out),transform .4s var(--ease-out),color .25s ease;}
+.mobile-menu.open .mob-link{opacity:1;transform:translateY(0);}
+.mobile-menu .mob-link:hover{color:var(--accent);}
+.mobile-menu.open .mob-link:nth-child(2){transition-delay:.07s;}
+.mobile-menu.open .mob-link:nth-child(3){transition-delay:.11s;}
+.mobile-menu.open .mob-link:nth-child(4){transition-delay:.15s;}
+.mobile-menu.open .mob-link:nth-child(5){transition-delay:.19s;}
+.mobile-menu.open .mob-link:nth-child(6){transition-delay:.23s;}
+.mobile-menu.open .mob-link:nth-child(7){transition-delay:.27s;}
+
+.res-confirm{display:none;font-size:13px;color:var(--accent);letter-spacing:.04em;margin-top:4px;}
+.res-confirm.show{display:block;animation:heroRise .5s var(--ease-out) forwards;}
+
+.hero-h1{font-size:78px;}
+.parallax{will-change:transform;}
+
+@media(max-width:1024px){
+ .nav-center,.nav-cta{display:none !important;}
+ .nav,.nav.scrolled{padding:16px 20px;}
+ .hamburger{display:flex !important;order:1;}
+ .nav .logo{order:2;position:absolute;left:50%;transform:translateX(-50%);}
+ .nav-spacer{display:block;order:3;width:36px;}
+}
 @media(max-width:768px){
- .sec-pad{padding:64px 24px;}
+ .sec-pad{padding:70px 24px;}
  .about-grid{grid-template-columns:1fr;gap:36px;}
  .pillars-grid{grid-template-columns:1fr 1fr;}
  .menu-grid{grid-template-columns:1fr;}
@@ -88,12 +178,18 @@ img{display:block;}
  .insta-grid{grid-template-columns:1fr 1fr;}
  .footer-grid{grid-template-columns:1fr;gap:36px;}
  .footer-bottom{flex-direction:column;gap:10px;text-align:center;}
- .nav-center,.nav-cta{display:none;}
- .nav{padding:16px 24px;}
- .hamburger{display:flex;}
- .hero-h1{font-size:44px;}
+ .hero-h1{font-size:46px;}
  .info-row{flex-wrap:wrap;}
  .info-item{flex:1 1 50%;}
+}
+
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto;}
+ *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0ms !important;transition-duration:.001ms !important;}
+ [data-reveal]{opacity:1 !important;transform:none !important;}
+ .hero-item{opacity:1 !important;}
+ .parallax{transform:none !important;}
+ .loader{display:none !important;}
 }
 </style>
 </head>
@@ -104,19 +200,20 @@ img{display:block;}
   <div class="loader" id="loader">
     <div class="loader-logo" style="text-align:center;">
       <img src="/concepts/PashaSarayi/assets/logo.png" alt="Pasha Sarayi" style="width:210px;max-width:62vw;height:auto;display:block;margin:0 auto;">
-      <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:500;letter-spacing:.42em;margin-top:14px;color:rgba(250,247,242,0.55);">RESTAURANT &amp; CAFÉ</div>
+      <div style="font-size:10px;font-weight:500;letter-spacing:.42em;margin-top:14px;color:rgba(250,247,242,0.55);">RESTAURANT &amp; CAFÉ</div>
+      <div class="loader-bar"></div>
     </div>
   </div>
 
   <!-- MOBILE MENU OVERLAY -->
   <div class="mobile-menu" id="mobileMenu">
-    <button id="closeMenuBtn" style="position:absolute;top:22px;right:24px;background:none;border:none;color:#FAF7F2;font-size:30px;line-height:1;cursor:pointer;">&times;</button>
-    <a href="#home" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">Home</a>
-    <a href="#menu" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">Menu</a>
-    <a href="#about" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">About</a>
-    <a href="#catering" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">Catering</a>
-    <a href="#location" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">Location</a>
-    <a href="#contact" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;font-weight:400;">Contact</a>
+    <button id="closeMenuBtn" aria-label="Close menu" style="position:absolute;top:22px;right:24px;background:none;border:none;color:#FAF7F2;font-size:30px;line-height:1;cursor:pointer;">&times;</button>
+    <a href="#home" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">Home</a>
+    <a href="#menu" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">Menu</a>
+    <a href="#about" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">About</a>
+    <a href="#catering" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">Catering</a>
+    <a href="#location" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">Location</a>
+    <a href="#contact" class="mob-link" style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#FAF7F2;text-decoration:none;">Contact</a>
   </div>
 
   <!-- NAV -->
@@ -134,48 +231,56 @@ img{display:block;}
     </div>
     <a href="#contact" class="btn btn-gold nav-cta">Reserve a table</a>
     <button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <span class="nav-spacer" aria-hidden="true"></span>
   </nav>
 
   <!-- HERO -->
-  <section id="home" data-nav-section class="hero" id="hero" style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;scroll-margin-top:0;">
-    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=90&fit=crop" loading="eager" fetchpriority="high" alt="Restaurant interior" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:kenburns 8s ease-out 2.3s both;transform:scale(1.08);">
-    <div style="position:absolute;inset:0;background:rgba(28,24,20,0.55);"></div>
-    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 24px;">
-      <div class="hero-item" style="animation-delay:.4s;font-family:'Inter',sans-serif;font-size:11px;color:var(--accent);letter-spacing:.22em;text-transform:uppercase;">Turkish Restaurant &amp; Café — Dubai, UAE</div>
-      <h1 style="margin:22px 0 0;color:#FAF7F2;font-family:'Cormorant Garamond',serif;font-weight:300;line-height:1.05;">
+  <section id="home" data-nav-section class="hero" style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;scroll-margin-top:0;">
+    <img id="heroImg" class="parallax" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=90&fit=crop" loading="eager" fetchpriority="high" alt="Pasha Sarayi restaurant interior" style="position:absolute;inset:0;width:100%;height:120%;object-fit:cover;animation:kenburns 12s ease-out 2.3s both;transform:scale(1.12);">
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(28,24,20,0.55),rgba(28,24,20,0.40) 40%,rgba(28,24,20,0.72));"></div>
+    <!-- ornaments -->
+    <svg class="hero-ornament" style="top:14%;left:8%;animation:floatOrn 9s ease-in-out infinite;" width="90" height="90" viewBox="0 0 24 24" fill="none" stroke="#FAF7F2" stroke-width="0.5"><path d="M12 2l2.5 7H22l-6 4.5L18.5 21 12 16.5 5.5 21 8 13.5 2 9h7.5z"/></svg>
+    <svg class="hero-ornament" style="bottom:16%;right:9%;animation:floatOrn 11s ease-in-out infinite 1s;" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="0.4"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><path d="M12 2v20M2 12h20"/></svg>
+    <div class="hero-content" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 24px;">
+      <div class="hero-item" style="animation-delay:.4s;" >
+        <span class="eyebrow" style="color:var(--accent);">Turkish Restaurant &amp; Café — Dubai, UAE</span>
+      </div>
+      <h1 style="margin:22px 0 0;color:#FAF7F2;font-family:'Cormorant Garamond',serif;font-weight:300;line-height:1.04;">
         <span class="hero-h1 hero-item" style="display:block;animation-delay:.65s;">Be Pasha</span>
-        <span class="hero-h1 hero-item" style="display:block;animation-delay:.8s;">in our Sarayi</span>
+        <span class="hero-h1 hero-item" style="display:block;animation-delay:.82s;font-style:italic;color:#fff;">in our Sarayi</span>
       </h1>
-      <p class="hero-item" style="animation-delay:1s;margin:16px 0 0;font-family:'Inter',sans-serif;font-size:15px;color:rgba(250,247,242,0.70);max-width:440px;line-height:1.6;">Authentic flavours where Ottoman tradition meets modern elegance</p>
-      <div class="hero-item" style="animation-delay:1.3s;display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;justify-content:center;">
+      <p class="hero-item" style="animation-delay:1.0s;margin:18px 0 0;font-size:15px;color:rgba(250,247,242,0.78);max-width:440px;line-height:1.7;">Authentic flavours where Ottoman tradition meets modern elegance</p>
+      <div class="hero-item" style="animation-delay:1.3s;display:flex;gap:12px;margin-top:34px;flex-wrap:wrap;justify-content:center;">
         <a href="#contact" class="btn btn-gold">Reserve a table</a>
-        <a href="#menu" class="btn btn-ghost">View menu</a>
+        <a href="#menu" class="btn btn-ghost">View menu <span class="btn-arrow">→</span></a>
       </div>
     </div>
-    <a href="#strip" style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;">
+    <a href="#strip" aria-label="Scroll down" style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FAF7F2" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="animation:pashaBounce 1.8s ease-in-out infinite;"><path d="M6 9l6 6 6-6"/></svg>
     </a>
   </section>
 
   <!-- INFO STRIP -->
   <div id="strip" class="info-strip" style="background:var(--dark);">
+    <div class="info-strip-inner" style="opacity:0;">
     <div class="info-row" style="display:flex;align-items:stretch;">
       <div class="info-item" style="display:flex;align-items:center;gap:10px;padding:16px 32px;border-right:0.5px solid rgba(255,255,255,0.12);flex:1;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="#B5804A"><path d="M12 2.5l2.7 5.9 6.4.6-4.85 4.3 1.45 6.3L12 16.9 6.3 19.6l1.45-6.3L2.9 9l6.4-.6z"/></svg>
-        <span style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">4.9 on Google Reviews</span>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);"><span class="count" data-to="4.9" data-dec="1">0</span> on Google Reviews</span>
       </div>
       <div class="info-item" style="display:flex;align-items:center;gap:10px;padding:16px 32px;border-right:0.5px solid rgba(255,255,255,0.12);flex:1;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></svg>
-        <span style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">Open Daily 12pm – 11pm</span>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">Open Daily 12pm – 11pm</span>
       </div>
       <div class="info-item" style="display:flex;align-items:center;gap:10px;padding:16px 32px;border-right:0.5px solid rgba(255,255,255,0.12);flex:1;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        <span style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">Mercato Mall, Jumeirah 1, Dubai</span>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">Mercato Mall, Jumeirah 1, Dubai</span>
       </div>
       <div class="info-item" style="display:flex;align-items:center;gap:10px;padding:16px 32px;flex:1;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 6a2 2 0 0 1 2-2z"/></svg>
-        <span style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">+971 56 684 6399</span>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(250,247,242,0.80);">+971 56 684 6399</span>
       </div>
+    </div>
     </div>
   </div>
 
@@ -183,15 +288,19 @@ img{display:block;}
   <section id="about" data-nav-section class="sec-pad" style="scroll-margin-top:80px;">
     <div class="about-grid">
       <div>
-        <div data-reveal style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);">Our story</div>
-        <h2 data-reveal style="animation-delay:.1s;margin:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:400;line-height:1.2;color:var(--text);">Where Ottoman heritage meets modern craft</h2>
-        <div data-reveal style="animation-delay:.16s;width:40px;height:1px;background:var(--accent);margin:22px 0;"></div>
-        <p data-reveal style="animation-delay:.2s;margin:0;font-family:'Inter',sans-serif;font-size:15px;color:var(--muted);line-height:1.85;">Pasha Sarayi is a culinary brand that blends the rich traditions of Turkish cuisine with contemporary global flavors and techniques. Drawing inspiration from every region of Turkey — from the aromatic spices of the East to the hearty grilled meats of the West — we craft a dining experience unlike any other in Dubai.</p>
-        <p data-reveal style="animation-delay:.26s;margin:14px 0 0;font-family:'Inter',sans-serif;font-size:15px;color:var(--muted);line-height:1.85;">Beyond the food, we offer a curated shisha experience and warm hospitality that makes every visit feel like a royal gathering in an Ottoman palace.</p>
-        <a href="#about" data-reveal class="btn btn-dark" style="animation-delay:.32s;margin-top:28px;">Discover our story</a>
+        <div data-reveal class="eyebrow">Our story</div>
+        <h2 data-reveal style="transition-delay:.08s;margin:16px 0 0;font-size:42px;" class="h-display">Where Ottoman heritage meets modern craft</h2>
+        <div data-reveal style="transition-delay:.14s;width:40px;height:1px;background:var(--accent);margin:22px 0;"></div>
+        <p data-reveal style="transition-delay:.2s;margin:0;font-size:15px;color:var(--muted);line-height:1.85;">Pasha Sarayi is a culinary brand that blends the rich traditions of Turkish cuisine with contemporary global flavors and techniques. Drawing inspiration from every region of Turkey — from the aromatic spices of the East to the hearty grilled meats of the West — we craft a dining experience unlike any other in Dubai.</p>
+        <p data-reveal style="transition-delay:.26s;margin:14px 0 0;font-size:15px;color:var(--muted);line-height:1.85;">Beyond the food, we offer a curated shisha experience and warm hospitality that makes every visit feel like a royal gathering in an Ottoman palace.</p>
+        <a href="#about" data-reveal class="btn btn-dark" style="transition-delay:.32s;margin-top:28px;">Discover our story <span class="btn-arrow">→</span></a>
       </div>
-      <div data-reveal="right">
-        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=85&fit=crop" loading="lazy" alt="Turkish dishes" style="width:100%;height:420px;object-fit:cover;border-radius:2px;">
+      <div data-reveal="right" style="position:relative;">
+        <img class="parallax" data-speed="0.06" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=85&fit=crop" loading="lazy" alt="Turkish dishes served at the table" style="width:100%;height:440px;object-fit:cover;border-radius:3px;box-shadow:0 30px 60px -30px rgba(28,24,20,0.5);">
+        <div style="position:absolute;bottom:-18px;right:-18px;background:var(--accent);color:#FAF7F2;padding:18px 22px;border-radius:3px;box-shadow:0 18px 40px -18px rgba(181,128,74,0.7);">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;"><span class="count" data-to="12">0</span>+</div>
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-top:4px;opacity:.85;">Years of craft</div>
+        </div>
       </div>
     </div>
   </section>
@@ -199,25 +308,25 @@ img{display:block;}
   <!-- FEATURE PILLARS -->
   <section id="catering" data-nav-section style="background:var(--bg);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);scroll-margin-top:80px;">
     <div class="pillars-grid">
-      <div data-reveal style="padding:36px 24px;text-align:center;border-right:0.5px solid var(--border);">
+      <div data-reveal class="pillar" style="border-right:0.5px solid var(--border);">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M12 3c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 .5 2 1.6 2.6 1.6 2.6C9.6 8 11 6 12 3z"/></svg>
-        <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text);margin-top:14px;">Live grill</div>
-        <div style="font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Freshly grilled kebabs &amp; meats prepared daily in-house</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:14px;">Live grill</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Freshly grilled kebabs &amp; meats prepared daily in-house</div>
       </div>
-      <div data-reveal style="animation-delay:.12s;padding:36px 24px;text-align:center;border-right:0.5px solid var(--border);">
+      <div data-reveal class="pillar" style="transition-delay:.1s;border-right:0.5px solid var(--border);">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14z"/><path d="M5 19c3-4.5 6.5-7 10.5-9"/></svg>
-        <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text);margin-top:14px;">Fresh ingredients</div>
-        <div style="font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Seasonal produce and traditional Turkish spices, sourced with care</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:14px;">Fresh ingredients</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Seasonal produce and traditional Turkish spices, sourced with care</div>
       </div>
-      <div data-reveal style="animation-delay:.24s;padding:36px 24px;text-align:center;border-right:0.5px solid var(--border);">
+      <div data-reveal class="pillar" style="transition-delay:.2s;border-right:0.5px solid var(--border);">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M3 9h10a3 3 0 1 0-3-3"/><path d="M3 14h14a3 3 0 1 1-3 3"/></svg>
-        <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text);margin-top:14px;">Shisha lounge</div>
-        <div style="font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">A curated shisha experience in a warm, relaxed setting</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:14px;">Shisha lounge</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">A curated shisha experience in a warm, relaxed setting</div>
       </div>
-      <div data-reveal style="animation-delay:.36s;padding:36px 24px;text-align:center;">
+      <div data-reveal class="pillar" style="transition-delay:.3s;">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B5804A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M3 18h18"/><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 7.5V6"/><circle cx="12" cy="5" r="1.1" fill="#B5804A"/></svg>
-        <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text);margin-top:14px;">Catering</div>
-        <div style="font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Full-service Turkish catering for private events and gatherings</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:14px;">Catering</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:6px;">Full-service Turkish catering for private events and gatherings</div>
       </div>
     </div>
   </section>
@@ -225,55 +334,61 @@ img{display:block;}
   <!-- MENU -->
   <section id="menu" data-nav-section class="sec-pad" style="background:var(--surface);scroll-margin-top:80px;">
     <div style="text-align:center;">
-      <div data-reveal style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);">Our menu</div>
-      <h2 data-reveal style="animation-delay:.1s;margin:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:400;line-height:1.2;color:var(--text);">A taste of Turkey, served in Dubai</h2>
-      <div data-reveal style="animation-delay:.16s;width:40px;height:1px;background:var(--accent);margin:20px auto 0;"></div>
+      <div data-reveal class="eyebrow">Our menu</div>
+      <h2 data-reveal style="transition-delay:.08s;margin:16px 0 0;font-size:42px;" class="h-display">A taste of Turkey, served in Dubai</h2>
+      <div data-reveal class="divider" style="transition-delay:.14s;margin:22px 0 0;"><span class="ln"></span><span class="dot"></span><span class="ln"></span></div>
     </div>
     <div class="menu-grid" style="margin-top:56px;">
-      <div data-reveal class="menu-card" style="background:var(--bg);border:0.5px solid var(--border);border-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-        <div style="overflow:hidden;"><img class="menu-img" src="https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600&q=85&fit=crop" loading="lazy" alt="Adana kebab" style="width:100%;height:210px;object-fit:cover;"></div>
+      <div data-reveal class="menu-card">
+        <div style="overflow:hidden;position:relative;"><div class="menu-fade"></div><img class="menu-img" src="https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600&q=85&fit=crop" loading="lazy" alt="Adana kebab on a skewer" style="width:100%;height:210px;object-fit:cover;"></div>
         <div style="padding:20px 22px;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text);">Adana kebab</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:var(--muted);line-height:1.65;margin-top:6px;">Spiced minced lamb on skewer, served with lavash and sumac onions</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--accent);margin-top:12px;">AED 68</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;color:var(--text);">Adana kebab</div>
+            <div style="font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;">AED 68</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65;margin-top:8px;">Spiced minced lamb on skewer, served with lavash and sumac onions</div>
         </div>
       </div>
-      <div data-reveal class="menu-card" style="animation-delay:.12s;background:var(--bg);border:0.5px solid var(--border);border-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-        <div style="overflow:hidden;"><img class="menu-img" src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=85&fit=crop" loading="lazy" alt="Meze platter" style="width:100%;height:210px;object-fit:cover;"></div>
+      <div data-reveal class="menu-card" style="transition-delay:.12s;">
+        <div style="overflow:hidden;position:relative;"><div class="menu-fade"></div><img class="menu-img" src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=85&fit=crop" loading="lazy" alt="Turkish meze platter" style="width:100%;height:210px;object-fit:cover;"></div>
         <div style="padding:20px 22px;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text);">Meze platter</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:var(--muted);line-height:1.65;margin-top:6px;">Hummus, muhammara, cacık, stuffed vine leaves, warm pita bread</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--accent);margin-top:12px;">AED 54</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;color:var(--text);">Meze platter</div>
+            <div style="font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;">AED 54</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65;margin-top:8px;">Hummus, muhammara, cacık, stuffed vine leaves, warm pita bread</div>
         </div>
       </div>
-      <div data-reveal class="menu-card" style="animation-delay:.24s;background:var(--bg);border:0.5px solid var(--border);border-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-        <div style="overflow:hidden;"><img class="menu-img" src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&q=85&fit=crop" loading="lazy" alt="Pistachio baklava" style="width:100%;height:210px;object-fit:cover;"></div>
+      <div data-reveal class="menu-card" style="transition-delay:.24s;">
+        <div style="overflow:hidden;position:relative;"><div class="menu-fade"></div><img class="menu-img" src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&q=85&fit=crop" loading="lazy" alt="Pistachio baklava" style="width:100%;height:210px;object-fit:cover;"></div>
         <div style="padding:20px 22px;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text);">Pistachio baklava</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;color:var(--muted);line-height:1.65;margin-top:6px;">Flaky layered pastry with crushed pistachios and fragrant rose syrup</div>
-          <div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--accent);margin-top:12px;">AED 36</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;color:var(--text);">Pistachio baklava</div>
+            <div style="font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;">AED 36</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65;margin-top:8px;">Flaky layered pastry with crushed pistachios and fragrant rose syrup</div>
         </div>
       </div>
     </div>
     <div data-reveal style="text-align:center;margin-top:48px;">
-      <a href="#menu" class="btn btn-dark">View full menu</a>
+      <a href="#menu" class="btn btn-dark">View full menu <span class="btn-arrow">→</span></a>
     </div>
   </section>
 
   <!-- RESERVATION -->
   <section id="contact" data-nav-section class="sec-pad" style="background:var(--dark);text-align:center;scroll-margin-top:80px;">
-    <div data-reveal style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);">Reservations</div>
-    <h2 data-reveal style="animation-delay:.1s;margin:16px 0 0;font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:400;color:#FAF7F2;line-height:1.15;">Book your table</h2>
-    <p data-reveal style="animation-delay:.16s;margin:12px 0 0;font-family:'Inter',sans-serif;font-size:14px;color:rgba(250,247,242,0.55);">Available daily for lunch &amp; dinner. Walk-ins welcome, reservations preferred.</p>
-    <form id="resForm" data-reveal style="animation-delay:.22s;max-width:640px;margin:44px auto 0;display:flex;flex-direction:column;gap:12px;">
+    <div data-reveal class="eyebrow">Reservations</div>
+    <h2 data-reveal style="transition-delay:.08s;margin:16px 0 0;font-size:46px;color:#FAF7F2;" class="h-display">Book your table</h2>
+    <p data-reveal style="transition-delay:.14s;margin:12px 0 0;font-size:14px;color:rgba(250,247,242,0.55);">Available daily for lunch &amp; dinner. Walk-ins welcome, reservations preferred.</p>
+    <form id="resForm" data-reveal style="transition-delay:.2s;max-width:640px;margin:44px auto 0;display:flex;flex-direction:column;gap:12px;">
       <div class="res-grid2">
-        <input class="res-input" type="text" placeholder="Full name" required>
-        <input class="res-input" type="tel" placeholder="Phone number" required>
+        <input class="res-input" type="text" placeholder="Full name" aria-label="Full name" required>
+        <input class="res-input" type="tel" placeholder="Phone number" aria-label="Phone number" required>
       </div>
       <div class="res-grid3">
-        <input class="res-input" type="date" required>
-        <input class="res-input" type="time" required>
-        <input class="res-input" type="number" min="1" placeholder="No. of guests" required>
+        <input class="res-input" type="date" aria-label="Date" required>
+        <input class="res-input" type="time" aria-label="Time" required>
+        <input class="res-input" type="number" min="1" placeholder="No. of guests" aria-label="Number of guests" required>
       </div>
       <button type="submit" class="btn btn-gold" style="width:100%;padding:15px;">Confirm reservation</button>
       <div class="res-confirm" id="resConfirm">Thank you — we'll call to confirm your table shortly.</div>
@@ -281,28 +396,27 @@ img{display:block;}
   </section>
 
   <!-- TESTIMONIAL -->
-  <section style="background:var(--bg);padding:80px;text-align:center;">
-    <div data-reveal style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);">What our guests say</div>
-    <div style="width:100%;height:0;border-top:0.5px solid var(--border);margin:40px 0;"></div>
+  <section style="background:var(--bg);padding:90px 80px;text-align:center;">
+    <div data-reveal class="eyebrow">What our guests say</div>
+    <div data-reveal class="divider" style="transition-delay:.08s;margin:34px 0;"><span class="ln"></span><span class="dot"></span><span class="ln"></span></div>
     <div data-reveal="scale">
       <div style="color:var(--accent);font-size:18px;letter-spacing:8px;">★★★★★</div>
-      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--text);line-height:1.85;max-width:580px;margin:20px auto;font-weight:400;">"The food was excellent — authentic Turkish and genuinely delicious. The ambiance is warm, the shisha is great, and the service is attentive. One of the best hidden gems in Mercato Mall."</p>
-      <div style="font-family:'Inter',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:20px;">— Verified Google Review · 5.0</div>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:23px;color:var(--text);line-height:1.85;max-width:580px;margin:20px auto;font-weight:400;">“The food was excellent — authentic Turkish and genuinely delicious. The ambiance is warm, the shisha is great, and the service is attentive. One of the best hidden gems in Mercato Mall.”</p>
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:20px;">— Verified Google Review · 5.0</div>
     </div>
-    <div style="width:100%;height:0;border-top:0.5px solid var(--border);margin:40px 0 0;"></div>
   </section>
 
   <!-- INSTAGRAM -->
-  <section id="location" data-nav-section style="background:var(--surface);padding:80px;scroll-margin-top:80px;">
+  <section id="location" data-nav-section style="background:var(--surface);padding:90px 80px;scroll-margin-top:80px;">
     <div style="text-align:center;">
-      <div data-reveal style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);">Follow our journey</div>
-      <h2 data-reveal style="animation-delay:.08s;margin:14px 0 0;font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;"><a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" class="insta-h2">@pasha_sarayi</a></h2>
+      <div data-reveal class="eyebrow">Follow our journey</div>
+      <h2 data-reveal style="transition-delay:.06s;margin:14px 0 0;font-size:34px;" class="h-display"><a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" class="insta-h2">@pasha_sarayi</a></h2>
     </div>
     <div class="insta-grid" style="margin-top:40px;">
-      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="aspect-ratio:1/1;overflow:hidden;display:block;"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&fit=crop" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;"></a>
-      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="animation-delay:.1s;aspect-ratio:1/1;overflow:hidden;display:block;"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;"></a>
-      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="animation-delay:.2s;aspect-ratio:1/1;overflow:hidden;display:block;"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80&fit=crop" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;"></a>
-      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="animation-delay:.3s;aspect-ratio:1/1;overflow:hidden;display:block;"><img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&q=80&fit=crop" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;"></a>
+      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="aspect-ratio:1/1;display:block;"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&fit=crop" loading="lazy" alt="Dining ambiance at Pasha Sarayi" style="width:100%;height:100%;object-fit:cover;"></a>
+      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="transition-delay:.08s;aspect-ratio:1/1;display:block;"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop" loading="lazy" alt="Grilled Turkish dishes" style="width:100%;height:100%;object-fit:cover;"></a>
+      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="transition-delay:.16s;aspect-ratio:1/1;display:block;"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80&fit=crop" loading="lazy" alt="Plated cuisine" style="width:100%;height:100%;object-fit:cover;"></a>
+      <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" data-reveal class="insta-tile" style="transition-delay:.24s;aspect-ratio:1/1;display:block;"><img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&q=80&fit=crop" loading="lazy" alt="Restaurant table setting" style="width:100%;height:100%;object-fit:cover;"></a>
     </div>
   </section>
 
@@ -311,15 +425,15 @@ img{display:block;}
     <div class="footer-grid" style="padding:64px 80px;">
       <div>
         <img src="/concepts/PashaSarayi/assets/logo.png" alt="Pasha Sarayi" style="height:56px;width:auto;display:block;">
-        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(250,247,242,0.50);line-height:2.0;margin-top:20px;">
+        <div style="font-size:13px;color:rgba(250,247,242,0.50);line-height:2.0;margin-top:20px;">
           Mercato Shopping Mall, 1st Floor<br>Jumeirah Beach Road, Jumeirah 1<br>Dubai, UAE<br>
           <a href="mailto:pasha.sarayi.uae@gmail.com" class="foot-link">pasha.sarayi.uae@gmail.com</a><br>
           +971 56 684 6399 · 04 881 3544
         </div>
       </div>
       <div>
-        <div style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);">Navigate</div>
-        <div style="display:flex;flex-direction:column;margin-top:14px;font-family:'Inter',sans-serif;font-size:13px;line-height:2.4;">
+        <div class="eyebrow" style="letter-spacing:.14em;">Navigate</div>
+        <div style="display:flex;flex-direction:column;margin-top:14px;font-size:13px;line-height:2.4;">
           <a href="#home" class="foot-link">Home</a>
           <a href="#menu" class="foot-link">Menu</a>
           <a href="#about" class="foot-link">About us</a>
@@ -329,8 +443,8 @@ img{display:block;}
         </div>
       </div>
       <div>
-        <div style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);">Experience</div>
-        <div style="display:flex;flex-direction:column;margin-top:14px;font-family:'Inter',sans-serif;font-size:13px;line-height:2.4;">
+        <div class="eyebrow" style="letter-spacing:.14em;">Experience</div>
+        <div style="display:flex;flex-direction:column;margin-top:14px;font-size:13px;line-height:2.4;">
           <a href="#contact" class="foot-link">Reserve a table</a>
           <a href="#menu" class="foot-link">Order online</a>
           <a href="#catering" class="foot-link">Shisha lounge</a>
@@ -339,8 +453,8 @@ img{display:block;}
         </div>
       </div>
     </div>
-    <div class="footer-bottom" style="background:#111009;padding:16px 80px;">
-      <div style="font-family:'Inter',sans-serif;font-size:11px;color:rgba(250,247,242,0.28);">© 2024 Pasha Sarayi Restaurant &amp; Cafe. All rights reserved.</div>
+    <div class="footer-bottom" style="background:var(--dark-2);padding:16px 80px;">
+      <div style="font-size:11px;color:rgba(250,247,242,0.28);">© 2024 Pasha Sarayi Restaurant &amp; Cafe. All rights reserved.</div>
       <div style="display:flex;align-items:center;gap:18px;">
         <a href="https://www.instagram.com/pasha_sarayi" target="_blank" rel="noopener" class="social-ic" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
         <a href="#" class="social-ic" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5h2V5.5h-2.2C11.4 5.5 10 7 10 9.2V11H8v3h2v6h3v-6h2.2l.4-3H13V9.4c0-.6.3-.9 1-.9z"/></svg></a>
@@ -353,14 +467,21 @@ img{display:block;}
 </div>
 
 <script>
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // Loader
   var loader = document.getElementById('loader');
   var hero = document.querySelector('.hero');
-  setTimeout(function() { loader.classList.add('hide'); hero.classList.add('ready'); }, 2300);
-  setTimeout(function() { loader.classList.add('gone'); }, 2900);
+  var nav = document.getElementById('nav');
+  if (reduceMotion) {
+    loader.classList.add('gone');
+    hero.classList.add('ready');
+  } else {
+    setTimeout(function() { loader.classList.add('hide'); hero.classList.add('ready'); nav.classList.add('drop'); }, 2300);
+    setTimeout(function() { loader.classList.add('gone'); }, 3400);
+  }
 
   // Nav scroll + active link
-  var nav = document.getElementById('nav');
   function onScroll() {
     nav.classList.toggle('scrolled', window.scrollY > 80);
     var cur = 'home';
@@ -374,6 +495,29 @@ img{display:block;}
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  // Hero + image parallax
+  var heroImg = document.getElementById('heroImg');
+  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('.parallax[data-speed]'));
+  if (!reduceMotion) {
+    var ticking = false;
+    function applyParallax() {
+      var y = window.scrollY;
+      if (heroImg && y < window.innerHeight) {
+        heroImg.style.transform = 'translateY(' + (y * 0.35) + 'px) scale(1.12)';
+      }
+      parallaxEls.forEach(function(el) {
+        var r = el.getBoundingClientRect();
+        var offset = (r.top + r.height / 2 - window.innerHeight / 2);
+        el.style.transform = 'translateY(' + (offset * -parseFloat(el.dataset.speed)) + 'px)';
+      });
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!ticking) { window.requestAnimationFrame(applyParallax); ticking = true; }
+    }, { passive: true });
+    applyParallax();
+  }
+
   // Mobile menu
   var mobileMenu = document.getElementById('mobileMenu');
   document.getElementById('hamburger').addEventListener('click', function() { mobileMenu.classList.add('open'); });
@@ -382,14 +526,39 @@ img{display:block;}
     a.addEventListener('click', function() { mobileMenu.classList.remove('open'); });
   });
 
-  // Scroll reveals
+  // Scroll reveals + animated counters
+  function runCounter(el) {
+    var to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec || '0', 10), start = null, dur = 1400;
+    if (reduceMotion) { el.textContent = to.toFixed(dec); return; }
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = (to * eased).toFixed(dec);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
   requestAnimationFrame(function() {
     var io = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          e.target.querySelectorAll && e.target.querySelectorAll('.count').forEach(runCounter);
+          io.unobserve(e.target);
+        }
       });
     }, { threshold: 0.15 });
     document.querySelectorAll('[data-reveal]').forEach(function(el) { io.observe(el); });
+
+    // counters inside info strip (not data-reveal)
+    var stripIo = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.querySelectorAll('.count').forEach(runCounter); stripIo.unobserve(e.target); }
+      });
+    }, { threshold: 0.4 });
+    document.querySelectorAll('.info-strip').forEach(function(el) { stripIo.observe(el); });
   });
 
   // Reservation form
