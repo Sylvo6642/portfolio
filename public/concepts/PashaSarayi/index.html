@@ -22,7 +22,7 @@ input,button{font-family:inherit;}
 img{display:block;}
 
 /* ---------- KEYFRAMES ---------- */
-@keyframes kenburns{from{transform:scale(1.12);}to{transform:scale(1.02);}}
+@keyframes kenburns{0%{transform:scale(1.04);}50%{transform:scale(1.12);}100%{transform:scale(1.04);}}
 @keyframes pashaBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
 @keyframes loaderWipe{from{clip-path:inset(0 100% 0 0);}to{clip-path:inset(0 0 0 0);}}
 @keyframes loaderFadeOut{from{opacity:1;}to{opacity:0;}}
@@ -50,9 +50,9 @@ img{display:block;}
 [data-reveal].in{opacity:1;transform:none;}
 
 /* ---------- HERO CAROUSEL ---------- */
-.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.12);transition:opacity 1.4s var(--ease);}
-.hero-slide.active{opacity:1;}
-.hero-slide.active.kb{animation:kenburns 7s ease-out forwards;}
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.6s ease-in-out;}
+.hero-slide.active{opacity:1;z-index:1;}
+.hero-slide.kb{animation:kenburns 16s ease-in-out infinite;}
 .hero-dot{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid rgba(250,247,242,0.6);background:transparent;cursor:pointer;transition:background .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease);}
 .hero-dot:hover{border-color:#FAF7F2;}
 .hero-dot.active{background:var(--accent);border-color:var(--accent);transform:scale(1.15);}
@@ -521,12 +521,12 @@ img{display:block;}
   var dots = Array.prototype.slice.call(document.querySelectorAll('.hero-dot'));
   var heroIndex = 0, heroTimer = null;
   var HERO_INTERVAL = 5500;
+  if (!reduceMotion) {
+    slides.forEach(function(s) { s.classList.add('kb'); });
+  }
   function showSlide(n) {
     heroIndex = (n + slides.length) % slides.length;
-    slides.forEach(function(s, i) {
-      s.classList.toggle('active', i === heroIndex);
-      if (!reduceMotion) { s.classList.remove('kb'); if (i === heroIndex) { void s.offsetWidth; s.classList.add('kb'); } }
-    });
+    slides.forEach(function(s, i) { s.classList.toggle('active', i === heroIndex); });
     dots.forEach(function(d, i) { d.classList.toggle('active', i === heroIndex); });
   }
   function startHero() {
