@@ -49,6 +49,14 @@ img{display:block;}
 [data-reveal="scale"]{transform:scale(.94);}
 [data-reveal].in{opacity:1;transform:none;}
 
+/* ---------- HERO CAROUSEL ---------- */
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.12);transition:opacity 1.4s var(--ease);}
+.hero-slide.active{opacity:1;}
+.hero-slide.active.kb{animation:kenburns 7s ease-out forwards;}
+.hero-dot{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid rgba(250,247,242,0.6);background:transparent;cursor:pointer;transition:background .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease);}
+.hero-dot:hover{border-color:#FAF7F2;}
+.hero-dot.active{background:var(--accent);border-color:var(--accent);transform:scale(1.15);}
+
 /* ---------- HERO ---------- */
 .hero.ready .hero-item{animation:heroRise .9s var(--ease-out) forwards;}
 .hero.ready .info-strip-inner{animation:stripIn .8s var(--ease-out) 1.6s forwards;}
@@ -236,7 +244,13 @@ img{display:block;}
 
   <!-- HERO -->
   <section id="home" data-nav-section class="hero" style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;scroll-margin-top:0;">
-    <img id="heroImg" class="parallax" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=90&fit=crop" loading="eager" fetchpriority="high" alt="Pasha Sarayi restaurant interior" style="position:absolute;inset:0;width:100%;height:120%;object-fit:cover;animation:kenburns 12s ease-out 2.3s both;transform:scale(1.12);">
+    <div id="heroCarousel" class="parallax" style="position:absolute;inset:0;width:100%;height:120%;">
+      <div class="hero-slide active" style="background-image:url('/concepts/PashaSarayi/assets/hero-interior.jpg');" role="img" aria-label="Pasha Sarayi dining room interior"></div>
+      <div class="hero-slide" style="background-image:url('/concepts/PashaSarayi/assets/hero-lounge.jpg');" role="img" aria-label="Guests dining and enjoying shisha in the lounge"></div>
+      <div class="hero-slide" style="background-image:url('/concepts/PashaSarayi/assets/hero-ribs.jpg');" role="img" aria-label="Grilled rack of lamb served by our chef"></div>
+      <div class="hero-slide" style="background-image:url('/concepts/PashaSarayi/assets/hero-kebab.jpg');" role="img" aria-label="Signature kebab platter on a Pasha Sarayi board"></div>
+      <div class="hero-slide" style="background-image:url('/concepts/PashaSarayi/assets/hero-steak.jpg');" role="img" aria-label="Char-grilled steak on a wooden serving board"></div>
+    </div>
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(28,24,20,0.55),rgba(28,24,20,0.40) 40%,rgba(28,24,20,0.72));"></div>
     <!-- ornaments -->
     <svg class="hero-ornament" style="top:14%;left:8%;animation:floatOrn 9s ease-in-out infinite;" width="90" height="90" viewBox="0 0 24 24" fill="none" stroke="#FAF7F2" stroke-width="0.5"><path d="M12 2l2.5 7H22l-6 4.5L18.5 21 12 16.5 5.5 21 8 13.5 2 9h7.5z"/></svg>
@@ -254,6 +268,13 @@ img{display:block;}
         <a href="#contact" class="btn btn-gold">Reserve a table</a>
         <a href="#menu" class="btn btn-ghost">View menu <span class="btn-arrow">→</span></a>
       </div>
+    </div>
+    <div class="hero-dots" id="heroDots" style="position:absolute;bottom:34px;right:48px;z-index:3;display:flex;gap:10px;">
+      <button class="hero-dot active" data-i="0" aria-label="Show slide 1"></button>
+      <button class="hero-dot" data-i="1" aria-label="Show slide 2"></button>
+      <button class="hero-dot" data-i="2" aria-label="Show slide 3"></button>
+      <button class="hero-dot" data-i="3" aria-label="Show slide 4"></button>
+      <button class="hero-dot" data-i="4" aria-label="Show slide 5"></button>
     </div>
     <a href="#strip" aria-label="Scroll down" style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FAF7F2" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="animation:pashaBounce 1.8s ease-in-out infinite;"><path d="M6 9l6 6 6-6"/></svg>
@@ -495,15 +516,39 @@ img{display:block;}
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // Hero + image parallax
-  var heroImg = document.getElementById('heroImg');
+  // Hero carousel
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.hero-slide'));
+  var dots = Array.prototype.slice.call(document.querySelectorAll('.hero-dot'));
+  var heroIndex = 0, heroTimer = null;
+  var HERO_INTERVAL = 5500;
+  function showSlide(n) {
+    heroIndex = (n + slides.length) % slides.length;
+    slides.forEach(function(s, i) {
+      s.classList.toggle('active', i === heroIndex);
+      if (!reduceMotion) { s.classList.remove('kb'); if (i === heroIndex) { void s.offsetWidth; s.classList.add('kb'); } }
+    });
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === heroIndex); });
+  }
+  function startHero() {
+    if (reduceMotion || slides.length < 2) return;
+    clearInterval(heroTimer);
+    heroTimer = setInterval(function() { showSlide(heroIndex + 1); }, HERO_INTERVAL);
+  }
+  dots.forEach(function(d) {
+    d.addEventListener('click', function() { showSlide(parseInt(d.dataset.i, 10)); startHero(); });
+  });
+  showSlide(0);
+  startHero();
+
+  // Image parallax
+  var heroCarousel = document.getElementById('heroCarousel');
   var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('.parallax[data-speed]'));
   if (!reduceMotion) {
     var ticking = false;
     function applyParallax() {
       var y = window.scrollY;
-      if (heroImg && y < window.innerHeight) {
-        heroImg.style.transform = 'translateY(' + (y * 0.35) + 'px) scale(1.12)';
+      if (heroCarousel && y < window.innerHeight) {
+        heroCarousel.style.transform = 'translateY(' + (y * 0.35) + 'px)';
       }
       parallaxEls.forEach(function(el) {
         var r = el.getBoundingClientRect();
