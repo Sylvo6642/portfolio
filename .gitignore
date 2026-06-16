@@ -9,4 +9,5 @@ supabase/.temp/
 *.png
 !public/KR_dark.png
 !public/KR_light.png
+!public/concepts/**/*.png
 scroll-shot.mjs
