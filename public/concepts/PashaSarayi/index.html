@@ -140,6 +140,9 @@ img{display:block;}
 .res-input{background:rgba(255,255,255,0.06);border:0.5px solid rgba(250,247,242,0.18);color:#FAF7F2;padding:14px 16px;border-radius:2px;font-size:13px;width:100%;color-scheme:dark;transition:border-color .3s ease,background .3s ease,box-shadow .3s ease;}
 .res-input::placeholder{color:rgba(250,247,242,0.38);}
 .res-input:focus{border-color:var(--accent);outline:none;background:rgba(255,255,255,0.09);box-shadow:0 0 0 3px rgba(181,128,74,0.18);}
+.res-field{position:relative;}
+.res-field-label{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(250,247,242,0.38);pointer-events:none;transition:opacity .15s ease;}
+.res-field-label.is-hidden{opacity:0;}
 
 /* divider with diamond */
 .divider{display:flex;align-items:center;justify-content:center;gap:14px;}
@@ -407,8 +410,14 @@ img{display:block;}
         <input class="res-input" type="tel" placeholder="Phone number" aria-label="Phone number" required>
       </div>
       <div class="res-grid3">
-        <input class="res-input" type="date" aria-label="Date" required>
-        <input class="res-input" type="time" aria-label="Time" required>
+        <div class="res-field">
+          <input class="res-input" type="date" aria-label="Date" required>
+          <span class="res-field-label" aria-hidden="true">Date</span>
+        </div>
+        <div class="res-field">
+          <input class="res-input" type="time" aria-label="Time" required>
+          <span class="res-field-label" aria-hidden="true">Time</span>
+        </div>
         <input class="res-input" type="number" min="1" placeholder="No. of guests" aria-label="Number of guests" required>
       </div>
       <button type="submit" class="btn btn-gold" style="width:100%;padding:15px;">Confirm reservation</button>
@@ -610,6 +619,16 @@ img{display:block;}
   document.getElementById('resForm').addEventListener('submit', function(e) {
     e.preventDefault();
     document.getElementById('resConfirm').classList.add('show');
+  });
+
+  // Date/time field labels (native inputs show no placeholder text)
+  document.querySelectorAll('.res-field').forEach(function(field) {
+    var input = field.querySelector('.res-input');
+    var label = field.querySelector('.res-field-label');
+    var sync = function() { label.classList.toggle('is-hidden', !!input.value); };
+    input.addEventListener('input', sync);
+    input.addEventListener('change', sync);
+    sync();
   });
 </script>
 </body>
