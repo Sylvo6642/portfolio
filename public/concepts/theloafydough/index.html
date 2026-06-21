@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Loafy Dough — Cottage Bakery</title>
+<link rel="icon" type="image/jpeg" href="/concepts/theloafydough/assets/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Cormorant+Garamond:wght@400;500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fde6ee;--surface:#fffafc;--surface2:#fff5f9;
+  --pink100:#fde6ee;--pink200:#fbd0e0;--pink300:#f7b6cf;--pink400:#f08fb6;
+  --pink500:#e85a8e;--pink600:#d63e76;--pink700:#b22a5e;
+  --caramel300:#e9b07a;--caramel400:#d59257;--caramel500:#b8763e;--caramel600:#97601f;
+  --brown900:#3a2418;--brown700:#5a3b2a;--brown500:#8a6b58;
+  --font-script:'Sacramento',cursive;
+  --font-display:'Cormorant Garamond',serif;
+  --font-body:'Quicksand',system-ui,sans-serif;
+  --ease:cubic-bezier(.25,.46,.45,.94);--ease-out:cubic-bezier(.16,1,.3,1);
+  --r-md:18px;--r-lg:28px;--r-xl:44px;
+  --shadow-soft:0 14px 40px -16px rgba(184,73,121,.28);
+  --shadow-card:0 22px 60px -24px rgba(184,73,121,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--brown900);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:17px;line-height:1.6;}
+img{display:block;max-width:100%;}
+a{color:var(--caramel500);text-decoration:none;transition:color .2s;}
+a:hover{color:var(--pink600);}
+::selection{background:var(--pink300);color:var(--brown900);}
+
+/* ------- KEYFRAMES ------- */
+@keyframes loaderFade{from{opacity:1;}to{opacity:0;}}
+@keyframes loaderRise{from{transform:translateY(24px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes fillBar{to{width:100%;}}
+@keyframes drawPath{to{stroke-dashoffset:0;}}
+@keyframes dotPulse{50%{opacity:1;}}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes sparkle{0%{opacity:0;transform:scale(.4);}40%{opacity:1;transform:scale(1.1);}100%{opacity:.9;transform:scale(1);}}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes navDrop{from{transform:translateY(-100%);}to{transform:none;}}
+@keyframes heroRise{from{transform:translateY(28px);opacity:0;}to{transform:none;opacity:1;}}
+
+/* ------- LOADER ------- */
+.loader{position:fixed;inset:0;z-index:999;pointer-events:auto;transition:opacity .55s ease,visibility .55s;}
+.loader.done{opacity:0;visibility:hidden;pointer-events:none;}
+.loader-bg{position:absolute;inset:0;background:linear-gradient(160deg,var(--pink200),var(--pink100) 60%,var(--surface2));}
+.loader-stage{position:relative;z-index:2;height:100%;display:grid;place-items:center;}
+.loader-logo{text-align:center;opacity:0;transform:translateY(20px);transition:all .8s cubic-bezier(.2,.7,.2,1);}
+.loader.animate .loader-logo{opacity:1;transform:none;}
+.loader-loaf{width:130px;height:auto;margin:0 auto 18px;filter:drop-shadow(0 12px 24px rgba(184,73,121,.18));}
+.loader-loaf path[stroke]{stroke-dasharray:600;stroke-dashoffset:600;}
+.loader.animate .loader-loaf path[stroke]{animation:drawPath 1.6s ease-out forwards;}
+.loader.animate .loader-loaf path:nth-child(3){animation-delay:.4s;}
+.loader.animate .loader-loaf path:nth-child(4){animation-delay:.55s;}
+.loader.animate .loader-loaf path:nth-child(5){animation-delay:.7s;}
+.loader-title{font-family:var(--font-script);font-size:64px;color:var(--caramel500);line-height:1;}
+.loader-sub{font-family:var(--font-body);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--brown900);margin:4px 0 26px;}
+.loader-bar{width:220px;height:3px;background:color-mix(in srgb,var(--pink300) 50%,transparent);border-radius:999px;margin:0 auto 14px;overflow:hidden;}
+.loader-bar span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--pink500),var(--caramel500));border-radius:inherit;}
+.loader.animate .loader-bar span{animation:fillBar 2s ease forwards;}
+.loader-tagline{font-size:13px;color:var(--brown700);letter-spacing:.04em;}
+.loader-tagline .dots i{display:inline-block;opacity:0;animation:dotPulse 1.2s infinite;font-style:normal;}
+.loader-tagline .dots i:nth-child(2){animation-delay:.2s;}
+.loader-tagline .dots i:nth-child(3){animation-delay:.4s;}
+.loader-sparkles{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;}
+.loader-sparkles .spk{opacity:0;transform-origin:center;}
+.loader.animate .spk{animation:sparkle 2.2s ease forwards;}
+.loader.animate .spk-b{animation-delay:.2s;}
+.loader.animate .spk-c{animation-delay:.35s;}
+.loader.animate .spk-d{animation-delay:.55s;}
+
+/* ------- REVEALS ------- */
+[data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out);}
+[data-reveal].in{opacity:1;transform:none;}
+
+/* ------- SHARED ------- */
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 32px;}
+.eyebrow{font-family:var(--font-body);font-weight:600;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--pink600);display:inline-flex;align-items:center;gap:10px;}
+.eyebrow::before,.eyebrow::after{content:'';width:18px;height:1.5px;background:var(--pink400);border-radius:2px;}
+.script{font-family:var(--font-script);font-weight:400;color:var(--caramel500);letter-spacing:0;line-height:.95;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;color:var(--brown900);letter-spacing:-.005em;line-height:1.08;margin:0 0 .5em;}
+.divider{display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0;color:var(--pink400);}
+.divider .ln{flex:0 0 80px;height:1.5px;background:linear-gradient(to right,transparent,var(--pink300),transparent);}
+.divider .ico{font-size:14px;color:var(--pink500);}
+.float-deco{position:absolute;pointer-events:none;user-select:none;}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.06em;background:var(--pink100);color:var(--pink700);border:1px solid var(--pink200);}
+.tag-warm{background:color-mix(in srgb,var(--caramel300) 40%,white);color:var(--caramel600);border-color:var(--caramel300);}
+.tag-new{background:color-mix(in srgb,var(--pink500) 18%,white);color:var(--pink700);border-color:var(--pink300);}
+
+/* ------- BUTTONS ------- */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border-radius:999px;font-family:var(--font-body);font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s,background .2s;white-space:nowrap;}
+.btn-primary{background:var(--pink500);color:white;box-shadow:0 12px 30px -10px rgba(232,90,142,.55);}
+.btn-primary:hover{background:var(--pink600);transform:translateY(-2px);box-shadow:0 16px 34px -10px rgba(214,62,118,.65);color:white;}
+.btn-ghost{background:transparent;color:var(--brown900);border:1.5px solid var(--brown900);}
+.btn-ghost:hover{background:var(--brown900);color:white;}
+.btn-soft{background:var(--surface);color:var(--caramel600);border:1.5px solid var(--pink200);}
+.btn-soft:hover{background:var(--pink100);color:var(--pink600);}
+
+/* ------- NAV ------- */
+.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb,var(--pink300) 35%,transparent);}
+.site-header.drop{animation:navDrop .6s var(--ease-out);}
+.nav{display:flex;align-items:center;justify-content:space-between;height:84px;}
+.nav-logo{display:flex;align-items:center;gap:14px;font-family:var(--font-script);font-size:30px;color:var(--caramel500);line-height:1;}
+.nav-logo .mark{width:44px;height:44px;border-radius:50%;background:var(--pink200) center/cover no-repeat;box-shadow:0 4px 14px -4px rgba(184,73,121,.3);}
+.nav-links{display:flex;gap:8px;align-items:center;}
+.nav-links a{font-family:var(--font-body);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brown700);padding:10px 16px;border-radius:999px;transition:all .2s;}
+.nav-links a:hover{color:var(--pink600);background:color-mix(in srgb,var(--pink200) 60%,transparent);}
+.nav-links a.active{color:var(--pink600);}
+.nav-links a.active::after{content:'♥';margin-left:6px;font-size:10px;color:var(--pink500);}
+.nav-cta{display:inline-flex;align-items:center;}
+.nav-toggle{display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:44px;height:44px;background:transparent;border:none;border-radius:12px;cursor:pointer;}
+.nav-toggle span{display:block;width:22px;height:2px;border-radius:2px;background:var(--brown900);transition:transform .3s,opacity .2s;}
+.site-header.open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.site-header.open .nav-toggle span:nth-child(2){opacity:0;}
+.site-header.open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ------- HERO ------- */
+.hero{position:relative;padding:80px 0 120px;overflow:hidden;}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;}
+.hero-title{font-family:var(--font-display);font-size:clamp(48px,7vw,96px);line-height:.96;letter-spacing:-.02em;margin:0 0 28px;}
+.hero-title .script{display:block;font-size:clamp(72px,11vw,150px);color:var(--caramel500);margin:4px 0 8px;font-weight:400;line-height:1.05;}
+.hero-eyebrow{margin-bottom:28px;}
+.hero-sub{font-size:18px;line-height:1.65;color:var(--brown700);max-width:480px;margin-bottom:36px;}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+.hero-image-stack{position:relative;aspect-ratio:4/5;width:100%;}
+.hero-image-stack .img-slot{position:absolute;inset:0;border-radius:48% 52% 50% 50% / 50% 48% 52% 50%;transform:rotate(-3deg);}
+.hero-badge{position:absolute;bottom:-28px;left:-28px;width:160px;height:160px;border-radius:50%;background:var(--brown900);color:var(--pink100);display:grid;place-items:center;text-align:center;font-family:var(--font-script);font-size:32px;line-height:1.05;transform:rotate(-12deg);box-shadow:var(--shadow-card);z-index:2;}
+.hero-badge small{font-family:var(--font-body);font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:block;margin-top:4px;color:var(--pink300);}
+.hero-stats{display:flex;gap:48px;margin-top:56px;padding-top:32px;border-top:1.5px dashed color-mix(in srgb,var(--caramel400) 35%,transparent);}
+.hero-stats>div{display:flex;flex-direction:column;gap:4px;}
+.hero-stats .num{font-family:var(--font-display);font-size:32px;color:var(--caramel500);line-height:1;}
+.hero-stats .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brown700);}
+.hero-marquee{position:relative;z-index:1;margin-top:72px;border-top:1.5px dashed color-mix(in srgb,var(--pink400) 50%,transparent);border-bottom:1.5px dashed color-mix(in srgb,var(--pink400) 50%,transparent);padding:18px 0;overflow:hidden;}
+.marquee-track{display:flex;gap:56px;white-space:nowrap;animation:marquee 36s linear infinite;font-family:var(--font-script);font-size:36px;color:var(--caramel500);width:max-content;}
+.marquee-track span{display:inline-flex;align-items:center;gap:32px;}
+.marquee-track .dot{width:10px;height:10px;background:var(--pink400);border-radius:50%;display:inline-block;}
+
+/* ------- IMG SLOT ------- */
+.img-slot{position:relative;background:linear-gradient(135deg,var(--pink200),var(--pink100));border-radius:var(--r-lg);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--pink600);font-family:var(--font-script);font-size:26px;box-shadow:var(--shadow-card);isolation:isolate;}
+.img-slot::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.5),transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,182,210,.35),transparent 55%);pointer-events:none;z-index:-1;}
+.img-slot.has-img{background:none;color:transparent;}
+.img-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+
+/* ------- STORY STRIP ------- */
+.story-strip{padding:60px 0;text-align:center;background:radial-gradient(ellipse 80% 100% at 50% 0%,color-mix(in srgb,var(--pink200) 50%,transparent),transparent);}
+.story-strip-inner{max-width:720px;margin:32px auto 0;}
+.story-strip p{font-size:22px;line-height:1.6;color:var(--brown700);font-family:var(--font-display);font-weight:500;}
+.story-script{display:block;font-family:var(--font-script);font-size:56px;color:var(--pink500);line-height:1;margin-bottom:18px;}
+
+/* ------- FEATURED ------- */
+.section-head{text-align:left;max-width:640px;margin-bottom:60px;}
+.section-head h2{font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;}
+.section-foot{text-align:center;margin-top:48px;}
+.featured-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:28px;align-items:stretch;}
+.prod-card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;border:1px solid color-mix(in srgb,var(--pink200) 60%,transparent);display:flex;flex-direction:column;box-shadow:var(--shadow-soft);transition:transform .35s,box-shadow .35s;}
+.prod-card:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:var(--shadow-card);}
+.prod-card-image{aspect-ratio:4/3;border-radius:0;box-shadow:none;}
+.prod-card.featured-big .prod-card-image{aspect-ratio:4/3.5;}
+.prod-card-body{padding:28px 28px 30px;display:flex;flex-direction:column;flex:1;gap:14px;}
+.prod-card-body h3{font-size:26px;margin:0;color:var(--brown900);}
+.prod-card-body p{font-size:14px;color:var(--brown700);margin:0;line-height:1.55;flex:1;}
+.prod-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:14px;border-top:1.5px dashed color-mix(in srgb,var(--pink300) 50%,transparent);}
+.prod-card-foot .price{font-family:var(--font-display);font-size:26px;color:var(--caramel500);}
+.prod-card-foot .price small{font-size:14px;color:var(--brown700);}
+.link-arrow{font-family:var(--font-body);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--pink600);}
+.link-arrow:hover{color:var(--brown900);}
+
+/* ------- ABOUT TEASER ------- */
+.about-teaser-grid{display:grid;grid-template-columns:.9fr 1fr;gap:80px;align-items:center;}
+.about-teaser-img{position:relative;}
+.about-teaser-text h2{font-size:clamp(36px,4.4vw,58px);margin-bottom:22px;}
+.about-teaser-text p{color:var(--brown700);font-size:17px;margin:0 0 18px;}
+.signature{font-size:30px!important;color:var(--pink600)!important;margin:12px 0 24px!important;}
+
+/* ------- MENU SECTION ------- */
+.menu-category{margin-top:64px;}
+.menu-category:first-child{margin-top:0;}
+.menu-category-head{display:flex;align-items:baseline;gap:18px;margin-bottom:32px;padding-bottom:18px;border-bottom:1.5px dashed color-mix(in srgb,var(--caramel400) 30%,transparent);}
+.menu-category-head h2{font-size:clamp(32px,3.6vw,46px);margin:0;}
+.menu-category-head .count{margin-left:auto;font-family:var(--font-body);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brown700);}
+.menu-board{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;}
+.menu-item{background:var(--surface);border-radius:var(--r-lg);padding:32px;border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:start;box-shadow:var(--shadow-soft);transition:transform .3s,box-shadow .3s;}
+.menu-item:hover{transform:translateY(-4px);box-shadow:var(--shadow-card);}
+.menu-item .img-slot{aspect-ratio:1;border-radius:var(--r-md);font-size:14px;box-shadow:none;}
+.menu-item-info h3{font-size:24px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
+.menu-item-info h3 .price{font-family:var(--font-display);font-size:22px;color:var(--caramel500);font-weight:500;white-space:nowrap;}
+.menu-item-info p{font-size:14px;color:var(--brown700);margin:0 0 12px;line-height:1.55;}
+.menu-item-meta{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ------- TESTIMONIALS ------- */
+.testimonials{background:var(--surface2);position:relative;}
+.testimonials-grid{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:28px;align-items:start;margin-top:40px;}
+.t-card{background:var(--surface);margin:0;padding:32px;border-radius:var(--r-lg);box-shadow:var(--shadow-soft);border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);position:relative;}
+.t-card-feature{background:var(--brown900);color:white;transform:translateY(-16px);}
+.t-card-feature p,.t-card-feature footer{color:white;}
+.t-card-feature .big-quote{font-size:64px;color:var(--pink400);position:absolute;top:-20px;left:24px;line-height:1;font-family:var(--font-script);}
+.t-card p{font-size:16px;line-height:1.55;color:var(--brown700);margin:0 0 22px;}
+.t-card-feature p{font-size:19px;line-height:1.5;}
+.t-card footer{display:flex;gap:12px;align-items:center;font-size:13px;}
+.t-card footer strong{display:block;font-family:var(--font-body);font-weight:700;font-size:14px;}
+.t-card footer em{font-style:normal;font-size:12px;letter-spacing:.08em;opacity:.65;}
+.t-card-feature footer em{color:var(--pink300);opacity:1;}
+.t-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--pink300),var(--caramel300));flex:0 0 38px;}
+
+/* ------- CTA BAND ------- */
+.cta-band{padding:40px 0 120px;}
+.cta-card{background:linear-gradient(135deg,var(--pink500),var(--pink600) 60%,var(--caramel500) 130%);border-radius:var(--r-xl);padding:64px 72px;color:white;display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden;box-shadow:0 40px 80px -30px rgba(214,62,118,.45);}
+.cta-card::before,.cta-card::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none;}
+.cta-card::before{width:360px;height:360px;top:-160px;right:-100px;}
+.cta-card::after{width:220px;height:220px;bottom:-80px;left:-60px;}
+.cta-head{color:white;font-size:clamp(32px,3.8vw,50px);margin:16px 0 16px;}
+.cta-head .script{color:var(--pink200);font-size:1.2em;display:inline-block;}
+.cta-card>p{color:rgba(255,255,255,.85);margin:0;}
+.cta-actions{display:flex;flex-direction:column;gap:14px;}
+.cta-card .btn-primary{background:white;color:var(--pink600);}
+.cta-card .btn-primary:hover{background:var(--brown900);color:white;}
+.cta-card .btn-soft{background:transparent;color:white;border-color:rgba(255,255,255,.5);}
+.cta-card .btn-soft:hover{background:rgba(255,255,255,.12);color:white;border-color:white;}
+.eyebrow-light{color:white;opacity:.85;}
+.eyebrow-light::before,.eyebrow-light::after{background:rgba(255,255,255,.5);}
+
+/* ------- ORDER PAGE ------- */
+.page-header{padding:72px 0 48px;text-align:center;position:relative;}
+.page-header .eyebrow{margin-bottom:18px;}
+.page-header h1{font-size:clamp(48px,6.5vw,82px);margin:0;}
+.page-header .script-lg{font-size:clamp(60px,8vw,110px);display:block;margin:-8px 0 0;color:var(--caramel500);font-family:var(--font-script);line-height:1;}
+.page-header p{max-width:540px;margin:24px auto 0;color:var(--brown700);font-size:17px;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:40px;}
+.step{position:relative;padding:32px 24px;background:var(--surface);border-radius:var(--r-lg);border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);}
+.step .num{position:absolute;top:-20px;left:24px;width:44px;height:44px;background:var(--pink500);color:white;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:20px;box-shadow:0 8px 20px -6px rgba(232,90,142,.4);}
+.step h3{font-size:20px;margin:12px 0 8px;}
+.step p{font-size:14px;color:var(--brown700);margin:0;line-height:1.55;}
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin:40px 0;}
+.day-card{background:var(--surface);padding:20px 12px;text-align:center;border-radius:var(--r-md);border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);}
+.day-card .dow{font-family:var(--font-body);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brown700);margin-bottom:8px;}
+.day-card .what{font-family:var(--font-script);font-size:26px;color:var(--caramel500);line-height:1.1;}
+.day-card .when{font-size:12px;color:var(--brown700);margin-top:4px;}
+.day-card.is-bake{background:var(--pink100);border-color:var(--pink300);}
+.day-card.is-bake .what{color:var(--pink600);}
+.faq-list{max-width:760px;margin:0 auto;}
+.faq-item{border-bottom:1.5px dashed color-mix(in srgb,var(--caramel400) 30%,transparent);padding:24px 0;}
+.faq-item summary{font-family:var(--font-display);font-size:22px;font-weight:500;color:var(--brown900);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary::after{content:'＋';font-family:var(--font-body);font-size:22px;color:var(--pink500);font-weight:400;transition:transform .3s;}
+.faq-item[open] summary::after{content:'−';transform:rotate(180deg);}
+.faq-item p{margin:16px 0 0;color:var(--brown700);font-size:16px;line-height:1.65;}
+
+/* ------- CONTACT ------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
+.contact-card{background:var(--surface);border-radius:var(--r-lg);padding:40px;border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);box-shadow:var(--shadow-soft);}
+.contact-card h3{font-size:28px;margin:0 0 16px;}
+.contact-row{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:18px 0;border-bottom:1px dashed color-mix(in srgb,var(--pink300) 50%,transparent);align-items:center;}
+.contact-row:last-child{border-bottom:none;}
+.contact-row .icn{width:44px;height:44px;background:var(--pink100);color:var(--pink600);border-radius:50%;display:grid;place-items:center;}
+.contact-row .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brown700);margin-bottom:2px;}
+.contact-row .val{font-family:var(--font-display);font-size:19px;color:var(--brown900);}
+.contact-form .form-row{margin-bottom:18px;display:flex;flex-direction:column;gap:6px;}
+.contact-form label{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brown700);}
+.contact-form input,.contact-form textarea,.contact-form select{font-family:var(--font-body);font-size:16px;padding:14px 18px;border-radius:var(--r-md);border:1.5px solid color-mix(in srgb,var(--pink300) 70%,transparent);background:var(--surface2);color:var(--brown900);transition:all .2s;width:100%;}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{outline:none;border-color:var(--pink500);background:white;box-shadow:0 0 0 4px color-mix(in srgb,var(--pink300) 35%,transparent);}
+.contact-form textarea{min-height:120px;resize:vertical;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.markets-card{margin-top:40px;background:var(--brown900);color:#fff;border-radius:var(--r-lg);padding:38px 40px;position:relative;overflow:hidden;}
+.markets-card::after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.05);top:-90px;right:-70px;pointer-events:none;}
+.markets-card .eyebrow{color:var(--pink300);}
+.markets-card .eyebrow::before,.markets-card .eyebrow::after{background:var(--pink400);}
+.markets-card h3{color:#fff;font-size:28px;margin:0 0 8px;}
+.markets-card>p{color:rgba(255,255,255,.8);font-size:15px;margin:0 0 22px;max-width:90%;}
+.markets-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;}
+.markets-list li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 0;border-bottom:1px dashed rgba(255,255,255,.18);}
+.markets-list li:last-child{border-bottom:none;}
+.mk-name{font-family:var(--font-display);font-size:21px;color:#fff;font-weight:500;}
+.mk-when{font-family:var(--font-body);font-size:13px;letter-spacing:.04em;color:var(--pink300);white-space:nowrap;}
+.markets-note{font-size:13px;color:rgba(255,255,255,.6);margin:20px 0 0;}
+
+/* ------- ABOUT PAGE ------- */
+.about-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:80px;}
+.about-intro h2{font-size:clamp(40px,5vw,64px);}
+.about-intro p{font-size:17px;color:var(--brown700);margin:0 0 16px;}
+.about-intro .img-slot{aspect-ratio:4/5;border-radius:var(--r-xl);}
+.timeline{position:relative;padding-left:64px;max-width:720px;margin:0 auto;}
+.timeline::before{content:'';position:absolute;left:24px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--pink300),var(--caramel400));border-radius:2px;}
+.tl-item{position:relative;padding:0 0 48px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-item::before{content:'♥';position:absolute;left:-50px;top:0;width:50px;height:50px;background:var(--pink100);color:var(--pink500);border-radius:50%;display:grid;place-items:center;border:2px solid var(--pink300);font-size:18px;}
+.tl-item .year{font-family:var(--font-script);font-size:36px;color:var(--caramel500);line-height:1;margin-bottom:6px;}
+.tl-item h3{font-size:24px;margin:0 0 8px;}
+.tl-item p{color:var(--brown700);margin:0;}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:48px;}
+.value-card{background:var(--surface);border-radius:var(--r-lg);padding:36px 28px;text-align:center;border:1px solid color-mix(in srgb,var(--pink200) 50%,transparent);}
+.value-icon{width:64px;height:64px;border-radius:50%;background:var(--pink100);display:grid;place-items:center;margin:0 auto 18px;color:var(--pink600);}
+.value-card h3{font-size:22px;margin:0 0 10px;}
+.value-card p{font-size:14px;color:var(--brown700);margin:0;}
+.ig-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:180px;gap:14px;}
+.ig-tile{border-radius:var(--r-md);font-size:18px;cursor:pointer;transition:transform .3s,box-shadow .3s;position:relative;}
+.ig-tile:hover{transform:scale(1.02);box-shadow:var(--shadow-card);}
+.ig-tile-lg{grid-row:span 2;grid-column:span 2;}
+.ig-overlay{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,.9);color:var(--pink600);padding:6px 12px;border-radius:999px;font-family:var(--font-body);font-size:12px;font-weight:600;letter-spacing:.1em;}
+
+/* ------- FOOTER ------- */
+.site-footer{background:linear-gradient(180deg,var(--bg),var(--pink200));padding:96px 0 32px;margin-top:80px;position:relative;overflow:hidden;}
+.footer-script{font-family:var(--font-script);font-size:56px;color:var(--caramel500);line-height:.9;margin-bottom:16px;}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;margin-bottom:64px;}
+.footer-grid h4{font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--pink700);margin-bottom:18px;}
+.footer-grid ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
+.footer-grid a{color:var(--brown700);font-size:14px;}
+.footer-grid a:hover{color:var(--pink600);}
+.footer-social{display:flex;gap:10px;margin-top:18px;}
+.social-ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--pink600);border:1px solid color-mix(in srgb,var(--pink300) 60%,transparent);transition:transform .22s,background .22s,color .22s,box-shadow .22s;}
+.social-ico:hover{background:var(--pink500);color:#fff;transform:translateY(-3px);box-shadow:0 10px 22px -8px rgba(232,90,142,.55);}
+.social-ico svg{width:19px;height:19px;display:block;}
+.footer-bottom{border-top:1px solid color-mix(in srgb,var(--caramel400) 30%,transparent);padding-top:24px;display:flex;justify-content:space-between;font-size:12px;color:var(--brown700);letter-spacing:.08em;}
+
+/* ------- TABS ------- */
+.tabs{display:flex;gap:4px;padding:6px;background:color-mix(in srgb,var(--pink200) 60%,transparent);border-radius:999px;width:fit-content;margin:0 auto 48px;}
+.tab{padding:10px 24px;border-radius:999px;font-family:var(--font-body);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--brown700);transition:all .25s;}
+.tab.active{background:white;color:var(--pink600);box-shadow:0 4px 12px -4px rgba(184,73,121,.25);}
+
+/* ------- SECTION HIDE ------- */
+.page-section{display:none;}
+.page-section.active{display:block;}
+
+/* ------- RESPONSIVE ------- */
+@media(max-width:900px){
+  .container{padding:0 24px;}
+  .nav-toggle{display:inline-flex;}
+  .nav-cta{display:none;}
+  .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:4px;position:absolute;top:calc(100% + 12px);left:0;right:0;background:var(--surface);padding:12px;border-radius:var(--r-md);box-shadow:var(--shadow-card);border:1px solid color-mix(in srgb,var(--pink200) 60%,transparent);transform:translateY(-10px);opacity:0;pointer-events:none;transition:transform .28s,opacity .28s;max-height:calc(100vh - 110px);overflow-y:auto;z-index:60;}
+  .site-header.open .nav-links{transform:none;opacity:1;pointer-events:auto;}
+  .nav-links a{width:100%;padding:14px 16px;text-align:left;}
+  .hero-grid,.about-teaser-grid,.about-intro,.contact-grid{grid-template-columns:1fr;gap:40px;}
+  .featured-grid,.testimonials-grid,.values-grid{grid-template-columns:1fr;}
+  .menu-board{grid-template-columns:1fr;}
+  .t-card-feature{transform:none;}
+  .ig-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:160px;}
+  .schedule-grid{grid-template-columns:repeat(3,1fr);}
+  .steps{grid-template-columns:repeat(2,1fr);}
+  .cta-card{padding:40px 32px;grid-template-columns:1fr;gap:28px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+}
+@media(max-width:600px){
+  .container{padding:0 18px;}
+  .nav{height:72px;}
+  .nav-logo{font-size:23px;gap:10px;}
+  .nav-logo .mark{width:36px;height:36px;}
+  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .footer-bottom{flex-direction:column;gap:8px;}
+  .hero{padding:48px 0 80px;}
+  .hero-badge{width:116px;height:116px;font-size:23px;left:auto;right:8px;bottom:-14px;}
+  .hero-marquee{margin-top:48px;}
+  .marquee-track{font-size:28px;gap:40px;}
+  .hero-stats{gap:18px 28px;flex-wrap:wrap;}
+  .menu-item{grid-template-columns:1fr;gap:18px;padding:24px;}
+  .menu-item .img-slot{aspect-ratio:16/10;max-height:200px;}
+  .form-row-2{grid-template-columns:1fr;}
+  .contact-card{padding:28px 22px;}
+  .steps{grid-template-columns:1fr;gap:28px;}
+  .schedule-grid{grid-template-columns:repeat(2,1fr);}
+  .ig-grid{grid-template-columns:1fr 1fr;grid-auto-rows:128px;gap:10px;}
+  .ig-tile-lg{grid-row:span 2;grid-column:span 2;}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;}
+  [data-reveal]{opacity:1!important;transform:none!important;}
+  .loader{display:none!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-bg"></div>
+  <svg class="loader-sparkles" viewBox="0 0 600 600" aria-hidden="true">
+    <g fill="#fff5f9">
+      <path class="spk spk-a" d="M120 100 l4 -16 l4 16 l16 4 l-16 4 l-4 16 l-4 -16 l-16 -4 z"/>
+      <path class="spk spk-b" d="M480 140 l5 -20 l5 20 l20 5 l-20 5 l-5 20 l-5 -20 l-20 -5 z"/>
+      <path class="spk spk-c" d="M520 440 l3 -12 l3 12 l12 3 l-12 3 l-3 12 l-3 -12 l-12 -3 z"/>
+      <path class="spk spk-d" d="M80 460 l4 -14 l4 14 l14 4 l-14 4 l-4 14 l-4 -14 l-14 -4 z"/>
+    </g>
+  </svg>
+  <div class="loader-stage">
+    <div class="loader-logo">
+      <svg viewBox="0 0 200 80" class="loader-loaf" aria-hidden="true">
+        <defs><linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9b07a"/><stop offset="1" stop-color="#b8763e"/></linearGradient></defs>
+        <path d="M30 60 Q24 30 60 24 Q70 14 96 14 Q120 14 130 24 Q166 30 160 60 Q160 70 150 70 L40 70 Q30 70 30 60 Z" fill="none" stroke="url(#lg1)" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M60 32 Q70 22 80 32" fill="none" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M88 30 Q98 20 108 30" fill="none" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M116 32 Q126 22 136 32" fill="none" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="loader-title">The Loafy Dough</div>
+      <div class="loader-sub">cottage bakery</div>
+      <div class="loader-bar"><span></span></div>
+      <div class="loader-tagline">warming the oven<span class="dots"><i>.</i><i>.</i><i>.</i></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="site-header" id="header">
+  <div class="container nav">
+    <a href="#home" class="nav-logo" onclick="showPage('home');return false;">
+      <span class="mark" style="background-image:url('/concepts/theloafydough/assets/logo.jpg')"></span>
+      <span>The Loafy Dough</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home"  data-page="home"  onclick="showPage('home');return false;">Home</a>
+      <a href="#menu"  data-page="menu"  onclick="showPage('menu');return false;">Menu</a>
+      <a href="#about" data-page="about" onclick="showPage('about');return false;">Our Story</a>
+      <a href="#order" data-page="order" onclick="showPage('order');return false;">How to Order</a>
+      <a href="#contact" data-page="contact" onclick="showPage('contact');return false;">Visit</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-cta">
+      <a href="#order" onclick="showPage('order');return false;" class="btn btn-primary">Order this week →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HOME ===================== -->
+<div id="page-home" class="page-section active">
+
+  <!-- HERO -->
+  <section class="hero" style="position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;pointer-events:none;z-index:0;" aria-hidden="true">
+      <svg class="float-deco" style="top:4%;left:1%;width:56px;opacity:.35" viewBox="0 0 24 24"><path fill="var(--pink400)" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+      <svg class="float-deco" style="bottom:18%;left:2%;width:32px;opacity:.4" viewBox="0 0 24 24"><path fill="var(--pink300)" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+      <svg class="float-deco" style="top:8%;right:1%;width:40px;opacity:.4" viewBox="0 0 24 24"><path fill="var(--caramel400)" d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+      <svg class="float-deco" style="bottom:4%;right:1%;width:64px;opacity:.35" viewBox="0 0 24 24"><path fill="var(--pink300)" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+    </div>
+    <div class="container hero-grid">
+      <div class="hero-text" data-reveal>
+        <div class="eyebrow hero-eyebrow">A tiny cottage bakery <span style="color:var(--pink500)">♥</span></div>
+        <h1 class="hero-title">Baked with<br/><span class="script">all my love</span>in a sunny kitchen</h1>
+        <p class="hero-sub">Slow-fermented sourdough loaves and the gooiest organic cinnamon rolls, made by hand each week and brought fresh to the <span class="script" style="color:var(--pink500);font-size:22px;">farmers market</span>.</p>
+        <div class="hero-actions">
+          <a href="#menu" onclick="showPage('menu');return false;" class="btn btn-primary">See this week's menu</a>
+          <a href="#about" onclick="showPage('about');return false;" class="btn btn-ghost">Meet Joshua</a>
+        </div>
+        <div class="hero-stats">
+          <div><span class="num">100%</span><span class="lbl">Organic flour</span></div>
+          <div><span class="num">48hr</span><span class="lbl">Slow ferment</span></div>
+          <div><span class="num">Markets</span><span class="lbl">Find us weekly</span></div>
+        </div>
+      </div>
+      <div data-reveal style="position:relative;aspect-ratio:4/5;width:100%;">
+        <div class="img-slot has-img" style="position:absolute;inset:0;border-radius:48% 52% 50% 50%/50% 48% 52% 50%;transform:rotate(-3deg);">
+          <img src="/concepts/theloafydough/assets/cinnamon-rolls.png" alt="Fresh sourdough cinnamon rolls"/>
+        </div>
+        <div class="hero-badge">Fresh<br/>this week<small>baked fri+sat</small></div>
+        <svg class="float-deco" style="top:-20px;right:20%;width:50px;z-index:3;" viewBox="0 0 24 24"><path fill="#fff5f9" stroke="#e85a8e" stroke-width="1.4" d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+      </div>
+    </div>
+    <div class="hero-marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>organic sourdough <i class="dot"></i></span><span>cinnamon rolls <i class="dot"></i></span><span>baked with love <i class="dot"></i></span><span>cottage kitchen <i class="dot"></i></span><span>slow-fermented <i class="dot"></i></span><span>small batch <i class="dot"></i></span>
+        <span>organic sourdough <i class="dot"></i></span><span>cinnamon rolls <i class="dot"></i></span><span>baked with love <i class="dot"></i></span><span>cottage kitchen <i class="dot"></i></span><span>slow-fermented <i class="dot"></i></span><span>small batch <i class="dot"></i></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY STRIP -->
+  <section class="story-strip">
+    <div class="container">
+      <div class="divider"><span class="ln"></span><span class="ico">♥</span><span class="ln"></span></div>
+      <div class="story-strip-inner" data-reveal>
+        <p><span class="story-script">Welcome, sweet friend.</span>We're a one-baker kitchen on a quiet street, kneading dough before sunrise and singing to the starter. Everything is organic, slow-fermented, and wrapped up like a little love letter.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section style="padding:80px 0;">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div class="eyebrow">This week's bakes</div>
+        <h2>Pulled fresh from the oven<br/><span class="script">— and into your hands.</span></h2>
+      </div>
+      <div class="featured-grid">
+        <article class="prod-card" data-reveal>
+          <div class="prod-card-image img-slot has-img"><img src="/concepts/theloafydough/assets/sourdough-loaf.png" alt="Sourdough bread loaf"/></div>
+          <div class="prod-card-body">
+            <span class="tag">Best seller</span>
+            <h3>Sourdough Bread Loaf</h3>
+            <p>A crackly crust, an open crumb, and just enough tang. Naturally leavened with our 6-year-old starter, Pearl.</p>
+            <div class="prod-card-foot"><span class="price">$9</span><a href="#menu" onclick="showPage('menu');return false;" class="link-arrow">Order →</a></div>
+          </div>
+        </article>
+        <article class="prod-card featured-big" data-reveal>
+          <div class="prod-card-image img-slot has-img"><img src="/concepts/theloafydough/assets/cinnamon-rolls.png" alt="Sourdough cinnamon rolls"/></div>
+          <div class="prod-card-body">
+            <span class="tag tag-warm">Customer favorite</span>
+            <h3>Sourdough Cinnamon Rolls</h3>
+            <p>Pillowy, gooey, swirled with cinnamon sugar and topped with a cream-cheese glaze that drips just right.</p>
+            <div class="prod-card-foot"><span class="price">$18 <small>/half-dozen</small></span><a href="#menu" onclick="showPage('menu');return false;" class="link-arrow">Order →</a></div>
+          </div>
+        </article>
+        <article class="prod-card" data-reveal>
+          <div class="prod-card-image img-slot has-img"><img src="/concepts/theloafydough/assets/focaccia.png" alt="Sourdough focaccia"/></div>
+          <div class="prod-card-body">
+            <span class="tag tag-new">New</span>
+            <h3>Sourdough Focaccia</h3>
+            <p>Dimpled, drenched in olive oil, finished with flaky salt and fresh rosemary from the garden.</p>
+            <div class="prod-card-foot"><span class="price">$12</span><a href="#menu" onclick="showPage('menu');return false;" class="link-arrow">Order →</a></div>
+          </div>
+        </article>
+      </div>
+      <div class="section-foot" data-reveal>
+        <a href="#menu" onclick="showPage('menu');return false;" class="btn btn-soft">See the whole menu →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT TEASER -->
+  <section style="padding:80px 0;">
+    <div class="container about-teaser-grid">
+      <div class="about-teaser-img" data-reveal="left">
+        <div class="img-slot has-img" style="aspect-ratio:4/5;border-radius:50% 50% 48% 52%/52% 48% 50% 50%;">
+          <img src="/concepts/theloafydough/assets/baker.png" alt="The baker at the farmers market"/>
+        </div>
+        <svg class="float-deco" style="top:-16px;right:-16px;width:90px;" viewBox="0 0 24 24"><path fill="#e85a8e" d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+      </div>
+      <div class="about-teaser-text" data-reveal>
+        <div class="eyebrow">Our little story</div>
+        <h2>It started with a jar of <span class="script">flour, water,</span> and a lot of patience.</h2>
+        <p>What was supposed to be a quiet hobby during a long pandemic spring turned into the loaves your neighbors keep asking about. Today, every bake is still hand-shaped, hand-scored, and carried to the market — sometimes still warm.</p>
+        <p class="signature script">— xoxo, Joshua</p>
+        <a href="#about" onclick="showPage('about');return false;" class="btn btn-ghost">Read the full story</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" style="padding:80px 0;">
+    <svg class="float-deco" style="top:8%;left:8%;width:60px;opacity:.6" viewBox="0 0 24 24"><path fill="var(--pink300)" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+    <svg class="float-deco" style="bottom:12%;right:6%;width:80px;opacity:.6" viewBox="0 0 24 24"><path fill="var(--pink300)" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+    <div class="container">
+      <div class="section-head center" style="text-align:center;margin-left:auto;margin-right:auto;" data-reveal>
+        <div class="eyebrow">Sweet words</div>
+        <h2>What our <span class="script">bread-loving</span> neighbors say</h2>
+      </div>
+      <div class="testimonials-grid">
+        <blockquote class="t-card" data-reveal>
+          <p>"These cinnamon rolls ruined every other cinnamon roll for me. My family fights over the last one every single Saturday."</p>
+          <footer><span class="t-avatar"></span><span><strong>Sarah M.</strong><em>regular since 2023</em></span></footer>
+        </blockquote>
+        <blockquote class="t-card t-card-feature" data-reveal>
+          <p><span class="big-quote">"</span>The sourdough is unreal — the crust shatters, the inside is the softest thing. And every bag comes with a little handwritten heart. I am converted.</p>
+          <footer><span class="t-avatar"></span><span><strong>Marcus + Jess</strong><em>weekly bread pickup</em></span></footer>
+        </blockquote>
+        <blockquote class="t-card" data-reveal>
+          <p>"I drove 40 minutes for a loaf and it was 100% worth it. Will be back. The packaging alone made my whole week."</p>
+          <footer><span class="t-avatar"></span><span><strong>Priya K.</strong><em>first-timer</em></span></footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-band">
+    <div class="container">
+      <div class="cta-card" data-reveal>
+        <div class="cta-text">
+          <div class="eyebrow eyebrow-light">Order window opens Monday <span style="color:var(--pink200)">♥</span></div>
+          <h2 class="cta-head">Ready to put a <span class="script">warm loaf</span> on your table?</h2>
+          <p>This week's batches go up Monday at 9am and sell out fast. Pop in your order and we'll have it bagged and ready at our market stall this weekend.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="#order" onclick="showPage('order');return false;" class="btn btn-primary">Place an order</a>
+          <a href="#menu" onclick="showPage('menu');return false;" class="btn btn-soft">Browse the menu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /home -->
+
+<!-- ===================== MENU ===================== -->
+<div id="page-menu" class="page-section">
+  <section class="page-header">
+    <div class="container">
+      <div class="eyebrow">This week's bakes <span style="color:var(--pink500)">♥</span></div>
+      <h1>What's coming out of <span class="script">the oven</span></h1>
+      <p>The menu rotates a bit week-to-week. Everything is hand-shaped from organic, small-batch dough.</p>
+      <div class="divider" style="margin-top:36px"><span class="ln"></span><span class="ico">♥</span><span class="ln"></span></div>
+    </div>
+  </section>
+  <section style="padding-top:24px;padding-bottom:120px;">
+    <div class="container">
+
+      <div class="menu-category" data-reveal>
+        <div class="menu-category-head">
+          <h2>Sourdough <span class="script">loaves</span></h2>
+          <span class="count">Five varieties · baked Fri + Sat</span>
+        </div>
+        <div class="menu-board">
+          <div class="menu-item">
+            <div class="img-slot has-img"><img src="/concepts/theloafydough/assets/sourdough-loaf.png" alt="Classic sourdough loaf"/></div>
+            <div class="menu-item-info">
+              <h3>Classic Country <span class="price">$9</span></h3>
+              <p>Our daily-driver loaf. Crackly crust, open crumb, gentle tang. 48-hour cold ferment with organic bread flour.</p>
+              <div class="menu-item-meta"><span class="tag">Best seller</span><span class="tag tag-warm">Organic</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot" style="background:linear-gradient(135deg,var(--caramel300),var(--caramel400));"><span style="font-size:13px;color:var(--brown900);opacity:.7;">Seeded loaf</span></div>
+            <div class="menu-item-info">
+              <h3>Seeded Multigrain <span class="price">$11</span></h3>
+              <p>Heaven for toast lovers. Sunflower, sesame, pumpkin, and flax baked into a hearty whole-grain crust.</p>
+              <div class="menu-item-meta"><span class="tag tag-warm">Organic</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot"><span style="font-size:13px;color:var(--brown700);opacity:.7;">Kalamata + Rosemary</span></div>
+            <div class="menu-item-info">
+              <h3>Kalamata + Rosemary <span class="price">$12</span></h3>
+              <p>Studded with briny olives and fresh rosemary. Eat it warm with good olive oil — that's the whole instruction.</p>
+              <div class="menu-item-meta"><span class="tag tag-new">Seasonal</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot"><span style="font-size:13px;color:var(--brown700);opacity:.7;">Cheddar Jalapeño</span></div>
+            <div class="menu-item-info">
+              <h3>Cheddar Jalapeño <span class="price">$12</span></h3>
+              <p>Sharp cheddar pockets and a gentle pickled-pepper warmth. Makes the world's best grilled cheese.</p>
+              <div class="menu-item-meta"><span class="tag">Spicy-ish</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot" style="background:linear-gradient(135deg,#a86844,#8a5230);"><span style="font-size:13px;color:#fde6ee;opacity:.8;">Chocolate Cherry</span></div>
+            <div class="menu-item-info">
+              <h3>Chocolate Cherry <span class="price">$14</span></h3>
+              <p>Dark cocoa dough with bursts of dried tart cherry. Toast it, butter it, weep a little.</p>
+              <div class="menu-item-meta"><span class="tag tag-new">New</span><span class="tag">Limited</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot"><span style="font-size:13px;color:var(--brown700);opacity:.7;">Cinnamon Swirl</span></div>
+            <div class="menu-item-info">
+              <h3>Cinnamon Sugar Swirl <span class="price">$13</span></h3>
+              <p>Soft sandwich loaf swirled with cinnamon sugar. French toast on Sunday morning — your only excuse needed.</p>
+              <div class="menu-item-meta"><span class="tag tag-warm">Sweet</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-category" data-reveal>
+        <div class="menu-category-head">
+          <h2>Cinnamon <span class="script">rolls</span></h2>
+          <span class="count">Sold by the half-dozen · 6 in a pan</span>
+        </div>
+        <div class="menu-board">
+          <div class="menu-item">
+            <div class="img-slot has-img"><img src="/concepts/theloafydough/assets/cinnamon-rolls.png" alt="Classic cinnamon rolls"/></div>
+            <div class="menu-item-info">
+              <h3>Classic Cinnamon <span class="price">$18</span></h3>
+              <p>The original. Pillowy, gooey, swirled with cinnamon-brown-sugar and capped with cream-cheese glaze.</p>
+              <div class="menu-item-meta"><span class="tag">Best seller</span><span class="tag tag-warm">Organic</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot" style="background:linear-gradient(135deg,var(--caramel300),#dca06a);"><span style="font-size:13px;color:var(--brown900);opacity:.7;">Maple Pecan</span></div>
+            <div class="menu-item-info">
+              <h3>Maple Pecan <span class="price">$22</span></h3>
+              <p>Toasted pecans, real maple syrup glaze, brown sugar that caramelizes on the bottom. Audibly good.</p>
+              <div class="menu-item-meta"><span class="tag tag-warm">Nuts</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot" style="background:linear-gradient(135deg,var(--pink200),var(--pink300));"><span style="font-size:13px;color:var(--pink700);opacity:.9;">Strawberry Rose</span></div>
+            <div class="menu-item-info">
+              <h3>Strawberry Rose <span class="price">$22</span></h3>
+              <p>Roasted-strawberry compote swirl and a rosewater glaze. Pretty as it is good. Sells out in an hour.</p>
+              <div class="menu-item-meta"><span class="tag tag-new">Seasonal</span><span class="tag">Limited</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot" style="background:linear-gradient(135deg,#dca06a,#6c4124);"><span style="font-size:13px;color:#fde6ee;opacity:.9;">Cardamom Knot</span></div>
+            <div class="menu-item-info">
+              <h3>Cardamom Knot <span class="price">$20</span></h3>
+              <p>A Nordic twist — cardamom, butter, knotted by hand. Less sweet, deeply spiced. Best with strong coffee.</p>
+              <div class="menu-item-meta"><span class="tag">Less sweet</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-category" data-reveal>
+        <div class="menu-category-head">
+          <h2>Savory <span class="script">extras</span></h2>
+          <span class="count">A little something else</span>
+        </div>
+        <div class="menu-board">
+          <div class="menu-item">
+            <div class="img-slot has-img"><img src="/concepts/theloafydough/assets/focaccia.png" alt="Rosemary focaccia"/></div>
+            <div class="menu-item-info">
+              <h3>Rosemary Focaccia <span class="price">$12</span></h3>
+              <p>Dimpled, soaked in olive oil, topped with flaky salt and garden rosemary. A whole tray, ready to tear.</p>
+              <div class="menu-item-meta"><span class="tag tag-new">New</span></div>
+            </div>
+          </div>
+          <div class="menu-item">
+            <div class="img-slot"><span style="font-size:13px;color:var(--brown700);opacity:.7;">Everything Bagels</span></div>
+            <div class="menu-item-info">
+              <h3>Everything Bagels <span class="price">$15</span></h3>
+              <p>Sourdough bagels boiled and baked in small batches. Half-dozen, comes with hand-mixed everything seasoning.</p>
+              <div class="menu-item-meta"><span class="tag">Half-dozen</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-foot" data-reveal style="margin-top:80px;">
+        <div class="divider"><span class="ln"></span><span class="ico">♥</span><span class="ln"></span></div>
+        <p style="font-family:var(--font-script);font-size:32px;color:var(--pink500);margin:16px 0 28px;">ready when you are</p>
+        <a href="#order" onclick="showPage('order');return false;" class="btn btn-primary">Place an order →</a>
+      </div>
+    </div>
+  </section>
+</div><!-- /menu -->
+
+<!-- ===================== ABOUT ===================== -->
+<div id="page-about" class="page-section">
+  <section class="page-header">
+    <div class="container">
+      <div class="eyebrow">Hi, nice to meet you <span style="color:var(--pink500)">♥</span></div>
+      <h1>Our little</h1>
+      <span class="script-lg script">love letter to bread.</span>
+      <p>Every loaf has a story. Here's ours.</p>
+    </div>
+  </section>
+  <section style="padding-top:24px;padding-bottom:120px;">
+    <div class="container">
+      <div class="about-intro" data-reveal>
+        <div>
+          <h2>Hi, I'm <span class="script">Joshua</span> — and this is my tiny-kitchen bakery.</h2>
+          <p>The Loafy Dough is a one-baker cottage bakery, run out of a sunny home kitchen. What began as a quiet pandemic-era hobby slowly became something my neighbors couldn't stop asking about.</p>
+          <p>So here we are. Each week I bake what I love eating: long-fermented sourdough loaves and the gooiest organic cinnamon rolls. Everything is made by hand, scored by hand, and packed up with a little note.</p>
+          <p>Thank you for being part of this. <span class="script" style="color:var(--pink600);font-size:22px;">truly.</span></p>
+        </div>
+        <div class="img-slot has-img"><img src="/concepts/theloafydough/assets/baker.png" alt="Joshua at the farmers market"/></div>
+      </div>
+
+      <div class="divider" style="padding:32px 0;"><span class="ln"></span><span class="ico">♥</span><span class="ln"></span></div>
+
+      <div data-reveal style="margin-top:60px;">
+        <div style="text-align:center;max-width:640px;margin:0 auto 60px;">
+          <div class="eyebrow">How we got here</div>
+          <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">A short, <span class="script">crumb-by-crumb</span> history.</h2>
+        </div>
+        <div class="timeline">
+          <div class="tl-item"><div class="year">2020</div><h3>The starter is born</h3><p>A jar of flour and water on a windowsill. We named her Pearl. She is older than my cat.</p></div>
+          <div class="tl-item"><div class="year">2021</div><h3>The first loaves go to neighbors</h3><p>Hand-delivered in paper bags. The thank-you notes that came back changed everything.</p></div>
+          <div class="tl-item"><div class="year">2022</div><h3>Cinnamon rolls join the menu</h3><p>A snowed-in Saturday experiment. They sold out within an hour. We have not stopped baking them since.</p></div>
+          <div class="tl-item"><div class="year">2023</div><h3>The cottage license comes through</h3><p>Officially official. The kitchen got a fresh coat of paint and a brand new dough hook.</p></div>
+          <div class="tl-item"><div class="year">2024</div><h3>You found us ♥</h3><p>Maybe today, maybe next week. Every order still feels like a small miracle. Thank you for being here.</p></div>
+        </div>
+      </div>
+
+      <div data-reveal style="margin-top:120px;">
+        <div style="text-align:center;max-width:640px;margin:0 auto 48px;">
+          <div class="eyebrow">What we believe in</div>
+          <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">Three things <span class="script">we never skip.</span></h2>
+        </div>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 6 4 9 4 14a8 8 0 0 0 16 0c0-5-4-8-8-12z"/></svg></div>
+            <h3>Organic, always</h3>
+            <p>Stone-milled organic flour, real butter, fresh eggs from the farm down the road. The boring kind of integrity.</p>
+          </div>
+          <div class="value-card">
+            <div class="value-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <h3>Slow time</h3>
+            <p>Every dough rests 24–48 hours before it sees the oven. You can taste patience. We promise.</p>
+          </div>
+          <div class="value-card">
+            <div class="value-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg></div>
+            <h3>Made by one pair of hands</h3>
+            <p>Every loaf is shaped by me, scored by me, and wrapped by me. Small batches by design.</p>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal style="margin-top:120px;">
+        <div class="section-head"><div class="eyebrow">Inside the kitchen</div><h2>A peek <span class="script">behind the flour cloud.</span></h2></div>
+        <div class="ig-grid">
+          <div class="ig-tile ig-tile-lg img-slot has-img"><img src="/concepts/theloafydough/assets/cinnamon-rolls.png" alt="Cinnamon rolls"/><span class="ig-overlay">♥ 248</span></div>
+          <div class="ig-tile img-slot"><span>pearl the starter</span></div>
+          <div class="ig-tile img-slot"><span>sunday shaping</span></div>
+          <div class="ig-tile img-slot"><span>flour-dusted</span></div>
+          <div class="ig-tile img-slot"><span>oven spring ♥</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-band" style="padding-top:80px;">
+    <div class="container">
+      <div class="cta-card" data-reveal>
+        <div class="cta-text">
+          <div class="eyebrow eyebrow-light">Come bake with us</div>
+          <h2 class="cta-head">Want to <span class="script">try a loaf</span> this week?</h2>
+          <p>Order before Thursday at midnight and we'll bring it to the weekend market for you.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="#order" onclick="showPage('order');return false;" class="btn btn-primary">Place an order</a>
+          <a href="#menu" onclick="showPage('menu');return false;" class="btn btn-soft">Browse the menu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div><!-- /about -->
+
+<!-- ===================== ORDER ===================== -->
+<div id="page-order" class="page-section">
+  <section class="page-header">
+    <div class="container">
+      <div class="eyebrow">It's easy <span style="color:var(--pink500)">♥</span></div>
+      <h1>How to</h1>
+      <span class="script-lg script">order from us.</span>
+      <p>Four steps, one weekly rhythm, zero stress. The order window opens every Monday at 9am and closes Thursday at midnight.</p>
+    </div>
+  </section>
+  <section style="padding-top:24px;padding-bottom:80px;">
+    <div class="container">
+      <div style="text-align:center;max-width:640px;margin:0 auto 40px;" data-reveal>
+        <div class="eyebrow">The rhythm</div>
+        <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">From <span class="script">starter</span> to your kitchen counter.</h2>
+      </div>
+      <div class="steps" data-reveal>
+        <div class="step"><span class="num">1</span><h3>Browse the menu</h3><p>Each Monday at 9am the week's bakes go live. Some weeks have surprise specials — peek before they sell out.</p></div>
+        <div class="step"><span class="num">2</span><h3>Place your order</h3><p>Fill out the form below with what you'd like and when you'll pick up. You'll get a sweet little confirmation.</p></div>
+        <div class="step"><span class="num">3</span><h3>We bake</h3><p>Thursday night the dough goes in. Friday morning the kitchen smells like heaven. Your order is named &amp; bagged.</p></div>
+        <div class="step"><span class="num">4</span><h3>Pick up at the market ♥</h3><p>Find our stall on market day — your bag is named and waiting. Bring a tote, leave with warm bread, possibly a hug.</p></div>
+      </div>
+
+      <div style="text-align:center;max-width:640px;margin:80px auto 40px;" data-reveal>
+        <div class="eyebrow">The week at a glance</div>
+        <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">When the <span class="script">oven</span> is on.</h2>
+      </div>
+      <div class="schedule-grid" data-reveal>
+        <div class="day-card is-bake"><div class="dow">Mon</div><div class="what">Menu drops</div><div class="when">9am</div></div>
+        <div class="day-card"><div class="dow">Tue</div><div class="what">Orders open</div><div class="when">all day</div></div>
+        <div class="day-card"><div class="dow">Wed</div><div class="what">Orders open</div><div class="when">all day</div></div>
+        <div class="day-card is-bake"><div class="dow">Thu</div><div class="what">Orders close</div><div class="when">midnight</div></div>
+        <div class="day-card is-bake"><div class="dow">Fri</div><div class="what">Baking day</div><div class="when">oven on</div></div>
+        <div class="day-card is-bake"><div class="dow">Sat</div><div class="what">Arbor Park Mkt</div><div class="when">9am – 1pm</div></div>
+        <div class="day-card is-bake"><div class="dow">Sun</div><div class="what">Riverside Mkt</div><div class="when">10am – 2pm</div></div>
+      </div>
+
+      <div style="text-align:center;max-width:640px;margin:80px auto 40px;" data-reveal>
+        <div class="eyebrow">Place your order</div>
+        <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">Tell us <span class="script">what you'd like.</span></h2>
+      </div>
+      <div class="contact-card" style="max-width:760px;margin:0 auto;" data-reveal>
+        <form class="contact-form" id="orderForm">
+          <div class="form-grid">
+            <div class="form-row-2">
+              <div class="form-row"><label>Your name</label><input type="text" placeholder="Jane Loafyfan" required/></div>
+              <div class="form-row"><label>Phone or email</label><input type="text" placeholder="hello@..." required/></div>
+            </div>
+            <div class="form-row"><label>What you'd like</label>
+              <select>
+                <option>1× Classic Country Sourdough — $9</option>
+                <option>1× Seeded Multigrain — $11</option>
+                <option>1× Kalamata Rosemary — $12</option>
+                <option>1× Cheddar Jalapeño — $12</option>
+                <option>1× Chocolate Cherry — $14</option>
+                <option>½ dozen Classic Cinnamon Rolls — $18</option>
+                <option>½ dozen Maple Pecan Rolls — $22</option>
+                <option>1× Rosemary Focaccia — $12</option>
+                <option>½ dozen Everything Bagels — $15</option>
+              </select>
+            </div>
+            <div class="form-row-2">
+              <div class="form-row"><label>Pick up at</label>
+                <select>
+                  <option>Arbor Park Market · Sat 9am – 1pm</option>
+                  <option>Riverside Market · Sun 10am – 2pm</option>
+                  <option>Downtown Makers · 1st Fri 4 – 8pm</option>
+                </select>
+              </div>
+              <div class="form-row"><label>Pickup window</label>
+                <select><option>As soon as you open</option><option>Early window</option><option>Late window</option></select>
+              </div>
+            </div>
+            <div class="form-row"><label>Anything else? (allergies, gift notes, requests)</label><textarea placeholder="Add a little message ♥"></textarea></div>
+            <div style="display:flex;gap:14px;align-items:center;margin-top:16px;">
+              <button type="submit" class="btn btn-primary">Send order →</button>
+              <span style="font-size:13px;color:var(--brown700);">We'll confirm by text within a day.</span>
+            </div>
+          </div>
+          <div id="orderThanks" hidden style="text-align:center;padding:40px 20px;">
+            <div style="font-family:var(--font-script);font-size:64px;color:var(--pink500);line-height:1;">Thank you ♥</div>
+            <p style="margin-top:16px;color:var(--brown700);">Your order is in. Look for a confirmation note from us soon — and prepare your kitchen for some very good smells.</p>
+          </div>
+        </form>
+      </div>
+
+      <div style="text-align:center;max-width:640px;margin:80px auto 40px;" data-reveal>
+        <div class="eyebrow">Questions, sweetly answered</div>
+        <h2 style="font-size:clamp(36px,4.6vw,60px);margin:14px 0 0;">The <span class="script">FAQ</span> corner.</h2>
+      </div>
+      <div class="faq-list" data-reveal>
+        <details class="faq-item" open><summary>When does the order window open and close?</summary><p>The menu drops Monday at 9am, and orders stay open until Thursday at midnight (or until we sell out).</p></details>
+        <details class="faq-item"><summary>Where do I pick up?</summary><p>At the market! We bring your preorder to whichever market you chose — Arbor Park (Sat), Riverside (Sun), or Downtown Makers (first Fri).</p></details>
+        <details class="faq-item"><summary>How do I pay?</summary><p>Venmo or cash at the market. We'll send a friendly reminder with your confirmation.</p></details>
+        <details class="faq-item"><summary>How should I store my bread?</summary><p>Sourdough keeps beautifully on the counter, cut-side down, for 3–4 days. Cinnamon rolls reheat best at 325°F for 6 minutes.</p></details>
+        <details class="faq-item"><summary>Can I order in bulk for a special occasion?</summary><p>Yes! Reach out at least two weeks ahead. We've done baby showers, brunches, dinner parties, and one very memorable engagement.</p></details>
+      </div>
+    </div>
+  </section>
+</div><!-- /order -->
+
+<!-- ===================== CONTACT ===================== -->
+<div id="page-contact" class="page-section">
+  <section class="page-header">
+    <div class="container">
+      <div class="eyebrow">Come say hi <span style="color:var(--pink500)">♥</span></div>
+      <h1>Find us,</h1>
+      <span class="script-lg script">drop a line.</span>
+      <p>Catch us at farmers markets around town, slide into our Instagram DMs, or drop a note. We answer everything between bakes.</p>
+    </div>
+  </section>
+  <section style="padding-top:24px;padding-bottom:120px;">
+    <div class="container">
+      <div class="contact-grid" data-reveal>
+        <div>
+          <div class="contact-card">
+            <h3>The details</h3>
+            <div class="contact-row"><div class="icn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-7-8-13a8 8 0 1 1 16 0c0 6-8 13-8 13z"/><circle cx="12" cy="9" r="3"/></svg></div><div><div class="lbl">Where to find us</div><div class="val">Farmers markets — no storefront</div></div></div>
+            <div class="contact-row"><div class="icn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><div class="lbl">Market days</div><div class="val">Sat · Sun · first Fridays</div></div></div>
+            <div class="contact-row"><div class="icn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92V20a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3.08a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div><div class="lbl">Text us</div><div class="val">(555) 123 · LOAF</div></div></div>
+            <div class="contact-row"><div class="icn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div><div class="lbl">Email</div><div class="val">hello@theloafydough.com</div></div></div>
+            <div class="contact-row"><div class="icn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div><div><div class="lbl">Instagram</div><div class="val">@theloafydough</div></div></div>
+          </div>
+          <div class="markets-card">
+            <div class="eyebrow">Catch us around town</div>
+            <h3>Where to find our stall</h3>
+            <p>We're a roaming market bakery with no fixed shop — come say hi at any of these.</p>
+            <ul class="markets-list">
+              <li><span class="mk-name">Arbor Park Market</span><span class="mk-when">Saturdays · 9am – 1pm</span></li>
+              <li><span class="mk-name">Riverside Farmers Market</span><span class="mk-when">Sundays · 10am – 2pm</span></li>
+              <li><span class="mk-name">Downtown Makers Market</span><span class="mk-when">First Friday · 4 – 8pm</span></li>
+            </ul>
+            <p class="markets-note">Our lineup shifts with the seasons — check Instagram for this week's stall.</p>
+          </div>
+        </div>
+        <div>
+          <div class="contact-card">
+            <h3>Drop us a note</h3>
+            <p style="color:var(--brown700);font-size:15px;margin:0 0 24px;">For collabs, custom orders, allergy questions, or just to say hello.</p>
+            <form class="contact-form" id="contactForm">
+              <div class="form-grid">
+                <div class="form-row-2">
+                  <div class="form-row"><label>Your name</label><input type="text" placeholder="What should we call you?" required/></div>
+                  <div class="form-row"><label>Email or phone</label><input type="text" placeholder="hello@..." required/></div>
+                </div>
+                <div class="form-row"><label>What's this about?</label>
+                  <select><option>Just saying hi</option><option>A custom or bulk order</option><option>Wholesale / collab</option><option>Question about an ingredient</option><option>Something else</option></select>
+                </div>
+                <div class="form-row"><label>Your message</label><textarea placeholder="Tell us everything ♥" required></textarea></div>
+                <button type="submit" class="btn btn-primary" style="margin-top:16px;">Send message →</button>
+              </div>
+              <div id="contactThanks" hidden style="text-align:center;padding:30px 10px;">
+                <div style="font-family:var(--font-script);font-size:56px;color:var(--pink500);line-height:1;">Got it ♥</div>
+                <p style="margin-top:16px;color:var(--brown700);">Thanks for writing in — we'll reply between bakes (usually within a day).</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal style="text-align:center;margin-top:120px;">
+        <div class="divider"><span class="ln"></span><span class="ico">♥</span><span class="ln"></span></div>
+        <p style="font-family:var(--font-script);font-size:64px;color:var(--pink500);margin:24px 0 8px;line-height:1;">see you soon, friend.</p>
+        <p style="color:var(--brown700);margin:0 0 28px;">The kettle's on, the oven's warm — come find us.</p>
+        <a href="#order" onclick="showPage('order');return false;" class="btn btn-primary">Place an order</a>
+      </div>
+    </div>
+  </section>
+</div><!-- /contact -->
+
+<!-- FOOTER (shared) -->
+<footer class="site-footer">
+  <svg class="float-deco" style="top:30%;left:10%;width:40px;opacity:.5" viewBox="0 0 24 24"><path fill="#d63e76" d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 5a5.5 5.5 0 0 1 9.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+  <svg class="float-deco" style="top:18%;right:14%;width:56px;opacity:.5" viewBox="0 0 24 24"><path fill="#b8763e" d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-script">The Loafy Dough</div>
+        <p style="max-width:320px;color:var(--brown700);font-size:14px;">A cottage bakery making organic sourdough and cinnamon rolls with all my heart, one batch at a time.</p>
+      </div>
+      <div><h4>Wander</h4><ul>
+        <li><a href="#home" onclick="showPage('home');return false;">Home</a></li>
+        <li><a href="#menu" onclick="showPage('menu');return false;">Menu</a></li>
+        <li><a href="#about" onclick="showPage('about');return false;">Our story</a></li>
+        <li><a href="#order" onclick="showPage('order');return false;">How to order</a></li>
+        <li><a href="#contact" onclick="showPage('contact');return false;">Visit us</a></li>
+      </ul></div>
+      <div><h4>Find us at</h4><ul style="color:var(--brown700);font-size:14px;">
+        <li>Arbor Park Market · Sat</li>
+        <li>Riverside Market · Sun</li>
+        <li>Downtown Makers · 1st Fri</li>
+        <li>Preorder for market pickup ♥</li>
+      </ul></div>
+      <div><h4>Stay in touch</h4><ul>
+        <li><a href="https://www.instagram.com/theloafydough/" target="_blank" rel="noopener">@theloafydough</a></li>
+        <li><a href="#">hello@theloafydough.com</a></li>
+        <li><a href="#">(555) 123 · LOAF</a></li>
+        <li><a href="#contact" onclick="showPage('contact');return false;">Find us →</a></li>
+      </ul>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/theloafydough/" target="_blank" rel="noopener" class="social-ico" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.tiktok.com/@the.loafy.dough" target="_blank" rel="noopener" class="social-ico" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.3 2.1 1.6 3.6 3.6 3.9v2.4c-1.3.1-2.5-.3-3.6-1v5.7c0 3.2-2.4 5.5-5.4 5.5a5.3 5.3 0 0 1-5.4-5.3c0-3.1 2.7-5.5 6-5.1v2.6c-.4-.1-.9-.2-1.3-.2-1.5 0-2.6 1.2-2.5 2.8.1 1.4 1.3 2.4 2.7 2.4 1.5 0 2.6-1.1 2.6-2.7V3h3.7z"/></svg></a>
+        <a href="https://www.facebook.com/share/1Dsfwc3jyW/?mibextid=wwXIfr" target="_blank" rel="noopener" class="social-ico" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a>
+      </div></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 The Loafy Dough · Cottage Bakery</span>
+      <span style="font-size:11px;opacity:.5;">For demo purposes only.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Loader
+var loader = document.getElementById('loader');
+var header = document.getElementById('header');
+if (reduceMotion) {
+  loader.classList.add('done');
+} else {
+  requestAnimationFrame(function() { loader.classList.add('animate'); });
+  setTimeout(function() {
+    loader.classList.add('done');
+    header.classList.add('drop');
+  }, 2400);
+}
+
+// SPA navigation
+var currentPage = 'home';
+function showPage(id) {
+  document.querySelectorAll('.page-section').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById('page-' + id);
+  if (el) { el.classList.add('active'); }
+  currentPage = id;
+
+  // Update active nav link
+  document.querySelectorAll('.nav-links a').forEach(function(a) {
+    a.classList.toggle('active', a.dataset.page === id);
+  });
+
+  // Close mobile menu
+  header.classList.remove('open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', 'false');
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Re-run reveals on new page
+  setTimeout(initReveal, 50);
+}
+
+// Nav scroll
+window.addEventListener('scroll', function() {
+  header.classList.toggle('scrolled', window.scrollY > 80);
+}, { passive: true });
+
+// Mobile nav
+var navToggle = document.getElementById('navToggle');
+navToggle.addEventListener('click', function() {
+  var open = header.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.addEventListener('click', function(e) {
+  if (!header.classList.contains('open')) return;
+  if (!header.contains(e.target)) {
+    header.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+
+// Scroll reveal
+function initReveal() {
+  var items = document.querySelectorAll('#page-' + currentPage + ' [data-reveal]');
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(function(el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  items.forEach(function(el) {
+    if (!el.classList.contains('in')) io.observe(el);
+  });
+}
+setTimeout(initReveal, 2500);
+
+// Forms
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  this.querySelector('.form-grid').hidden = true;
+  document.getElementById('orderThanks').hidden = false;
+});
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  this.querySelector('.form-grid').hidden = true;
+  document.getElementById('contactThanks').hidden = false;
+});
+
+// Set home as active in nav on load
+document.querySelectorAll('.nav-links a').forEach(function(a) {
+  if (a.dataset.page === 'home') a.classList.add('active');
+});
+</script>
+</body>
+</html>
