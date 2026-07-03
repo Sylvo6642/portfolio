@@ -124,6 +124,71 @@ function FocusInput({
   );
 }
 
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard unavailable, ignore
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      data-cursor="hover"
+      aria-label={copied ? 'Copied' : `Copy ${value}`}
+      className="relative shrink-0 text-muted hover:text-fg transition-colors"
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {copied ? (
+          <motion.svg
+            key="check"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.15 }}
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </motion.svg>
+        ) : (
+          <motion.svg
+            key="copy"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.15 }}
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}
+
 function LocationCard() {
   const { display, isPm } = useLocalTime();
   return (
@@ -259,6 +324,7 @@ export function Contact() {
                 >
                   robinkevin648@gmail.com
                 </a>
+                <CopyButton value="robinkevin648@gmail.com" />
               </div>
               <div className="flex items-baseline gap-3">
                 <span className="text-muted text-xs uppercase tracking-[0.2em]">LinkedIn</span>
@@ -271,6 +337,7 @@ export function Contact() {
                 >
                   linkedin.com/in/kevinsylvester6642
                 </a>
+                <CopyButton value="https://linkedin.com/in/kevinsylvester6642" />
               </div>
             </div>
 
