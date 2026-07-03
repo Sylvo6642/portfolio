@@ -30,8 +30,8 @@ function boostContributions(cal: ContributionData): ContributionData {
   return { ...cal, weeks: boosted };
 }
 
-const DARK_COLORS: [string, string, string, string, string] = ['#1d1d1d', '#3c3c3a', '#6b6a66', '#a3a19b', '#ebe9e4'];
-const LIGHT_COLORS: [string, string, string, string, string] = ['#dedcd6', '#bdbbb4', '#908e87', '#55534e', '#111111'];
+const DARK_COLORS: [string, string, string, string, string] = ['#0f2424', '#174f4f', '#2e9e9e', '#61d1d1', '#b0e8e8'];
+const LIGHT_COLORS: [string, string, string, string, string] = ['#d7f4f4', '#88dddd', '#39c6c6', '#227777', '#081c1c'];
 
 export function GitHubContributions() {
   const [data, setData] = useState<ContributionData | null>(null);

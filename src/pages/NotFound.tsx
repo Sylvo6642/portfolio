@@ -6,7 +6,7 @@ import { useMagneticButton } from '../hooks/useMagneticButton';
 const SPRING_CFG = { stiffness: 60, damping: 18 };
 
 const GLITCH_CHARS = '!@#$%^&*<>?/\\|[]{}~';
-const PURPLE_SHADES = ['#c2410c', '#f0a05c', '#9a3412', '#f5c9a3', '#7c2d12', '#fbe3cf'];
+const PURPLE_SHADES = ['#2e9e9e', '#88dddd', '#227777', '#b0e8e8', '#174f4f', '#d7f4f4'];
 
 function useGlitchText(target: string, forceActive: boolean) {
   const [display, setDisplay] = useState(target);

@@ -3,24 +3,94 @@
 @tailwind utilities;
 
 :root {
-  --bg: 235 233 228;
-  --fg: 17 17 17;
-  --muted: 110 108 102;
-  --edge: 17 17 17;
+  --color-porcelain-50: #ffffe5;
+  --color-porcelain-100: #ffffcc;
+  --color-porcelain-200: #ffff99;
+  --color-porcelain-300: #ffff66;
+  --color-porcelain-400: #ffff33;
+  --color-porcelain-500: #ffff00;
+  --color-porcelain-600: #cccc00;
+  --color-porcelain-700: #999900;
+  --color-porcelain-800: #666600;
+  --color-porcelain-900: #333300;
+  --color-porcelain-950: #242400;
+
+  --color-stormy-teal-50: #e8fafc;
+  --color-stormy-teal-100: #d2f6f9;
+  --color-stormy-teal-200: #a5edf3;
+  --color-stormy-teal-300: #78e4ed;
+  --color-stormy-teal-400: #4adae8;
+  --color-stormy-teal-500: #1dd1e2;
+  --color-stormy-teal-600: #17a7b5;
+  --color-stormy-teal-700: #127e87;
+  --color-stormy-teal-800: #0c545a;
+  --color-stormy-teal-900: #062a2d;
+  --color-stormy-teal-950: #041d20;
+
+  --color-tropical-teal-50: #edf7f7;
+  --color-tropical-teal-100: #dbf0f0;
+  --color-tropical-teal-200: #b7e1e0;
+  --color-tropical-teal-300: #93d2d1;
+  --color-tropical-teal-400: #6fc3c1;
+  --color-tropical-teal-500: #4bb4b2;
+  --color-tropical-teal-600: #3c908e;
+  --color-tropical-teal-700: #2d6c6b;
+  --color-tropical-teal-800: #1e4847;
+  --color-tropical-teal-900: #0f2424;
+  --color-tropical-teal-950: #0b1919;
+
+  --color-pearl-aqua-50: #ebf8f9;
+  --color-pearl-aqua-100: #d8f1f3;
+  --color-pearl-aqua-200: #b0e2e8;
+  --color-pearl-aqua-300: #89d4dc;
+  --color-pearl-aqua-400: #62c5d0;
+  --color-pearl-aqua-500: #3bb7c4;
+  --color-pearl-aqua-600: #2f929d;
+  --color-pearl-aqua-700: #236e76;
+  --color-pearl-aqua-800: #17494f;
+  --color-pearl-aqua-900: #0c2527;
+  --color-pearl-aqua-950: #081a1b;
+
+  --color-teal-50: #ebf9f9;
+  --color-teal-100: #d7f4f4;
+  --color-teal-200: #b0e8e8;
+  --color-teal-300: #88dddd;
+  --color-teal-400: #61d1d1;
+  --color-teal-500: #39c6c6;
+  --color-teal-600: #2e9e9e;
+  --color-teal-700: #227777;
+  --color-teal-800: #174f4f;
+  --color-teal-900: #0b2828;
+  --color-teal-950: #081c1c;
+
+  /* porcelain-50 */
+  --bg: 255 255 229;
+  /* teal-950 */
+  --fg: 8 28 28;
+  /* tropical-teal-700 */
+  --muted: 45 108 107;
+  /* teal-950 */
+  --edge: 8 28 28;
   --edge-alpha: 0.14;
-  --accent: 17 17 17;
-  --void: 17 17 17;
+  /* stormy-teal-700 */
+  --accent: 18 126 135;
+  --void: 8 28 28;
   color-scheme: light;
 }
 
 html.dark {
-  --bg: 13 13 13;
-  --fg: 235 233 228;
-  --muted: 142 140 134;
-  --edge: 235 233 228;
+  /* stormy-teal-950 */
+  --bg: 4 29 32;
+  /* teal-50 */
+  --fg: 235 249 249;
+  /* tropical-teal-400 */
+  --muted: 111 195 193;
+  /* teal-50 */
+  --edge: 235 249 249;
   --edge-alpha: 0.16;
-  --accent: 235 233 228;
-  --void: 13 13 13;
+  /* stormy-teal-400 */
+  --accent: 74 218 232;
+  --void: 4 29 32;
   color-scheme: dark;
 }
 
