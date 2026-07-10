@@ -15,4 +15,8 @@ export const SKILL_GROUPS: { title: string; items: string[] }[] = [
     title: 'AI & LLMs',
     items: ['OpenAI API', 'Gemini API', 'Claude API', 'Ollama', 'Hugging Face'],
   },
+  {
+    title: 'Web Performance',
+    items: ['SEO', 'Core Web Vitals', 'Lighthouse'],
+  },
 ];

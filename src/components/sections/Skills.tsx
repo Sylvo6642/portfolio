@@ -76,6 +76,9 @@ const SKILL_COLORS: Record<string, string> = {
   'Claude API':   '#d97706',
   'Ollama':       '#ffffff',
   'Hugging Face': '#FFD21E',
+  SEO:              '#4285F4',
+  'Core Web Vitals': '#0cce6b',
+  Lighthouse:       '#F44B21',
 };
 
 function SkillPill({ name, color }: { name: string; color: string }) {

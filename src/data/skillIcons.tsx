@@ -149,6 +149,24 @@ export const SKILL_ICONS: Record<string, ReactNode> = {
     </svg>
   ),
 
+  SEO: (
+    <svg viewBox="0 0 24 24" fill="#4285F4" className="w-3.5 h-3.5 shrink-0">
+      <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z" />
+    </svg>
+  ),
+
+  'Core Web Vitals': (
+    <svg viewBox="0 0 24 24" fill="#0cce6b" className="w-3.5 h-3.5 shrink-0">
+      <path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z" />
+    </svg>
+  ),
+
+  Lighthouse: (
+    <svg viewBox="0 0 24 24" fill="#F44B21" className="w-3.5 h-3.5 shrink-0">
+      <path d="M7 2v11h3v9l7-12h-4l4-8z" />
+    </svg>
+  ),
+
   n8n: (
     <svg viewBox="0 0 640 480" className="w-3.5 h-3.5 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="100" cy="240" r="72" stroke="#EA4B71" strokeWidth="52" />
