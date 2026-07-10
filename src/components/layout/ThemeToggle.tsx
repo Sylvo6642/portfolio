@@ -118,7 +118,7 @@ export function ThemeToggle() {
       onClick={handleClick}
       data-cursor="hover"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="relative h-9 w-9 rounded-full hairline grid place-items-center overflow-hidden hover:bg-fg/5 transition-colors"
+      className="liquid-glass relative h-12 w-12 rounded-full grid place-items-center hover:bg-fg/5 transition-colors"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
       <span className="sr-only">Toggle theme</span>
