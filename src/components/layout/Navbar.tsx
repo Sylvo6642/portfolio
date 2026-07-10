@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
+import { Magnetic } from '../shared/Magnetic';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { scrollToId, scrollToTop } from '../../lib/scroll';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -65,13 +66,14 @@ export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
       className="fixed inset-x-0 top-4 z-40 px-4 md:px-6"
     >
       <div className="mx-auto max-w-[1400px] flex items-center justify-between">
+        <Magnetic className="shrink-0">
         <button
           type="button"
           data-secret-logo
           onClick={() => scrollToTop()}
           onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}
           data-cursor="hover"
-          className="liquid-glass rounded-full h-12 w-12 grid place-items-center shrink-0"
+          className="liquid-glass rounded-full h-12 w-12 grid place-items-center"
         >
           <motion.img
             src={theme === 'dark' ? '/KR_dark.png' : '/KR_light.png'}
@@ -88,6 +90,7 @@ export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
             className="h-9 w-9 object-contain"
           />
         </button>
+        </Magnetic>
 
         <nav className="hidden md:flex items-center gap-0.5 liquid-glass rounded-full px-1.5 py-1.5">
           {NAV.map((item, i) => {
@@ -119,7 +122,9 @@ export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <Magnetic>
+            <ThemeToggle />
+          </Magnetic>
           <button
             type="button"
             data-cursor="hover"

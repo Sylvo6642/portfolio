@@ -337,9 +337,9 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                       <button
                         onClick={() => onVideoOpen(p)}
                         data-cursor="hover"
-                        className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
+                        className="group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
                       >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="transition-transform duration-300 group-hover:scale-125"><path d="M8 5v14l11-7z" /></svg>
                         Watch demo
                       </button>
                     )}
@@ -349,10 +349,10 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                         target="_blank"
                         rel="noopener noreferrer"
                         data-cursor="hover"
-                        className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
+                        className="group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 border border-fg/30 hover:bg-fg hover:text-bg transition-colors"
                       >
                         View Project
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M7 7h10v10" /></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><path d="M7 17L17 7M7 7h10v10" /></svg>
                       </a>
                     )}
                     {p.link ? (
@@ -368,15 +368,26 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
                   </div>
                 </div>
 
-                <p className="mt-5 max-w-3xl text-sm leading-relaxed text-fg/75">
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-5 max-w-3xl text-sm leading-relaxed text-fg/75"
+                >
                   {p.description}
-                </p>
+                </motion.p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {p.tech.map((t) => (
-                    <span key={t} className="font-mono text-[11px] px-2.5 py-1 border border-fg/20 text-fg/80">
+                  {p.tech.map((t, ti) => (
+                    <motion.span
+                      key={t}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.2 + ti * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                      className="font-mono text-[11px] px-2.5 py-1 border border-fg/20 text-fg/80 hover:border-fg/50 hover:text-fg transition-colors"
+                    >
                       {t}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>

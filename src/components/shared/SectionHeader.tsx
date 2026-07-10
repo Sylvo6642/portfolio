@@ -30,20 +30,35 @@ export function SectionHeader({
 
   return (
     <div ref={ref}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.6 }}
-        className="hairline-t flex items-baseline justify-between pt-4 mb-8 md:mb-12"
-      >
-        <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">
+      <div className="relative flex items-baseline justify-between pt-4 mb-8 md:mb-12">
+        <motion.span
+          aria-hidden
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+          className="absolute top-0 left-0 right-0 h-px origin-left"
+          style={{ background: 'rgb(var(--edge) / var(--edge-alpha))' }}
+        />
+        <motion.span
+          initial={{ opacity: 0, x: -12 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted"
+        >
           ({index})
-        </span>
-        <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">
+        </motion.span>
+        <motion.span
+          initial={{ opacity: 0, x: 12 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted"
+        >
           {label}
-        </span>
-      </motion.div>
+        </motion.span>
+      </div>
 
       <motion.h2
         style={{ y, fontSize: 'clamp(2.6rem, 8vw, 7rem)' }}
