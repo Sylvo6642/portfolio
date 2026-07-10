@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion';
 
 const SESSION_KEY = 'kr-loader-seen';
 
@@ -65,7 +65,7 @@ function GlitchText({ text, reveal }: { text: string; reveal: boolean }) {
 function Counter({ progress }: { progress: number }) {
   const display = Math.round(progress * 100);
   return (
-    <div className="font-mono tabular-nums" style={{ fontSize: 'clamp(5rem, 14vw, 11rem)', lineHeight: 1, letterSpacing: '-0.04em' }}>
+    <div className="font-mono tabular-nums" style={{ fontSize: 'clamp(3.5rem, 9vw, 7rem)', lineHeight: 1, letterSpacing: '-0.04em' }}>
       <span style={{ color: 'rgb(var(--fg))' }}>{String(display).padStart(2, '0')}</span>
       <span style={{ color: 'rgb(var(--accent) / 0.5)', fontSize: '0.45em', verticalAlign: 'super', marginLeft: '0.1em' }}>%</span>
     </div>
@@ -102,7 +102,6 @@ export function Loader({ onDone }: { onDone: () => void }) {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, [onDone]);
 
-  const barWidth = useTransform(springProgress, [0, 1], ['0%', '100%']);
   const EXIT_DURATION = 0.65;
 
   return (
@@ -151,36 +150,15 @@ export function Loader({ onDone }: { onDone: () => void }) {
       />
 
 
-      {/* Top-right label */}
-      <motion.div
-        className="absolute top-8 right-8 font-mono text-[10px] tracking-[0.25em] uppercase"
-        style={{ color: 'rgb(var(--fg) / 0.35)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-      >
-        kevin robin
-      </motion.div>
-
       {/* Main center content */}
       <div className="flex-1 flex flex-col items-center justify-center px-8 gap-6">
         <AnimatePresence mode="wait">
           {phase === 'counting' && (
             <motion.div
               key="counter"
-              className="flex flex-col items-center gap-4"
               exit={{ opacity: 0, y: -20, transition: { duration: 0.35, ease: 'easeIn' } }}
             >
               <Counter progress={progressSnap} />
-              <motion.p
-                className="font-mono text-[11px] tracking-[0.28em] uppercase"
-                style={{ color: 'rgb(var(--accent) / 0.7)' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-              >
-                initializing
-              </motion.p>
             </motion.div>
           )}
 
@@ -229,51 +207,6 @@ export function Loader({ onDone }: { onDone: () => void }) {
         </AnimatePresence>
       </div>
 
-      {/* Bottom progress bar */}
-      <div className="px-8 pb-10 flex flex-col gap-3">
-        <div
-          className="relative h-[1px] w-full overflow-hidden"
-          style={{ background: 'rgb(var(--fg) / 0.08)' }}
-        >
-          <motion.div
-            className="absolute inset-y-0 left-0"
-            style={{
-              width: barWidth,
-              background: 'linear-gradient(90deg, rgb(var(--accent) / 0.5), rgb(var(--accent)))',
-            }}
-          />
-          {/* Glowing tip */}
-          <motion.div
-            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full -translate-x-1/2"
-            style={{
-              left: barWidth,
-              background: 'rgb(var(--accent))',
-              boxShadow: '0 0 8px 2px rgb(var(--accent) / 0.8)',
-            }}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <motion.span
-            className="font-mono text-[9px] tracking-[0.2em] uppercase"
-            style={{ color: 'rgb(var(--fg) / 0.25)' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            loading experience
-          </motion.span>
-          <motion.span
-            className="font-mono text-[9px] tracking-[0.2em]"
-            style={{ color: 'rgb(var(--fg) / 0.25)' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            {String(Math.round(progressSnap * 100)).padStart(3, '0')}
-          </motion.span>
-        </div>
-      </div>
     </motion.div>
   );
 }
