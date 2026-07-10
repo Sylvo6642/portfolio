@@ -36,9 +36,6 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
 
 function TiltPhoto() {
   const ref = useRef<HTMLDivElement>(null);
-  // Observe the unclipped wrapper — the clipped frame itself reports zero
-  // visible area while hidden, so it can never trigger its own reveal.
-  const revealed = useInView(ref, { once: true, amount: 0.25 });
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
 
@@ -65,22 +62,13 @@ function TiltPhoto() {
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
-      {/* Clip-path wipe: frame opens bottom-up while the image settles from a zoom */}
-      <motion.div
-        className="overflow-hidden"
-        style={{ aspectRatio: '3/4' }}
-        initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
-        animate={revealed ? { clipPath: 'inset(0% 0% 0% 0%)' } : undefined}
-        transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
-      >
+      <div className="overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <motion.img
           src="/kevin.png"
           alt="Kevin Robin"
           className="w-full h-full object-cover object-top"
-          initial={{ scale: 1.25 }}
-          animate={revealed ? { scale: 1 } : undefined}
           whileHover={{ scale: 1.04 }}
-          transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -88,7 +76,7 @@ function TiltPhoto() {
             background: 'linear-gradient(to top, rgb(var(--bg) / 0.35) 0%, transparent 45%)',
           }}
         />
-      </motion.div>
+      </div>
       <motion.div
         className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline backdrop-blur-sm"
         style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
