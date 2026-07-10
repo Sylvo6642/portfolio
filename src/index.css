@@ -3,94 +3,94 @@
 @tailwind utilities;
 
 :root {
-  --color-porcelain-50: #ffffe5;
-  --color-porcelain-100: #ffffcc;
-  --color-porcelain-200: #ffff99;
-  --color-porcelain-300: #ffff66;
-  --color-porcelain-400: #ffff33;
-  --color-porcelain-500: #ffff00;
-  --color-porcelain-600: #cccc00;
-  --color-porcelain-700: #999900;
-  --color-porcelain-800: #666600;
-  --color-porcelain-900: #333300;
-  --color-porcelain-950: #242400;
+  --color-ink-black-50: #ebf2f9;
+  --color-ink-black-100: #d8e5f3;
+  --color-ink-black-200: #b1cbe7;
+  --color-ink-black-300: #8ab1db;
+  --color-ink-black-400: #6397cf;
+  --color-ink-black-500: #3c7dc3;
+  --color-ink-black-600: #30649c;
+  --color-ink-black-700: #244b75;
+  --color-ink-black-800: #18324e;
+  --color-ink-black-900: #0c1927;
+  --color-ink-black-950: #08121b;
 
-  --color-stormy-teal-50: #e8fafc;
-  --color-stormy-teal-100: #d2f6f9;
-  --color-stormy-teal-200: #a5edf3;
-  --color-stormy-teal-300: #78e4ed;
-  --color-stormy-teal-400: #4adae8;
-  --color-stormy-teal-500: #1dd1e2;
-  --color-stormy-teal-600: #17a7b5;
-  --color-stormy-teal-700: #127e87;
-  --color-stormy-teal-800: #0c545a;
-  --color-stormy-teal-900: #062a2d;
-  --color-stormy-teal-950: #041d20;
+  --color-prussian-blue-50: #eef1f7;
+  --color-prussian-blue-100: #dce3ef;
+  --color-prussian-blue-200: #b9c6df;
+  --color-prussian-blue-300: #96aacf;
+  --color-prussian-blue-400: #738ebf;
+  --color-prussian-blue-500: #5071af;
+  --color-prussian-blue-600: #405b8c;
+  --color-prussian-blue-700: #304469;
+  --color-prussian-blue-800: #202d46;
+  --color-prussian-blue-900: #101723;
+  --color-prussian-blue-950: #0b1018;
 
-  --color-tropical-teal-50: #edf7f7;
-  --color-tropical-teal-100: #dbf0f0;
-  --color-tropical-teal-200: #b7e1e0;
-  --color-tropical-teal-300: #93d2d1;
-  --color-tropical-teal-400: #6fc3c1;
-  --color-tropical-teal-500: #4bb4b2;
-  --color-tropical-teal-600: #3c908e;
-  --color-tropical-teal-700: #2d6c6b;
-  --color-tropical-teal-800: #1e4847;
-  --color-tropical-teal-900: #0f2424;
-  --color-tropical-teal-950: #0b1919;
+  --color-dusk-blue-50: #eff2f6;
+  --color-dusk-blue-100: #dee5ed;
+  --color-dusk-blue-200: #bdcbdb;
+  --color-dusk-blue-300: #9cb1c9;
+  --color-dusk-blue-400: #7b97b7;
+  --color-dusk-blue-500: #5b7da4;
+  --color-dusk-blue-600: #486484;
+  --color-dusk-blue-700: #364b63;
+  --color-dusk-blue-800: #243242;
+  --color-dusk-blue-900: #121921;
+  --color-dusk-blue-950: #0d1217;
 
-  --color-pearl-aqua-50: #ebf8f9;
-  --color-pearl-aqua-100: #d8f1f3;
-  --color-pearl-aqua-200: #b0e2e8;
-  --color-pearl-aqua-300: #89d4dc;
-  --color-pearl-aqua-400: #62c5d0;
-  --color-pearl-aqua-500: #3bb7c4;
-  --color-pearl-aqua-600: #2f929d;
-  --color-pearl-aqua-700: #236e76;
-  --color-pearl-aqua-800: #17494f;
-  --color-pearl-aqua-900: #0c2527;
-  --color-pearl-aqua-950: #081a1b;
+  --color-dusty-denim-50: #eff2f5;
+  --color-dusty-denim-100: #e0e5eb;
+  --color-dusty-denim-200: #c0cad8;
+  --color-dusty-denim-300: #a1b0c4;
+  --color-dusty-denim-400: #8296b0;
+  --color-dusty-denim-500: #627c9d;
+  --color-dusty-denim-600: #4f637d;
+  --color-dusty-denim-700: #3b4a5e;
+  --color-dusty-denim-800: #27313f;
+  --color-dusty-denim-900: #14191f;
+  --color-dusty-denim-950: #0e1116;
 
-  --color-teal-50: #ebf9f9;
-  --color-teal-100: #d7f4f4;
-  --color-teal-200: #b0e8e8;
-  --color-teal-300: #88dddd;
-  --color-teal-400: #61d1d1;
-  --color-teal-500: #39c6c6;
-  --color-teal-600: #2e9e9e;
-  --color-teal-700: #227777;
-  --color-teal-800: #174f4f;
-  --color-teal-900: #0b2828;
-  --color-teal-950: #081c1c;
+  --color-alabaster-grey-50: #f3f3f1;
+  --color-alabaster-grey-100: #e6e7e4;
+  --color-alabaster-grey-200: #cecfc9;
+  --color-alabaster-grey-300: #b5b7ae;
+  --color-alabaster-grey-400: #9c9f93;
+  --color-alabaster-grey-500: #838778;
+  --color-alabaster-grey-600: #696c60;
+  --color-alabaster-grey-700: #4f5148;
+  --color-alabaster-grey-800: #353630;
+  --color-alabaster-grey-900: #1a1b18;
+  --color-alabaster-grey-950: #121311;
 
-  /* porcelain-50 */
-  --bg: 255 255 229;
-  /* teal-950 */
-  --fg: 8 28 28;
-  /* tropical-teal-700 */
-  --muted: 45 108 107;
-  /* teal-950 */
-  --edge: 8 28 28;
+  /* alabaster-grey-50 */
+  --bg: 243 243 241;
+  /* ink-black-950 */
+  --fg: 8 18 27;
+  /* dusty-denim-600 */
+  --muted: 79 99 125;
+  /* ink-black-950 */
+  --edge: 8 18 27;
   --edge-alpha: 0.14;
-  /* stormy-teal-700 */
-  --accent: 18 126 135;
-  --void: 8 28 28;
+  /* ink-black-600 */
+  --accent: 48 100 156;
+  --void: 8 18 27;
   color-scheme: light;
 }
 
 html.dark {
-  /* stormy-teal-950 */
-  --bg: 4 29 32;
-  /* teal-50 */
-  --fg: 235 249 249;
-  /* tropical-teal-400 */
-  --muted: 111 195 193;
-  /* teal-50 */
-  --edge: 235 249 249;
+  /* ink-black-950 */
+  --bg: 8 18 27;
+  /* ink-black-50 */
+  --fg: 235 242 249;
+  /* dusty-denim-400 */
+  --muted: 130 150 176;
+  /* ink-black-50 */
+  --edge: 235 242 249;
   --edge-alpha: 0.16;
-  /* stormy-teal-400 */
-  --accent: 74 218 232;
-  --void: 4 29 32;
+  /* ink-black-400 */
+  --accent: 99 151 207;
+  --void: 8 18 27;
   color-scheme: dark;
 }
 
@@ -191,6 +191,37 @@ body {
 .ink-row[data-open='true'] .ink-row-pill {
   border-color: rgb(var(--bg) / 0.4);
   color: rgb(var(--bg) / 0.85);
+}
+
+/* ─── Liquid glass (theme-aware: hairline gradient uses --edge) ─── */
+.liquid-glass {
+  background: rgb(var(--bg) / 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgb(var(--edge) / 0.45) 0%,
+    rgb(var(--edge) / 0.15) 20%,
+    rgb(var(--edge) / 0) 40%,
+    rgb(var(--edge) / 0) 60%,
+    rgb(var(--edge) / 0.15) 80%,
+    rgb(var(--edge) / 0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Hairline border helper */
