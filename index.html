@@ -15,6 +15,14 @@
     />
   </head>
   <body>
+    <script>
+      // Apply saved theme before first paint; new visitors default to light
+      try {
+        if (localStorage.getItem('kr-portfolio-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
