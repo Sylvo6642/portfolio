@@ -13,7 +13,7 @@ export function useMousePosition() {
 }
 
 export function useIsCoarsePointer() {
-  const [coarse, setCoarse] = useState(false);
+  const [coarse, setCoarse] = useState(() => window.matchMedia('(pointer: coarse)').matches);
   useEffect(() => {
     const mq = window.matchMedia('(pointer: coarse)');
     const update = () => setCoarse(mq.matches);

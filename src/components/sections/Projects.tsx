@@ -8,6 +8,7 @@ import {
   useReducedMotion,
 } from 'framer-motion';
 import { useState } from 'react';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { SectionReveal } from '../shared/SectionReveal';
 import { SectionHeader } from '../shared/SectionHeader';
 import { TiltCard } from '../shared/TiltCard';
@@ -402,6 +403,7 @@ function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: numb
 export function Projects() {
   const [active, setActive] = useState<PersonalProject | null>(null);
   const reduced = useReducedMotion();
+  const mobile = useMobileLayout();
 
   // Elastic skew: fast scrolling shears the project list, springing back on stop
   const { scrollY } = useScroll();
@@ -428,7 +430,7 @@ export function Projects() {
 
         <motion.div
           className="flex flex-col hairline-b"
-          style={reduced ? undefined : { skewY }}
+          style={reduced || mobile ? undefined : { skewY }}
         >
           {PERSONAL_PROJECTS.map((p, i) => (
             <PersonalProjectRow key={p.name} p={p} i={i} onVideoOpen={setActive} />

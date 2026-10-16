@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
+import { scrollToId } from '../lib/scroll';
 
 export function useScrollSpy(ids: string[], offset = 120) {
   const [activeId, setActiveId] = useState<string>(ids[0] ?? '');
+  // Preserve the requested destination before scroll tracking updates the URL.
+  const [initialHash] = useState(() => window.location.hash.slice(1));
 
   // On mount, scroll to the section matching the current hash
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
+    const hash = initialHash;
     if (hash && ids.includes(hash)) {
       const el = document.getElementById(hash);
       if (el) {
         // Small delay to let the page finish rendering
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 300);
+        const timer = setTimeout(() => scrollToId(hash), 300);
+        return () => clearTimeout(timer);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -23,7 +27,7 @@ export function useScrollSpy(ids: string[], offset = 120) {
       for (const id of ids) {
         const el = document.getElementById(id);
         if (!el) continue;
-        if (el.offsetTop <= y) current = id;
+        if (el.getBoundingClientRect().top + window.scrollY <= y) current = id;
       }
       setActiveId(current);
 

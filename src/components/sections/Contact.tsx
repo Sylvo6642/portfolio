@@ -241,6 +241,7 @@ export function Contact() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (cooldown > 0) return;
+    if (!supabase) { setStatus('error'); return; }
     setStatus('sending');
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -315,25 +316,25 @@ export function Contact() {
             </p>
 
             <div className="mt-10 space-y-5 font-mono text-sm">
-              <div className="flex items-baseline gap-3">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-3">
                 <span className="text-muted text-xs uppercase tracking-[0.2em]">Email</span>
                 <a
                   href="mailto:robinkevin648@gmail.com"
                   data-cursor="hover"
-                  className="link-underline text-fg"
+                  className="link-underline min-w-0 break-all text-fg"
                 >
                   robinkevin648@gmail.com
                 </a>
                 <CopyButton value="robinkevin648@gmail.com" />
               </div>
-              <div className="flex items-baseline gap-3">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-3">
                 <span className="text-muted text-xs uppercase tracking-[0.2em]">LinkedIn</span>
                 <a
                   href="https://linkedin.com/in/kevinsylvester6642"
                   target="_blank"
                   rel="noreferrer"
                   data-cursor="hover"
-                  className="link-underline text-fg"
+                  className="link-underline min-w-0 break-all text-fg"
                 >
                   linkedin.com/in/kevinsylvester6642
                 </a>
@@ -344,7 +345,7 @@ export function Contact() {
             <LocationCard />
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-5">
+          <form id="contact-form" data-scroll-target aria-label="Send a message" onSubmit={onSubmit} className="space-y-5">
             <FocusInput label="Name" required value={name} onChange={setName} />
             <FocusInput label="Email" type="email" required value={email} onChange={setEmail} />
             <FocusInput label="Message" multiline required value={message} onChange={setMessage} />

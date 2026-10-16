@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server/dev.js",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

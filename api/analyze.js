@@ -29,12 +29,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.VITE_GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server misconfiguration: missing API key' });
+    return res.status(503).json({ error: 'AI analysis is unavailable. Configure GEMINI_API_KEY on the server.' });
   }
 
-  const { prompt } = req.body;
+  const { prompt } = req.body ?? {};
   if (!prompt || typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Missing prompt' });
   }

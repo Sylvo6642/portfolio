@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 /**
  * Phantom.land-style section header:
@@ -20,6 +21,7 @@ export function SectionHeader({
 }) {
   const words = title.split(' ');
   const ref = useRef<HTMLDivElement>(null);
+  const mobile = useMobileLayout();
 
   // Parallax: title lags the scroll while the hairline above moves at page speed
   const { scrollYProgress } = useScroll({
@@ -61,7 +63,7 @@ export function SectionHeader({
       </div>
 
       <motion.h2
-        style={{ y, fontSize: 'clamp(2.6rem, 8vw, 7rem)' }}
+        style={{ y: mobile ? 0 : y, fontSize: 'clamp(2.6rem, 8vw, 7rem)' }}
         className="display-type"
         aria-label={title}
       >

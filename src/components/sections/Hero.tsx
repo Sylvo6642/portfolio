@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConnectingDots } from '../layout/ConnectingDots';
 import { scrollToId } from '../../lib/scroll';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 // Set to your CV URL to show the Download CV button, or leave empty to hide it
 const CV_URL = "";
@@ -107,6 +108,7 @@ function SplitPhrase({ text, phase }: { text: string; phase: 'in' | 'out' | 'idl
 
 export function Hero() {
   const coarse = useIsCoarsePointer();
+  const mobile = useMobileLayout();
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [phase, setPhase] = useState<'in' | 'out' | 'idle'>('idle');
   const HOLD_MS = 2400;
@@ -118,6 +120,7 @@ export function Hero() {
   }, []);
 
   useEffect(() => {
+    if (mobile) return;
     const flyInDuration = ROTATING[phraseIndex].length * STAGGER_MS + 750;
     // after hold, fly out then advance index
     const t1 = window.setTimeout(() => {
@@ -131,7 +134,7 @@ export function Hero() {
       return () => window.clearTimeout(t2);
     }, flyInDuration + HOLD_MS);
     return () => window.clearTimeout(t1);
-  }, [phraseIndex]);
+  }, [phraseIndex, mobile]);
 
   // Raw mouse position (normalized -1 … 1 relative to viewport center)
   const rawX = useMotionValue(0);
@@ -203,7 +206,7 @@ const textX  = useTransform(mx, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT
 {/* Layer 3 — content (exit transforms on the outer layer, mouse parallax inside) */}
       <motion.div
         className="relative mx-auto max-w-[1400px] px-6 pt-32 pb-10 md:pb-14 w-full flex-1 flex flex-col justify-center"
-        style={{ y: exitY, scale: exitScale, opacity: exitOpacity }}
+        style={mobile ? undefined : { y: exitY, scale: exitScale, opacity: exitOpacity }}
       >
       <motion.div style={coarse ? {} : { x: textX, y: textY }}>
         {/* Meta row */}
@@ -244,11 +247,11 @@ const textX  = useTransform(mx, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
             className="font-mono text-xs md:text-sm tracking-[0.18em] uppercase text-fg/70 max-w-md"
-            aria-label={ROTATING[phraseIndex]}
+            aria-label={mobile ? ROTATING[0] : ROTATING[phraseIndex]}
           >
             <span className="text-muted mr-3" aria-hidden>—</span>
             <span aria-hidden>
-              <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />
+              {mobile ? ROTATING[0] : <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />}
             </span>
           </motion.p>
 

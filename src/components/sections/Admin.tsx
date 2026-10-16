@@ -87,6 +87,7 @@ export function Admin() {
 
   // Restore session on mount
   useEffect(() => {
+    if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setAuthed(true);
     });
@@ -98,10 +99,11 @@ export function Admin() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!supabase) { setError('Configure Supabase in .env.local to enable admin access.'); return; }
     setSigningIn(true);
     setError('');
     try {
-      const res = await fetch('https://wxtacfflftsahpubrani.supabase.co/functions/v1/admin-login', {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -120,11 +122,11 @@ export function Admin() {
   }
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
+    await supabase?.auth.signOut();
   }
 
   useEffect(() => {
-    if (!authed) return;
+    if (!authed || !supabase) return;
     setLoading(true);
     Promise.all([
       supabase.from('visitor_logs').select('*').order('visited_at', { ascending: false }).limit(100),

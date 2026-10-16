@@ -1,7 +1,8 @@
 import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
-import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent, type ReactNode } from 'react';
+import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { useCountUp } from '../../hooks/useCountUp';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 const STATS = [
   { value: 3, suffix: '+', label: 'Years in Production' },
@@ -64,7 +65,7 @@ function TiltPhoto() {
     >
       <div className="overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <motion.img
-          src="/kevin.png"
+          src="/kevin.jpg"
           alt="Kevin Robin"
           className="w-full h-full object-cover object-top"
           whileHover={{ scale: 1.04 }}
@@ -452,67 +453,11 @@ function ProgressDot({ progress, index, count }: { progress: MotionValue<number>
   );
 }
 
-/* ─── Fit-to-viewport wrapper ───
-   On phones, measures content vs. available height and scales it down so the
-   whole panel always fits one screen — no inner scrolling, on any device.
-   On md+ it's a no-op (content renders at full size). */
-function FitPanel({ enabled, children }: { enabled: boolean; children: ReactNode }) {
-  const outerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    if (!enabled) {
-      setScale(1);
-      return;
-    }
-    const outer = outerRef.current;
-    const inner = innerRef.current;
-    if (!outer || !inner) return;
-
-    const measure = () => {
-      const avail = outer.clientHeight;
-      // Natural (unscaled) content height.
-      const natural = inner.scrollHeight;
-      if (natural <= 0 || avail <= 0) return;
-      // Leave a little breathing room top/bottom.
-      const next = Math.min(1, (avail - 8) / natural);
-      setScale(next);
-    };
-
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(outer);
-    ro.observe(inner);
-    window.addEventListener('orientationchange', measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('orientationchange', measure);
-    };
-  }, [enabled]);
-
-  if (!enabled) {
-    return <>{children}</>;
-  }
-
-  return (
-    <div ref={outerRef} className="h-full w-full flex items-stretch justify-center overflow-hidden">
-      <div
-        ref={innerRef}
-        style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
-        className="w-full"
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
 /* ─── Horizontal scroll container ─── */
 function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440));
-  const isMobile = vw < 768;
+  const isMobile = useMobileLayout();
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -531,6 +476,22 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   const smoothProgress = useSpring(scrollYProgress, springConfig);
   const totalShift = -(PANELS.length - 1) * vw;
   const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
+
+  // Native document flow avoids resizing/scaling an entire sticky track as
+  // mobile browser chrome expands and collapses during a swipe.
+  if (isMobile) {
+    return (
+      <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
+        <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(01) — About</p>
+        <div className="space-y-20">
+          <PanelIntro />
+          <PanelStats statsRef={statsRef} inView={inView} />
+          <PanelPhilosophy />
+          <PanelBeyond />
+        </div>
+      </div>
+    );
+  }
 
   return (
     /* Outer — tall enough to provide scroll distance: 100vh per panel */
@@ -560,36 +521,28 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
           {/* Panel 1 — Intro */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <FitPanel enabled={isMobile}>
-                <PanelIntro />
-              </FitPanel>
+              <PanelIntro />
             </div>
           </div>
 
           {/* Panel 2 — Stats */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <FitPanel enabled={isMobile}>
-                <PanelStats statsRef={statsRef} inView={inView} />
-              </FitPanel>
+              <PanelStats statsRef={statsRef} inView={inView} />
             </div>
           </div>
 
           {/* Panel 3 — Philosophy */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <FitPanel enabled={isMobile}>
-                <PanelPhilosophy />
-              </FitPanel>
+              <PanelPhilosophy />
             </div>
           </div>
 
           {/* Panel 4 — Beyond */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <FitPanel enabled={isMobile}>
-                <PanelBeyond />
-              </FitPanel>
+              <PanelBeyond />
             </div>
           </div>
         </motion.div>

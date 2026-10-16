@@ -50,15 +50,22 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
     let tier = tierForWidth(window.innerWidth);
     let dots: Dot[] = [];
     let raf = 0;
+    let visible = true;
     let mouseX = cssW / 2;
     let mouseY = cssH / 2;
     let accent = readAccent();
     let accentMix = { r: 128, g: 126, b: 120 }; // neutral gray secondary, ~15% of dots
 
     const resize = () => {
-      cssW = wrap.clientWidth;
-      cssH = wrap.clientHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const nextW = wrap.clientWidth;
+      const nextH = wrap.clientHeight;
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Assigning canvas.width clears its bitmap. Mobile toolbar resize events
+      // used to clear/reseed every canvas even when its actual size was unchanged.
+      if (dots.length > 0 && canvas.width === Math.floor(nextW * nextDpr) && canvas.height === Math.floor(nextH * nextDpr) && dpr === nextDpr) return;
+      cssW = nextW;
+      cssH = nextH;
+      dpr = nextDpr;
       canvas.width = Math.floor(cssW * dpr);
       canvas.height = Math.floor(cssH * dpr);
       canvas.style.width = `${cssW}px`;
@@ -153,7 +160,7 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
         ctx.fill();
       }
 
-      raf = requestAnimationFrame(tick);
+      if (!reduced && visible && !document.hidden) raf = requestAnimationFrame(tick);
     };
 
     let lastClientX = -1;
@@ -206,28 +213,48 @@ export function ConnectingDots({ className = '' }: { className?: string }) {
       }
     }
 
-    resize();
-    if (!reduced) {
-      raf = requestAnimationFrame(tick);
-    } else {
-      // Render a single static frame so there's still texture
-      tick();
+    const resume = () => {
       cancelAnimationFrame(raf);
+      if (visible && !document.hidden) tick();
+    };
+    resize();
+    resume();
+    const sizeObserver = new ResizeObserver(() => {
+      resize();
+      resume();
+    });
+    sizeObserver.observe(wrap);
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      resume();
+    });
+    visibilityObserver.observe(wrap);
+    document.addEventListener('visibilitychange', resume);
+
+    if (reduced) {
+      // Resize/theme changes can still repaint this static texture.
+      tick();
     }
 
-    window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('scroll', onScroll, { passive: true });
 
     // Re-read accent if theme toggles (HTML class change → recompute on next resize)
     const themeObserver = new MutationObserver(() => {
+      const previous = `${accent.r},${accent.g},${accent.b}`;
       accent = readAccent();
+      for (const dot of dots) {
+        if (dot.color === previous) dot.color = `${accent.r},${accent.g},${accent.b}`;
+      }
+      resume();
     });
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', resize);
+      sizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      document.removeEventListener('visibilitychange', resume);
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('deviceorientation', onOrient);

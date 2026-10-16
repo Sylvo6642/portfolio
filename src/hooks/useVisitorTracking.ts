@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 
 export function useVisitorTracking() {
   useEffect(() => {
-    if (window.location.pathname === '/admin') return;
+    if (!supabase || window.location.pathname === '/admin' || import.meta.env.DEV) return;
 
     async function log() {
       let ip: string | null = null;
@@ -20,7 +20,7 @@ export function useVisitorTracking() {
         // silently fail
       }
 
-      await supabase.from('visitor_logs').insert({
+      await supabase?.from('visitor_logs').insert({
         ip,
         country,
         city,
