@@ -159,40 +159,6 @@ body {
   .stroke-text { -webkit-text-stroke-width: 1px; }
 }
 
-/* ─── Phantom list row hover: ink sweep ─── */
-.ink-row {
-  position: relative;
-  isolation: isolate;
-}
-.ink-row::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgb(var(--fg));
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
-  z-index: -1;
-}
-.ink-row:hover::after,
-.ink-row[data-open='true']::after {
-  transform: scaleY(1);
-  transform-origin: top;
-}
-.ink-row:hover,
-.ink-row[data-open='true'] {
-  color: rgb(var(--bg));
-}
-.ink-row:hover .ink-row-muted,
-.ink-row[data-open='true'] .ink-row-muted {
-  color: rgb(var(--bg) / 0.6);
-}
-.ink-row:hover .ink-row-pill,
-.ink-row[data-open='true'] .ink-row-pill {
-  border-color: rgb(var(--bg) / 0.4);
-  color: rgb(var(--bg) / 0.85);
-}
-
 /* ─── Liquid glass (theme-aware: hairline gradient uses --edge) ─── */
 .liquid-glass {
   background: rgb(var(--bg) / 0.45);
@@ -253,41 +219,6 @@ body {
 .link-underline:hover::after,
 .link-underline:focus-visible::after {
   width: 100%;
-}
-
-/* Void Vault floating icons */
-.vv-icon {
-  color: rgb(10 10 11);
-}
-html.dark .vv-icon {
-  color: white;
-}
-
-@keyframes vv-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-7px); }
-}
-
-/* Project cards — monochrome panels with hairline gradient borders */
-.proj-card {
-  position: relative;
-  border-radius: 0;
-  overflow: hidden;
-  background-color: rgb(var(--fg) / 0.03);
-}
-.proj-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 0;
-  padding: 1px;
-  background: linear-gradient(135deg, rgb(var(--fg) / 0.45), rgb(var(--fg) / 0.08));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 1;
 }
 
 /* Shimmer / gloss sweep on hover */
