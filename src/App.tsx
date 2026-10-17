@@ -79,16 +79,21 @@ export default function App() {
           <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
             <Hero />
           </div>
-          <div className="relative bg-bg" style={{ zIndex: 1 }}>
-            <About />
-            <Skills />
-            <Experience />
-            <Projects />
-            <GitHubContributions />
-            <Courses />
-            <Blog />
-            <Contact />
-          </div>
+          {/* On mobile, sections render already revealed. Dozens of reveal
+              animations starting mid-scroll make iOS Safari re-rasterize text
+              as each one ends, which reads as shimmering on the first pass. */}
+          <AnimatePresence initial={!mobile}>
+            <div key="sections" className="relative bg-bg" style={{ zIndex: 1 }}>
+              <About />
+              <Skills />
+              <Experience />
+              <Projects />
+              <GitHubContributions />
+              <Courses />
+              <Blog />
+              <Contact />
+            </div>
+          </AnimatePresence>
         </main>
         <Footer />
         <BackToTop />

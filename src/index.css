@@ -391,6 +391,11 @@ html.dark .vv-icon {
   .site-footer { position: relative; height: auto; min-height: 55svh; background: rgb(var(--bg)); }
   .nav-shell { background: rgb(var(--bg)); backdrop-filter: none; -webkit-backdrop-filter: none; }
   #experience { overflow-x: clip; }
+  /* Every blurred card, skill pill and badge is its own backdrop layer that the
+     compositor re-samples each scroll frame, which flickers on mobile GPUs. They
+     only sit over the solid page background, so the blur adds nothing here.
+     !important also beats the inline backdropFilter on the skill pills. */
+  [class*='backdrop-blur'], [style*='backdrop-filter'] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 }
 
 /* Caret blink */
