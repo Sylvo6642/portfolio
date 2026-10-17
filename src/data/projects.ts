@@ -11,6 +11,8 @@ export interface PersonalProject {
   liveUrl?: string;
   video?: string;
   poster?: string;
+  /** Kept in the data but left off the site */
+  hidden?: boolean;
 }
 
 export interface ProfessionalCard {
@@ -35,6 +37,7 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
   },
   {
     name: 'SPENDWISE',
+    hidden: true,
     status: 'wip',
     summary: 'A calm, editorial personal expense tracker.',
     highlights: [

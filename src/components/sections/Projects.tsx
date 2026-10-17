@@ -198,7 +198,7 @@ export function Projects() {
           className="flex flex-col hairline-b"
           style={reduced || mobile ? undefined : { skewY }}
         >
-          {PERSONAL_PROJECTS.map((p, i) => (
+          {PERSONAL_PROJECTS.filter((p) => !p.hidden).map((p, i) => (
             <PersonalProjectRow key={p.name} p={p} i={i} onVideoOpen={setActive} />
           ))}
         </motion.div>
