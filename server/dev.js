@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import analyze from '../api/analyze.js';
+import chat from '../api/chat.js';
 
 const port = Number(process.env.API_PORT || 3001);
 
@@ -17,9 +18,12 @@ const server = createServer(async (req, res) => {
     return res.json({ status: 'ok', services: {
       gemini: Boolean(process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY),
       supabase: Boolean(process.env.VITE_SUPABASE_URL && process.env.VITE_SUPABASE_ANON_KEY),
+      openai: Boolean(process.env.OPENAI_API_KEY),
     } });
   }
-  if (pathname !== '/api/analyze') return res.status(404).json({ error: 'Not found' });
+  const handler = { '/api/analyze': analyze, '/api/chat': chat }[pathname];
+  if (!handler) return res.status(404).json({ error: 'Not found' });
+  if (pathname === '/api/chat' && req.method === 'GET') return await chat(req, res);
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
@@ -41,7 +45,7 @@ const server = createServer(async (req, res) => {
     } catch {
       return res.status(400).json({ error: 'Invalid JSON' });
     }
-    return await analyze(req, res);
+    return await handler(req, res);
   } catch (error) {
     console.error('Local API request failed:', error.message);
     if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });

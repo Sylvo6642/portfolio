@@ -1,4 +1,7 @@
 {
+  "functions": {
+    "api/chat.js": { "maxDuration": 30 }
+  },
   "rewrites": [
     { "source": "/projects/SkillDash/(.*)", "destination": "/projects/SkillDash/index.html" },
     { "source": "/projects/SpendWise/(.*)", "destination": "/projects/SpendWise/index.html" },

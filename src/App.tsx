@@ -10,6 +10,7 @@ import { TerminalGlitch } from './components/layout/TerminalGlitch';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollBar } from './components/layout/ScrollBar';
+import { ChatWidget } from './components/chat/ChatWidget';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { Intro } from './components/sections/Intro';
@@ -95,6 +96,7 @@ export default function App() {
         </main>
         <Footer />
         {done && <ScrollBar />}
+        <ChatWidget ready={done} />
       </MotionConfig>
     </ThemeProvider>
   );
