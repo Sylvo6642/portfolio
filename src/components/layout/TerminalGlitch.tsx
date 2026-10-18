@@ -92,7 +92,7 @@ const SCRIPT: LineConfig[] = [
   { text: '  [ WARN ] canvas.connecting-dots .... experimental', color: '#f59e0b', delay: 200, typeSpeed: 14 },
   { text: '  [  OK  ] supabase-edge ............. connected', color: '#00cc33', delay: 160, typeSpeed: 14, pauseAfter: 400 },
   { text: 'Mounting filesystem...', color: '#6b6b7a', delay: 100, typeSpeed: 22 },
-  { text: '  /projects ........... rw  [clausify, portfolio, spendwise, skilldash]', color: '#00cc33', delay: 200, typeSpeed: 10 },
+  { text: '  /projects ........... rw  [clausify, portfolio, commitgrid, skilldash]', color: '#00cc33', delay: 200, typeSpeed: 10 },
   { text: '  /skills ............. rw  [react, django, angular, node, postgres]', color: '#00cc33', delay: 120, typeSpeed: 10 },
   { text: '  /contact ............ rw  [robinkevin648@gmail.com]', color: '#00cc33', delay: 120, typeSpeed: 10, pauseAfter: 500 },
   { text: 'Running diagnostics...', color: '#6b6b7a', delay: 100, typeSpeed: 22 },

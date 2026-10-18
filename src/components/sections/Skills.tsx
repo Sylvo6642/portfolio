@@ -2,44 +2,44 @@ import { motion } from 'framer-motion';
 
 const DELIVERABLES = [
   {
-    icon: '🔌',
-    title: 'REST APIs & Microservices',
-    description: 'Building and consuming APIs, service architecture, and clean endpoint design.',
+    icon: '✦',
+    title: 'LLM-Powered Features',
+    description: 'Chat, summarisation, extraction and classification on GPT, Claude, Gemini, Grok and Mistral, with streaming UIs via the Vercel AI SDK.',
+  },
+  {
+    icon: '◎',
+    title: 'RAG Pipelines',
+    description: 'Chunking, embeddings and retrieval over Weaviate or Pinecone, so answers are grounded in your own data instead of guessed.',
+  },
+  {
+    icon: '⟳',
+    title: 'AI Agents & Tool Calling',
+    description: 'Agents that route between tools, call your APIs and act on the results, with guardrails, retries and sensible fallbacks.',
+  },
+  {
+    icon: '{ }',
+    title: 'Structured AI Output',
+    description: 'Schema-constrained generation that returns validated JSON your app can trust, not prose it has to parse.',
   },
   {
     icon: '🔐',
-    title: 'Auth & Authorization',
-    description: 'OAuth, JWT, RBAC, SSO secure login flows and role-based access control.',
+    title: 'Secure AI Integrations',
+    description: 'API keys behind server-side proxies, prompt-injection-aware input handling, and rate-limit and cost controls.',
+  },
+  {
+    icon: '🔌',
+    title: 'Full-Stack Web Apps',
+    description: 'Django, Angular and React products end to end: APIs, auth, admin tooling and polished, accessible UI.',
   },
   {
     icon: '🗄️',
-    title: 'Database Design',
-    description: 'Schema design, query optimization, indexing, and migrations across SQL and NoSQL.',
-  },
-  {
-    icon: '⚙️',
-    title: 'CI/CD & DevOps',
-    description: 'Pipelines, Docker, and deployment automation for reliable, repeatable releases.',
-  },
-  {
-    icon: '🎨',
-    title: 'Frontend UI/UX',
-    description: 'Component libraries, responsive layouts, animations, and accessible interfaces.',
-  },
-  {
-    icon: '⚡',
-    title: 'Real-time Features',
-    description: 'WebSockets, live updates, presence indicators, and push notifications.',
+    title: 'Data & Performance',
+    description: 'Schema design, indexing and query optimisation across SQL and NoSQL, plus the N+1 hunts nobody else wants.',
   },
   {
     icon: '🔗',
-    title: 'Third-party Integrations',
-    description: 'Payment gateways, external APIs, webhooks, and automation workflows.',
-  },
-  {
-    icon: '🧪',
-    title: 'Testing & Code Quality',
-    description: 'Unit, integration, and e2e tests. Code review, linting, and maintainable patterns.',
+    title: 'Integrations & Automation',
+    description: 'Payment gateways, webhooks, third-party APIs and n8n workflows that wire AI into the tools you already use.',
   },
 ];
 import { SectionReveal } from '../shared/SectionReveal';
@@ -71,14 +71,25 @@ const SKILL_COLORS: Record<string, string> = {
   Bash:         '#4EAA25',
   n8n:          '#EA4B71',
   'FastAPI':      '#009688',
-  'OpenAI API':   '#10a37f',
-  'Gemini API':   '#4285F4',
-  'Claude API':   '#d97706',
+  'OpenAI (ChatGPT)': '#10a37f',
+  Whisper:        '#10a37f',
+  Gemini:         '#4285F4',
+  Claude:         '#d97706',
+  Grok:           '#888888',
+  Mistral:        '#FA520F',
   'Ollama':       '#ffffff',
-  'Hugging Face': '#FFD21E',
+  'Hugging Face Transformers': '#FFD21E',
+  'AI Agents':    '#B9803F',
+  RAG:            '#0EA5E9',
+  'Tool Calling & Routing': '#14B8A6',
+  Weaviate:       '#00C29A',
+  Pinecone:       '#6366F1',
+  'Vercel AI SDK': '#888888',
   SEO:              '#4285F4',
   'Core Web Vitals': '#0cce6b',
   Lighthouse:       '#F44B21',
+  'Structured Outputs': '#7A4A2B',
+  'Prompt Engineering': '#8B5CF6',
 };
 
 function SkillPill({ name, color }: { name: string; color: string }) {
@@ -114,7 +125,7 @@ export function Skills() {
     <section id="skills" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6 mb-16">
         <SectionHeader
-          index="02"
+          index="03"
           label="Skills"
           title="What I work with"
           sub="My stack, from backend logic to delivered pixel."
@@ -172,7 +183,7 @@ export function Skills() {
               transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               className="hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2 hover:bg-fg/[0.04] transition-colors"
             >
-              <h4 className="font-bold text-sm tracking-tight uppercase">{item.title}</h4>
+              <h4 className="font-medium text-base tracking-[-0.01em]">{item.title}</h4>
               <p className="text-xs text-fg/55 leading-relaxed">{item.description}</p>
             </motion.div>
           ))}

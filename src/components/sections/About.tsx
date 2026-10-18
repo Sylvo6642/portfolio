@@ -9,7 +9,7 @@ const STATS = [
   { value: 400, suffix: '+', label: 'APIs Built' },
   { value: 700, suffix: '+', label: 'Bugs Squashed' },
   { value: 10, suffix: '+', label: 'Apps Shipped' },
-  { value: 5, suffix: '+', label: 'Tech Stacks' },
+  { value: 5, suffix: '+', label: 'LLM Providers' },
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
 
@@ -127,8 +127,8 @@ function PanelIntro() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]"
         >
-          A <span className="stroke-text">security brain</span> and a{' '}
-          <span className="stroke-text">motion brain</span>, in the same developer.
+          A <span className="stroke-text">security brain</span> and an{' '}
+          <span className="stroke-text">AI brain</span>, in the same developer.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -148,8 +148,9 @@ function PanelIntro() {
         >
           Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
           <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> 
-          Django, Angular, MongoDB. Currently moving into React, Node, Supabase, and
-          PostgreSQL. Every project I ship has encryption in it; I don't think that's a
+          Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over
+          vector databases, tool-calling agents, and LLM features with schema-validated output —
+          alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a
           coincidence.
         </motion.p>
       </div>
@@ -195,8 +196,8 @@ function PanelPhilosophy() {
     },
     {
       icon: '◎',
-      title: 'Motion as craft',
-      body: 'How a thing moves is part of what it is. Not paths and easing curves applied after the fact physics, intent, restraint. If it can drift instead of slide, it should drift.',
+      title: 'AI that earns its place',
+      body: 'An LLM call is a dependency like any other: it gets a schema, a fallback, a cost budget and a way to check it was right. If plain code does the job better, plain code wins.',
     },
     {
       icon: '◐',
@@ -279,6 +280,7 @@ function PanelBeyond() {
       group: 'Mind',
       items: [
         { label: 'Cybersecurity rabbit holes', icon: '◉' },
+        { label: 'AI papers & model releases', icon: '✦' },
         { label: 'UI/UX teardowns', icon: '✧' },
         { label: 'Cooking', icon: '♪', note: 'keyword: attempting' },
       ],
@@ -293,8 +295,8 @@ function PanelBeyond() {
   ];
 
   const now = [
-    { kind: 'building', label: 'Clausify', meta: 'React · Vite · Framer Motion' },
-    { kind: 'learning', label: 'Docker + AWS', meta: 'getting serious about infra' },
+    { kind: 'building', label: 'Clausify', meta: 'Gemini · structured outputs · React' },
+    { kind: 'learning', label: 'RAG & AI agents', meta: 'Weaviate · Pinecone · tool calling' },
     { kind: 'reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
     { kind: 'shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
   ];
@@ -482,7 +484,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   if (isMobile) {
     return (
       <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
-        <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(01) — About</p>
+        <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
           <PanelIntro />
           <PanelStats statsRef={statsRef} inView={inView} />
@@ -502,7 +504,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
         <div className="absolute top-20 left-6 right-6 z-20 flex items-center justify-between pointer-events-none">
           <SectionReveal>
             <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted">
-              (01) — About
+              (02) — About
             </p>
           </SectionReveal>
 

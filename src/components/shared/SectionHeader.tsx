@@ -47,7 +47,7 @@ export function SectionHeader({
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted"
+          className="eyebrow"
         >
           ({index})
         </motion.span>
@@ -56,25 +56,29 @@ export function SectionHeader({
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted"
+          className="eyebrow"
         >
           {label}
         </motion.span>
       </div>
 
       <motion.h2
-        style={{ y: mobile ? 0 : y, fontSize: 'clamp(2.6rem, 8vw, 7rem)' }}
+        style={{ y: mobile ? 0 : y, fontSize: 'clamp(2.5rem, 6.5vw, 6rem)', letterSpacing: '-0.045em' }}
         className="display-type"
         aria-label={title}
+        // The heading watches the viewport; masked words can't (their mask clips them to zero)
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.4 }}
       >
         <span className="flex flex-wrap gap-x-[0.22em]" aria-hidden>
           {words.map((word, i) => (
             <span key={i} className="overflow-hidden inline-block pb-[0.08em] -mb-[0.08em]">
               <motion.span
-                initial={{ y: '110%' }}
-                whileInView={{ y: '0%' }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.8, delay: i * 0.07, ease: [0.76, 0, 0.24, 1] }}
+                variants={{
+                  hidden: { y: '110%' },
+                  show: { y: '0%', transition: { duration: 0.8, delay: i * 0.07, ease: [0.76, 0, 0.24, 1] } },
+                }}
                 className="inline-block"
               >
                 {word}
@@ -90,7 +94,7 @@ export function SectionHeader({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-5 font-mono text-xs md:text-sm tracking-wide text-muted uppercase"
+          className="mt-5 text-base md:text-lg text-muted max-w-xl"
         >
           {sub}
         </motion.p>

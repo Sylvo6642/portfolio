@@ -1,36 +1,41 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
+import { useEffect, useState } from 'react';
+import { SOCIALS } from './Navbar';
 
-/**
- * Curtain footer, phantom.land style.
- * Fixed behind <main> (which carries an equal bottom margin), so the page
- * content slides up like a curtain and uncovers the giant wordmark.
- * The wordmark rises with page scroll as the curtain opens (IntersectionObserver
- * can't tell when a fixed element is uncovered, so this is scroll-driven).
- */
+function useKeralaTime() {
+  const format = () =>
+    new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
+  const [time, setTime] = useState(format);
+  useEffect(() => {
+    const id = window.setInterval(() => setTime(format()), 10_000);
+    return () => window.clearInterval(id);
+  }, []);
+  return time;
+}
+
+/* Bottom bar of the dark contact surface */
 export function Footer() {
-  const mobile = useMobileLayout();
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0.86, 1], [90, 0]);
-  const opacity = useTransform(scrollYProgress, [0.86, 0.98], [0, 1]);
+  const time = useKeralaTime();
 
   return (
-    <footer
-      aria-label="Site footer"
-      className="site-footer fixed bottom-0 left-0 right-0 z-0 h-[55vh] md:h-[60vh] flex flex-col justify-end overflow-hidden"
-    >
-      <div className="mx-auto max-w-[1400px] w-full px-6 flex-1 flex flex-col justify-center">
-        <motion.p
-          style={{ y: mobile ? 0 : y, opacity: mobile ? 1 : opacity, fontSize: 'clamp(3.2rem, 12.5vw, 12rem)', lineHeight: 0.85 }}
-          className="display-type text-center select-none"
-        >
-          Kevin <span className="stroke-text">Robin</span>
-        </motion.p>
-      </div>
-
-      <div className="mx-auto max-w-[1400px] w-full px-6 pb-8">
-        <div className="hairline-t pt-6 text-center font-mono text-[10px] tracking-[0.2em] uppercase text-muted">
-          <span>© {new Date().getFullYear()} Kevin Robin</span>
+    <footer aria-label="Site footer" className="on-ink">
+      <div className="flex flex-col gap-8 px-5 sm:px-8 md:px-10 pt-24 md:pt-36 pb-8 md:flex-row md:items-end md:justify-between">
+        {/* Bottom-aligned so the copyright line sits level with the labelled values beside it */}
+        <div className="flex items-end gap-10 md:gap-14">
+          <p className="text-[15px]">© {new Date().getFullYear()} Kevin Robin</p>
+          <div>
+            <p className="eyebrow mb-3">Local time</p>
+            <p className="text-[15px] tabular-nums">{time} IST</p>
+          </div>
+        </div>
+        <div>
+          <p className="eyebrow mb-3">Socials</p>
+          <div className="flex flex-wrap gap-x-7 gap-y-2 text-[15px]">
+            {SOCIALS.map((s) => (
+              <a key={s.label} href={s.href} className="nav-link py-0" target={s.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+                {s.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

@@ -6,8 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Archivo"', 'system-ui', 'sans-serif'],
-        display: ['"Archivo"', 'system-ui', 'sans-serif'],
+        sans: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+        display: ['"Inter Tight"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
@@ -16,6 +16,26 @@ export default {
         muted: 'rgb(var(--muted) / <alpha-value>)',
         edge: 'rgb(var(--edge) / <alpha-value>)',
         accent: 'rgb(var(--accent) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
+        'edge-strong': 'rgb(var(--edge-strong) / <alpha-value>)',
+        'accent-hover': 'rgb(var(--accent-hover) / <alpha-value>)',
+        'on-accent': 'rgb(var(--on-accent) / <alpha-value>)',
+        'accent-soft': 'rgb(var(--accent-soft) / <alpha-value>)',
+        'accent-soft-text': 'rgb(var(--accent-soft-text) / <alpha-value>)',
+        highlight: 'rgb(var(--highlight) / <alpha-value>)',
+        code: {
+          bg: 'rgb(var(--code-bg) / <alpha-value>)',
+          bar: 'rgb(var(--code-bar) / <alpha-value>)',
+          text: 'rgb(var(--code-text) / <alpha-value>)',
+          comment: 'rgb(var(--code-comment) / <alpha-value>)',
+          keyword: 'rgb(var(--code-keyword) / <alpha-value>)',
+          string: 'rgb(var(--code-string) / <alpha-value>)',
+          function: 'rgb(var(--code-function) / <alpha-value>)',
+          number: 'rgb(var(--code-number) / <alpha-value>)',
+        },
+        hero: 'rgb(var(--hero) / <alpha-value>)',
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        page: 'rgb(var(--page) / <alpha-value>)',
         'ink-black': {
           50: '#ebf2f9', 100: '#d8e5f3', 200: '#b1cbe7', 300: '#8ab1db',
           400: '#6397cf', 500: '#3c7dc3', 600: '#30649c', 700: '#244b75',

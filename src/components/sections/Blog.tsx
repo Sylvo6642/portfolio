@@ -40,7 +40,7 @@ export function Blog() {
                   {post.date ?? `/${String(i + 1).padStart(2, '0')}`}
                 </span>
               </div>
-              <h3 className="mt-6 text-lg font-bold tracking-tight leading-snug uppercase">{post.title}</h3>
+              <h3 className="mt-6 text-xl font-normal tracking-[-0.02em] leading-snug">{post.title}</h3>
               <div className="mt-8 flex items-center justify-between text-xs text-muted">
                 <span className="font-mono uppercase tracking-[0.15em]">{post.content ? 'published' : 'draft'}</span>
                 {post.content && (

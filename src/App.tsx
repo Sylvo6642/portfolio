@@ -9,10 +9,9 @@ import { useMobileSecret } from './hooks/useMobileSecret';
 import { TerminalGlitch } from './components/layout/TerminalGlitch';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
-import { ScrollProgress } from './components/layout/ScrollProgress';
-import { BackToTop } from './components/layout/BackToTop';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
+import { Intro } from './components/sections/Intro';
 import { About } from './components/sections/About';
 import { Skills } from './components/sections/Skills';
 import { Experience } from './components/sections/Experience';
@@ -70,20 +69,18 @@ export default function App() {
         <AnimatePresence>
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
-        <ScrollProgress />
-        <Navbar loaderDone={done} />
-        {/* main scrolls over the fixed footer (curtain reveal) — its bottom
-            margin must match the footer height */}
-        <main className="portfolio-main relative bg-bg mb-[55vh] md:mb-[60vh]" style={{ zIndex: 1 }}>
-          {/* Hero is sticky so About slides up over it like a curtain */}
+        <Navbar />
+        <main className="relative bg-bg" style={{ zIndex: 1 }}>
+          {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
-            <Hero />
+            <Hero ready={done} />
           </div>
           <div className="relative bg-bg" style={{ zIndex: 1 }}>
+            <Intro />
+            <Projects />
             <About />
             <Skills />
             <Experience />
-            <Projects />
             <GitHubContributions />
             <Courses />
             <Blog />
@@ -91,7 +88,6 @@ export default function App() {
           </div>
         </main>
         <Footer />
-        <BackToTop />
       </MotionConfig>
     </ThemeProvider>
   );

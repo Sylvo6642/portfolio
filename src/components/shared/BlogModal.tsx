@@ -72,7 +72,7 @@ export function BlogModal({ post, onClose }: { post: BlogPost | null; onClose: (
                       if (part.startsWith('```')) {
                         const code = part.replace(/^```\w*\n?/, '').replace(/```$/, '');
                         return (
-                          <pre key={j} className="mt-2 mb-2 rounded-lg bg-fg/5 border hairline p-4 overflow-x-auto font-mono text-xs text-fg/90 leading-relaxed whitespace-pre">
+                          <pre key={j} className="mt-2 mb-2 rounded-lg bg-code-bg p-4 overflow-x-auto font-mono text-xs text-code-text leading-relaxed whitespace-pre">
                             {code}
                           </pre>
                         );
