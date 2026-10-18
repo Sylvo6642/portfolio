@@ -4,7 +4,14 @@ export interface Course {
   period: string;
 }
 
+// TODO(Kevin): the AI entries marked "placeholder" are real courses picked to match the
+// AI skill set — keep only the ones you've actually taken or are taking before publishing.
 export const COURSES: Course[] = [
+  { title: 'AI Agents Course', org: 'Hugging Face', period: 'Mar 2026 – Present' }, // placeholder
+  { title: 'Vector Databases: from Embeddings to Applications', org: 'DeepLearning.AI × Weaviate', period: 'Feb 2026' }, // placeholder
+  { title: 'Building Agentic RAG with LlamaIndex', org: 'DeepLearning.AI', period: 'Jan 2026' }, // placeholder
+  { title: 'Functions, Tools and Agents with LangChain', org: 'DeepLearning.AI', period: 'Dec 2025' }, // placeholder
+  { title: 'ChatGPT Prompt Engineering for Developers', org: 'DeepLearning.AI × OpenAI', period: 'Oct 2025' }, // placeholder
   { title: 'Machine Learning', org: 'Coursera', period: 'Aug 2025 – Present' },
   { title: 'Python Full Stack Developer', org: 'Techolas Technologies', period: 'Jan – Sep 2023' },
   { title: 'Red Team CICSA Analyst', org: 'Red Team', period: 'May – Dec 2022' },

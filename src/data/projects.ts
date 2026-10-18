@@ -3,6 +3,12 @@ export type ProjectStatus = 'live' | 'wip' | 'private';
 export interface PersonalProject {
   name: string;
   status: ProjectStatus;
+  /** Short discipline line shown at the right of the work list */
+  category: string;
+  /** Screenshot for the hover preview; omitted when the preview is drawn in code */
+  preview?: string;
+  /** Backdrop behind the preview */
+  previewBg: string;
   summary: string;
   highlights: string[];
   tech: string[];
@@ -22,7 +28,27 @@ export interface ProfessionalCard {
 
 export const PERSONAL_PROJECTS: PersonalProject[] = [
   {
-    name: 'COMMITGRID',
+    name: 'Clausify',
+    category: 'AI Engineering · LLM Contract Analysis',
+    preview: '/projects/previews/clausify.jpg',
+    previewBg: '#D5DAE1',
+    status: 'private',
+    summary: 'AI contract risk analyzer: an LLM pipeline that flags risky clauses and explains each one in plain English.',
+    highlights: [
+      'Gemini 2.0 Flash behind a server-side proxy, so the API key never reaches the browser',
+      'Schema-constrained JSON output at low temperature: overall risk, summary and per-clause flags the UI can always trust',
+      'Prompts tailored to occupation, jurisdiction, detail level and report language for multilingual analysis',
+      'pdf.js extraction, PDF report export, Google OAuth, Razorpay billing and report history on Supabase',
+    ],
+    tech: ['Gemini API', 'Structured Outputs', 'Prompt Engineering', 'Serverless API', 'React', 'Vite', 'Supabase', 'Razorpay', 'pdf.js', 'jsPDF'],
+    link: null,
+    linkLabel: 'Private',
+    liveUrl: '/projects/Clausify/',
+  },
+  {
+    name: 'CommitGrid',
+    category: 'Open Source · React Component',
+    previewBg: '#0D1117',
     status: 'live',
     summary: 'Animated GitHub-style contribution heatmap for React, published on npm.',
     highlights: [
@@ -36,7 +62,10 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     liveUrl: 'https://www.npmjs.com/package/commitgrid',
   },
   {
-    name: 'SPENDWISE',
+    name: 'SpendWise',
+    category: 'Product Design & Full-Stack',
+    preview: '/projects/previews/spendwise.jpg',
+    previewBg: '#E9DCC6',
     hidden: true,
     status: 'wip',
     summary: 'A calm, editorial personal expense tracker.',
@@ -51,7 +80,10 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     liveUrl: '/projects/SpendWise/',
   },
   {
-    name: 'VOID VAULT',
+    name: 'Void Vault',
+    category: 'Security & Encrypted Storage',
+    preview: '/projects/previews/voidvault.jpg',
+    previewBg: '#16151F',
     status: 'private',
     summary: 'Encrypted personal cloud storage on a Discord backend.',
     highlights: [
@@ -67,21 +99,10 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     poster: '/media/void-vault-poster.jpg',
   },
   {
-    name: 'CLAUSIFY',
-    status: 'private',
-    summary: 'Contract risk analyzer that explains every clause in plain English.',
-    highlights: [
-      'Clauses flagged by severity using schema-constrained AI output',
-      'PDF upload via pdf.js and exportable PDF reports',
-      'Google OAuth, Razorpay billing and saved report history on Supabase',
-    ],
-    tech: ['React', 'Vite', 'Supabase', 'Razorpay', 'pdf.js', 'jsPDF', 'Tailwind CSS'],
-    link: null,
-    linkLabel: 'Private',
-    liveUrl: '/projects/Clausify/',
-  },
-  {
-    name: 'SKILLDASH',
+    name: 'SkillDash',
+    category: 'Marketplace & Full-Stack',
+    preview: '/projects/previews/skilldash.jpg',
+    previewBg: '#F2A93B',
     status: 'wip',
     summary: 'Connects customers with local manual-labor workers across India.',
     highlights: [

@@ -1,241 +1,254 @@
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useSpring,
-  useTransform,
-  useVelocity,
-  useReducedMotion,
-} from 'framer-motion';
-import { useState } from 'react';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
-import { SectionReveal } from '../shared/SectionReveal';
-import { SectionHeader } from '../shared/SectionHeader';
+import { AnimatePresence, motion, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 import { VideoModal } from '../shared/VideoModal';
 import { PERSONAL_PROJECTS, PROFESSIONAL_CARDS, type PersonalProject, type ProjectStatus } from '../../data/projects';
 
-const STATUS: Record<ProjectStatus, { label: string; className: string }> = {
-  live: { label: 'Live', className: 'text-[#2f8f5b] dark:text-[#4fbf85]' },
-  wip: { label: 'In development', className: 'text-[#b7791f] dark:text-[#e0a54a]' },
-  private: { label: 'Private', className: 'text-muted' },
-};
+const EASE = [0.76, 0, 0.24, 1] as const;
+const PROJECTS = PERSONAL_PROJECTS.filter((p) => !p.hidden);
+const STATUS_LABEL: Record<ProjectStatus, string> = { live: 'Live', wip: 'In development', private: 'Private build' };
 
-function StatusDot({ status, className = '' }: { status: ProjectStatus; className?: string }) {
-  const s = STATUS[status];
+/* CommitGrid has no screenshot — draw a small contributions heatmap instead */
+function CommitGridArt() {
+  const cells = useMemo(() => {
+    // Deterministic pseudo-random levels so the art is stable between renders
+    let seed = 7;
+    return Array.from({ length: 7 * 22 }, () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      const r = seed / 233280;
+      return r < 0.32 ? 0 : r < 0.58 ? 1 : r < 0.78 ? 2 : r < 0.92 ? 3 : 4;
+    });
+  }, []);
+  const shades = ['#161B22', '#0E4429', '#006D32', '#26A641', '#39D353'];
   return (
-    <span className={`items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase whitespace-nowrap ${s.className} ${className}`}>
-      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-current" />
-      {s.label}
-    </span>
+    <div className="grid grid-flow-col grid-rows-7 gap-[3px] p-4 rounded-md bg-[#0D1117] shadow-[0_20px_50px_rgb(0_0_0/0.45)]">
+      {cells.map((level, i) => (
+        <span key={i} className="h-[9px] w-[9px] rounded-[2px]" style={{ background: shades[level] }} />
+      ))}
+    </div>
   );
 }
 
-function ArrowUpRight() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M7 17 17 7M7 7h10v10" />
-    </svg>
+function PreviewArt({ p }: { p: PersonalProject }) {
+  if (p.preview) {
+    return <img src={p.preview} alt="" className="w-[82%] h-auto rounded-[3px] shadow-[0_20px_50px_rgb(0_0_0/0.3)]" loading="lazy" decoding="async" />;
+  }
+  return <CommitGridArt />;
+}
+
+/* Floating preview that trails the cursor over the work list (fine pointers only) */
+function HoverPreview({ active, index, label, x, y }: {
+  active: boolean;
+  index: number;
+  label: string;
+  x: MotionValue<number>;
+  y: MotionValue<number>;
+}) {
+  const modalX = useSpring(x, { stiffness: 150, damping: 20, mass: 0.5 });
+  const modalY = useSpring(y, { stiffness: 150, damping: 20, mass: 0.5 });
+  const cursorX = useSpring(x, { stiffness: 320, damping: 28, mass: 0.4 });
+  const cursorY = useSpring(y, { stiffness: 320, damping: 28, mass: 0.4 });
+  const scale = { scale: active ? 1 : 0 };
+  const transition = { duration: 0.4, ease: EASE };
+
+  return createPortal(
+    <>
+      <motion.div className="fixed left-0 top-0 z-[45] pointer-events-none" style={{ x: modalX, y: modalY }} aria-hidden>
+        <motion.div
+          className="-translate-x-1/2 -translate-y-1/2 h-[300px] w-[360px] lg:h-[340px] lg:w-[400px] overflow-hidden"
+          initial={false}
+          animate={scale}
+          transition={transition}
+        >
+          <div className="h-full w-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" style={{ transform: `translateY(${-index * 100}%)` }}>
+            {PROJECTS.map((p) => (
+              <div key={p.name} className="h-full w-full flex items-center justify-center" style={{ background: p.previewBg }}>
+                <PreviewArt p={p} />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+      <motion.div className="fixed left-0 top-0 z-[46] pointer-events-none" style={{ x: cursorX, y: cursorY }} aria-hidden>
+        <motion.div
+          className="-translate-x-1/2 -translate-y-1/2 grid h-20 w-20 place-items-center rounded-full bg-accent text-[14px] text-on-accent"
+          initial={false}
+          animate={scale}
+          transition={transition}
+        >
+          {label}
+        </motion.div>
+      </motion.div>
+    </>,
+    document.body,
   );
 }
 
-function PersonalProjectRow({ p, i, onVideoOpen }: { p: PersonalProject; i: number; onVideoOpen: (p: PersonalProject) => void }) {
-  const [open, setOpen] = useState(false);
-
+function ProjectDetails({ p, onVideoOpen }: { p: PersonalProject; onVideoOpen: (p: PersonalProject) => void }) {
+  const pill = 'inline-flex items-center gap-2 rounded-full border border-fg/20 px-5 py-2.5 text-sm transition-colors hover:bg-fg hover:text-bg hover:border-fg';
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="hairline-t"
+      key="details"
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.5, ease: EASE }}
+      className="overflow-hidden"
     >
-      {/* Collapsed row: useful on its own, so the summary and status live here */}
-      <button
-        onClick={() => setOpen((o) => !o)}
-        data-cursor="hover"
-        aria-expanded={open}
-        className="group w-full text-left grid grid-cols-[auto_minmax(0,1fr)_auto] md:grid-cols-[48px_minmax(0,1fr)_auto_auto] items-center gap-x-4 md:gap-x-6 px-1 md:px-2 py-5 md:py-7 transition-colors duration-300 md:hover:bg-fg/[0.025]"
-      >
-        <span className="self-start pt-2 md:pt-3 font-mono text-[10px] md:text-xs tracking-[0.15em] text-muted">
-          {String(i + 1).padStart(2, '0')}
-        </span>
-
-        <span className="min-w-0">
-          <span className="block display-type text-2xl md:text-4xl truncate">{p.name}</span>
-          <span className="mt-1.5 block text-sm text-fg/65 leading-snug">{p.summary}</span>
-          <StatusDot status={p.status} className="mt-2.5 inline-flex md:hidden" />
-        </span>
-
-        <StatusDot status={p.status} className="hidden md:inline-flex" />
-
-        <span className="grid h-8 w-8 md:h-9 md:w-9 place-items-center rounded-full hairline transition-colors duration-300 group-hover:border-fg/40">
-          <motion.svg
-            animate={{ rotate: open ? 45 : 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden
-          >
-            <path d="M12 5v14M5 12h14" />
-          </motion.svg>
-        </span>
-      </button>
-
-      {/* Expanded panel */}
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="body"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: 'hidden' }}
-          >
-            {/* Phone: one column (preview, highlights, stack, links).
-                Desktop: highlights + links on the left, preview + stack on the right. */}
-            <div className="grid gap-6 md:grid-cols-[1.3fr_1fr] md:gap-10 px-1 md:px-2 md:pl-[72px] pb-8 md:pb-10">
-              <div className="contents md:flex md:flex-col md:gap-7">
-                <ul className="order-2 md:order-none grid gap-2.5">
-                  {p.highlights.map((h) => (
-                    <li key={h} className="relative pl-5 text-sm md:text-[15px] leading-relaxed text-fg/80">
-                      <span aria-hidden className="absolute left-0 top-[0.75em] h-px w-2.5 bg-fg/50" />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="order-4 md:order-none flex flex-wrap items-center gap-x-6 gap-y-3">
-                  {p.liveUrl && (
-                    <a
-                      href={p.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-cursor="hover"
-                      className="inline-flex items-center gap-1.5 pb-0.5 border-b border-fg text-sm font-medium hover:opacity-70 transition-opacity"
-                    >
-                      View project <ArrowUpRight />
-                    </a>
-                  )}
-                  {p.link ? (
-                    <a
-                      href={p.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-cursor="hover"
-                      className="inline-flex items-center gap-1.5 pb-0.5 border-b border-fg/25 text-sm font-medium hover:border-fg transition-colors"
-                    >
-                      {p.linkLabel}
-                    </a>
-                  ) : (
-                    <span className="text-sm text-muted">Source private</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="contents md:flex md:flex-col md:gap-5">
-                {p.video && (
-                  <button
-                    type="button"
-                    onClick={() => onVideoOpen(p)}
-                    data-cursor="hover"
-                    aria-label={`Watch the ${p.name} demo`}
-                    className="group/media order-1 md:order-none relative aspect-[16/10] overflow-hidden rounded-[10px] hairline bg-fg/[0.04]"
-                  >
-                    {p.poster && (
-                      <img src={p.poster} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-                    )}
-                    <span className="absolute bottom-3 left-3">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-bg px-3.5 py-2 hairline font-mono text-[11px] uppercase tracking-[0.12em] transition-transform duration-300 group-hover/media:scale-105">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
-                        Watch demo
-                      </span>
-                    </span>
-                  </button>
-                )}
-
-                <div className="order-3 md:order-none">
-                  <span className="block mb-1.5 font-mono text-[10px] tracking-[0.2em] uppercase text-muted">Stack</span>
-                  <p className="font-mono text-[11px] md:text-xs leading-relaxed text-muted">{p.tech.join(' · ')}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-8 md:gap-14 px-1 sm:px-4 md:px-[6%] pb-12 md:pb-16">
+        <div className="flex aspect-[16/11] items-center justify-center overflow-hidden" style={{ background: p.previewBg }}>
+          <PreviewArt p={p} />
+        </div>
+        <div className="flex flex-col">
+          <p className="eyebrow">{STATUS_LABEL[p.status]}</p>
+          <p className="mt-4 text-[17px] md:text-lg leading-[1.55] tracking-[-0.01em]">{p.summary}</p>
+          <ul className="mt-5 space-y-2.5">
+            {p.highlights.map((h) => (
+              <li key={h} className="flex gap-3 text-[15px] leading-[1.6] text-fg/75">
+                <span aria-hidden className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                {h}
+              </li>
+            ))}
+          </ul>
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Tech stack">
+            {p.tech.map((t) => (
+              <li key={t} className="rounded-full bg-accent-soft text-accent-soft-text px-3 py-1 text-[13px] text-fg/80">{t}</li>
+            ))}
+          </ul>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {p.video && (
+              <button type="button" onClick={() => onVideoOpen(p)} className={pill} data-cursor="hover">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                Watch demo
+              </button>
+            )}
+            {p.liveUrl && (
+              <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className={pill} data-cursor="hover">
+                View project
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M7 17L17 7M7 7h10v10" /></svg>
+              </a>
+            )}
+            {p.link ? (
+              <a href={p.link} target="_blank" rel="noopener noreferrer" className={pill} data-cursor="hover">{p.linkLabel}</a>
+            ) : (
+              <span className="inline-flex items-center rounded-full border border-fg/10 px-5 py-2.5 text-sm text-fg/45">{p.linkLabel}</span>
+            )}
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }
 
 export function Projects() {
-  const [active, setActive] = useState<PersonalProject | null>(null);
-  const reduced = useReducedMotion();
-  const mobile = useMobileLayout();
+  const coarse = useIsCoarsePointer();
+  const [video, setVideo] = useState<PersonalProject | null>(null);
+  const [openName, setOpenName] = useState<string | null>(null);
+  const [hover, setHover] = useState<{ active: boolean; index: number }>({ active: false, index: 0 });
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
-  // Elastic skew: fast scrolling shears the project list, springing back on stop
-  const { scrollY } = useScroll();
-  const velocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
-  const skewY = useTransform(smoothVelocity, [-1500, 0, 1500], [-2.5, 0, 2.5]);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const onMove = (event: MouseEvent) => {
+    mouseX.set(event.clientX);
+    mouseY.set(event.clientY);
+  };
+
+  // Scrolling (wheel, keyboard, anchor jumps) can carry the list out from under a
+  // still cursor without firing mouseleave — hide the preview when that happens
+  useEffect(() => {
+    if (!hover.active) return;
+    const onScroll = () => {
+      const under = document.elementFromPoint(mouseX.get(), mouseY.get());
+      if (!under || !listRef.current?.contains(under)) setHover((h) => ({ ...h, active: false }));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [hover.active, mouseX, mouseY]);
+
+  const hovered = PROJECTS[hover.index];
 
   return (
-    <section id="projects" className="relative py-32 hairline-b">
-      <div className="mx-auto max-w-6xl px-6">
-        <SectionHeader
-          index="04"
-          label="Projects"
-          title="Things I've built"
-          sub="Side projects, client work, and everything in between."
-        />
+    <section id="projects" className="relative bg-bg pb-28 md:pb-40">
+      <div className="mx-auto max-w-[1200px] px-5 sm:px-8 md:px-10">
+        <p className="eyebrow mb-8 md:mb-12 md:px-[6%]">(01) — Recent work</p>
 
-        {/* Personal projects — accordion rows */}
-        <SectionReveal delay={0.15}>
-          <h3 className="mt-16 mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-muted">
-            ↳ Personal Projects
-          </h3>
-        </SectionReveal>
+        <ul ref={listRef} className="border-b border-edge" onMouseMove={onMove} onMouseLeave={() => setHover((h) => ({ ...h, active: false }))}>
+          {PROJECTS.map((p, i) => {
+            const open = openName === p.name;
+            return (
+              <motion.li
+                key={p.name}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.05 * i }}
+                className="border-t border-edge"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenName(open ? null : p.name)}
+                  onMouseEnter={() => setHover({ active: true, index: i })}
+                  onMouseLeave={() => setHover((h) => ({ ...h, active: false }))}
+                  aria-expanded={open}
+                  className="group/row w-full flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6 px-1 sm:px-4 md:px-[6%] py-8 sm:py-10 md:py-14 text-left"
+                  data-cursor="hover"
+                >
+                  <span className="display-type text-[clamp(2.4rem,7vw,5.75rem)] tracking-[-0.04em] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] md:group-hover/row:-translate-x-3 md:group-hover/row:opacity-40">
+                    {p.name}
+                  </span>
+                  <span className="flex items-center gap-4 text-[14px] sm:text-[15px] text-fg/80 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] md:group-hover/row:translate-x-3 md:group-hover/row:opacity-40">
+                    {p.category}
+                    <svg
+                      width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden
+                      className={`shrink-0 transition-transform duration-500 ${open ? 'rotate-45' : ''}`}
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {open && <ProjectDetails p={p} onVideoOpen={setVideo} />}
+                </AnimatePresence>
+              </motion.li>
+            );
+          })}
+        </ul>
 
-        <motion.div
-          className="flex flex-col hairline-b"
-          style={reduced || mobile ? undefined : { skewY }}
-        >
-          {PERSONAL_PROJECTS.filter((p) => !p.hidden).map((p, i) => (
-            <PersonalProjectRow key={p.name} p={p} i={i} onVideoOpen={setActive} />
-          ))}
-        </motion.div>
-
-        {/* Professional work */}
-        <SectionReveal delay={0.1}>
-          <h3 className="mt-20 mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-muted">
-            ↳ What I Build (Professional)
-          </h3>
-        </SectionReveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 hairline-t">
-          {PROFESSIONAL_CARDS.map((c, i) => (
-            <motion.div
-              key={c.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: (i % 2) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 gap-y-1.5 px-1 md:px-2 py-5 md:py-7 hairline-b"
-            >
-              <span className="row-span-2 pt-1 font-mono text-[10px] md:text-xs tracking-[0.15em] text-muted">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <h4 className="text-base md:text-lg font-bold tracking-tight">{c.title}</h4>
-              <p className="text-sm text-fg/65 leading-relaxed">{c.description}</p>
-            </motion.div>
-          ))}
+        {/* Day-job work */}
+        <div className="mt-24 md:mt-36">
+          <p className="eyebrow mb-8 md:mb-12 md:px-[6%]">What I build at work</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 border-t border-edge md:mx-[6%]">
+            {PROFESSIONAL_CARDS.map((c, i) => (
+              <motion.div
+                key={c.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.06 * (i % 2) }}
+                className={`border-b border-edge py-8 md:py-10 ${i % 2 === 0 ? 'md:pr-10 md:border-r' : 'md:pl-10'}`}
+              >
+                <h3 className="text-[clamp(1.35rem,2vw,1.75rem)] tracking-[-0.02em] leading-tight">{c.title}</h3>
+                <p className="mt-3 text-[15px] leading-[1.7] text-fg/70">{c.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <VideoModal
-        src={active?.video ?? ''}
-        open={!!active}
-        onClose={() => setActive(null)}
-        title={active?.name ?? ''}
-      />
+      {!coarse && (
+        <HoverPreview
+          active={hover.active}
+          index={hover.index}
+          label={openName === hovered?.name ? 'Close' : 'Open'}
+          x={mouseX}
+          y={mouseY}
+        />
+      )}
+
+      <VideoModal src={video?.video ?? ''} open={!!video} onClose={() => setVideo(null)} title={video?.name ?? ''} />
     </section>
   );
 }

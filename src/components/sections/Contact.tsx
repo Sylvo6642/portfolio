@@ -1,22 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { FadeText } from '../shared/FadeText';
-import { useState, useEffect, type FormEvent, type ButtonHTMLAttributes } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useState, useEffect, useRef, type FormEvent, type ButtonHTMLAttributes } from 'react';
 import { supabase } from '../../lib/supabase';
-
-function useLocalTime() {
-  const [time, setTime] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const ist = new Date(time.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  const h = ist.getHours();
-  const m = ist.getMinutes();
-  const s = ist.getSeconds();
-  const isPm = h >= 12;
-  const display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  return { display, isPm };
-}
+import { RoundButton } from '../shared/RoundButton';
 
 const COOLDOWN_MS = 5 * 60 * 1000;
 const LS_KEY = 'contact_last_sent';
@@ -39,7 +24,7 @@ function InteractiveHoverButton({ children, className = '', disabled, ...props }
   return (
     <button
       disabled={disabled}
-      className={`group relative w-auto cursor-pointer overflow-hidden border border-fg/15 p-2.5 px-7 text-center font-mono text-[11px] uppercase tracking-[0.2em] bg-fg text-bg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`group relative w-auto cursor-pointer overflow-hidden rounded-full border border-fg/15 py-4 px-9 text-center text-[15px] bg-fg text-bg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       {...props}
     >
       <div className="flex items-center justify-center gap-2">
@@ -80,7 +65,7 @@ function FocusInput({
 
   return (
     <label htmlFor={id} className="relative block">
-      <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted">
+      <span className="eyebrow">
         {label}
       </span>
       <div className="relative mt-2">
@@ -189,35 +174,35 @@ function CopyButton({ value }: { value: string }) {
   );
 }
 
-function LocationCard() {
-  const { display, isPm } = useLocalTime();
+const EMAIL = 'robinkevin648@gmail.com';
+const LINKEDIN = 'https://linkedin.com/in/kevinsylvester6642';
+const EASE = [0.76, 0, 0.24, 1] as const;
+
+/* Page-coloured bowl hanging over the dark section; it flattens as the section scrolls up */
+function CurvedEdge() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const height = useTransform(scrollYProgress, [0, 0.9], ['12vh', '0vh']);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: 0.45 }}
-      className="mt-8 hairline p-4 flex items-center justify-between bg-fg/[0.02]"
-    >
-      <div className="flex items-center gap-3">
-        <span className="text-accent text-lg">◎</span>
-        <div>
-          <p className="text-sm font-medium">Kozhikode, Kerala</p>
-          <p className="font-mono text-[10px] text-muted tracking-wide mt-0.5">
-            UTC +5:30
-          </p>
-        </div>
-      </div>
-      <div className="flex flex-col items-end">
-        <span
-          className="font-mono text-base font-bold tabular-nums"
-          style={{ color: isPm ? 'rgb(var(--accent))' : 'rgb(var(--fg))' }}
-        >
-          {display}
-        </span>
-        <span className="font-mono text-[9px] tracking-[0.18em] uppercase text-muted mt-0.5">My time</span>
+    <motion.div ref={ref} style={{ height }} className="relative z-[1] bg-ink" aria-hidden>
+      <div className="absolute inset-x-0 top-0 h-full overflow-hidden">
+        <div className="absolute left-[-25%] bottom-0 h-[750%] w-[150%] rounded-b-[50%] bg-page shadow-[0_40px_60px_rgb(0_0_0/0.35)]" />
       </div>
     </motion.div>
+  );
+}
+
+function Pill({ href, children, external }: { href: string; children: React.ReactNode; external?: boolean }) {
+  return (
+    <a
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
+      data-cursor="hover"
+      className="btn-round border border-fg/25 hover:text-on-accent transition-colors duration-300 px-7 py-5 md:px-9 md:py-6 text-[15px] md:text-base"
+    >
+      <span aria-hidden className="btn-fill bg-accent" />
+      <span className="relative z-[1]">{children}</span>
+    </a>
   );
 }
 
@@ -227,6 +212,7 @@ export function Contact() {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [cooldown, setCooldown] = useState<number>(() => getCooldownRemaining());
+  const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -270,130 +256,131 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="relative py-32 hairline-b">
-      <div className="mx-auto max-w-6xl px-6">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.6 }}
-          className="hairline-t flex items-baseline justify-between pt-4 mb-8 md:mb-12"
-        >
-          <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">(08)</span>
-          <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-muted">Contact</span>
-        </motion.div>
-
-        <p className="font-mono text-xs tracking-[0.18em] uppercase text-muted mb-4">
-          <FadeText text="Have an idea? Let's build it." delay={0.1} />
-        </p>
-
-        <h2
-          className="display-type"
-          style={{ fontSize: 'clamp(2.8rem, 9vw, 8rem)' }}
-          aria-label={HEADING}
-        >
-          <span className="inline-flex flex-wrap gap-x-[0.22em]" aria-hidden>
-            {HEADING.split(' ').map((word, i) => (
-              <span key={i} className="overflow-hidden inline-block pb-[0.08em] -mb-[0.08em]">
-                <motion.span
-                  initial={{ y: '110%' }}
-                  whileInView={{ y: '0%' }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.8, delay: i * 0.07, ease: [0.76, 0, 0.24, 1] }}
-                  className={`inline-block ${i === HEADING.split(' ').length - 1 ? 'stroke-text' : ''}`}
-                >
-                  {word}
+    <>
+      <CurvedEdge />
+      <section id="contact" className="on-ink relative overflow-hidden">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-8 md:px-10 pt-[18vh] md:pt-[22vh]">
+          <div className="flex items-start justify-between gap-6 md:px-[6%]">
+            <motion.h2
+              className="display-type text-[clamp(3rem,8.6vw,8.5rem)] leading-[1.02] tracking-[-0.045em]"
+              aria-label={HEADING}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.5 }}
+            >
+              <span className="flex items-center gap-[0.22em]" aria-hidden>
+                <motion.img
+                  src="/kevin.jpg"
+                  alt=""
+                  className="h-[0.78em] w-[0.78em] rounded-full object-cover object-[50%_22%]"
+                  variants={{ hidden: { scale: 0 }, show: { scale: 1, transition: { duration: 0.8, ease: EASE } } }}
+                />
+                <span className="overflow-hidden pb-[0.08em] -mb-[0.08em]">
+                  <motion.span className="inline-block" variants={{ hidden: { y: '110%' }, show: { y: '0%', transition: { duration: 0.8, ease: EASE } } }}>
+                    Let&rsquo;s work
+                  </motion.span>
+                </span>
+              </span>
+              <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]" aria-hidden>
+                <motion.span className="inline-block" variants={{ hidden: { y: '110%' }, show: { y: '0%', transition: { duration: 0.8, ease: EASE, delay: 0.08 } } }}>
+                  together
                 </motion.span>
               </span>
-            ))}
-          </span>
-        </h2>
-
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
-            <p className="text-lg text-fg/80 max-w-md">
-              Open to interesting roles, collaborations, and freelance work. Drop a line. I read everything.
-            </p>
-
-            <div className="mt-10 space-y-5 font-mono text-sm">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-3">
-                <span className="text-muted text-xs uppercase tracking-[0.2em]">Email</span>
-                <a
-                  href="mailto:robinkevin648@gmail.com"
-                  data-cursor="hover"
-                  className="link-underline min-w-0 break-all text-fg"
-                >
-                  robinkevin648@gmail.com
-                </a>
-                <CopyButton value="robinkevin648@gmail.com" />
-              </div>
-              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-3">
-                <span className="text-muted text-xs uppercase tracking-[0.2em]">LinkedIn</span>
-                <a
-                  href="https://linkedin.com/in/kevinsylvester6642"
-                  target="_blank"
-                  rel="noreferrer"
-                  data-cursor="hover"
-                  className="link-underline min-w-0 break-all text-fg"
-                >
-                  linkedin.com/in/kevinsylvester6642
-                </a>
-                <CopyButton value="https://linkedin.com/in/kevinsylvester6642" />
-              </div>
-            </div>
-
-            <LocationCard />
+            </motion.h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="hidden md:block mt-[22vh] shrink-0" aria-hidden>
+              <path d="M18 6L6 18M16 18H6V8" />
+            </svg>
           </div>
 
-          <form id="contact-form" data-scroll-target aria-label="Send a message" onSubmit={onSubmit} className="space-y-5">
-            <FocusInput label="Name" required value={name} onChange={setName} />
-            <FocusInput label="Email" type="email" required value={email} onChange={setEmail} />
-            <FocusInput label="Message" multiline required value={message} onChange={setMessage} />
-            <div className="flex items-center gap-4 flex-wrap">
-              <InteractiveHoverButton
-                type="submit"
-                disabled={status === 'sending' || cooldown > 0}
-                data-cursor="hover"
+          {/* Divider with the call-to-action riding on it */}
+          <div className="relative mt-20 md:mt-28 border-t border-fg/20 md:mx-[6%]">
+            <div className="absolute right-0 sm:right-[8%] md:right-[12%] top-0 -translate-y-1/2">
+              <RoundButton
+                onClick={() => {
+                  setFormOpen((v) => !v);
+                  if (!formOpen) window.setTimeout(() => document.getElementById('field-name')?.focus({ preventScroll: true }), 450);
+                }}
+                ariaExpanded={formOpen}
+                className="h-32 w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 bg-accent text-on-accent text-[15px] md:text-base"
+                fillClass="bg-accent-hover"
               >
-                {status === 'sending' ? 'Sending…' : cooldown > 0 ? `Wait ${formatTime(cooldown)}` : 'Send Message'}
-              </InteractiveHoverButton>
-              <AnimatePresence>
-                {status === 'sent' && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    className="font-mono text-xs text-accent"
-                  >
-                    ✓ message sent — I'll be in touch
-                  </motion.span>
-                )}
-                {status === 'error' && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    className="font-mono text-xs text-red-400"
-                  >
-                    ✕ something went wrong — try again
-                  </motion.span>
-                )}
-                {cooldown > 0 && status === 'idle' && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    className="font-mono text-xs text-muted"
-                  >
-                    you can send another message in {formatTime(cooldown)}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+                {formOpen ? 'Close form' : 'Get in touch'}
+              </RoundButton>
             </div>
-          </form>
-        </div>
+          </div>
 
-      </div>
-    </section>
+          <div className="pt-24 sm:pt-16 md:mx-[6%] flex flex-wrap items-center gap-3">
+            <Pill href={`mailto:${EMAIL}`}>{EMAIL}</Pill>
+            <span className="-ml-1 mr-2"><CopyButton value={EMAIL} /></span>
+            <Pill href={LINKEDIN} external>LinkedIn</Pill>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {formOpen && (
+              <motion.div
+                key="form"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.6, ease: EASE }}
+                className="overflow-hidden md:mx-[6%]"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-10 md:gap-16 pt-16 md:pt-20">
+                  <p className="text-[15px] md:text-lg leading-[1.7] text-fg/70 max-w-sm">
+                    Open to interesting roles, collaborations, and freelance work. Drop a line — I read everything.
+                  </p>
+                  <form id="contact-form" aria-label="Send a message" onSubmit={onSubmit} className="space-y-6">
+                    <FocusInput label="Name" required value={name} onChange={setName} />
+                    <FocusInput label="Email" type="email" required value={email} onChange={setEmail} />
+                    <FocusInput label="Message" multiline required value={message} onChange={setMessage} />
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <InteractiveHoverButton
+                        type="submit"
+                        disabled={status === 'sending' || cooldown > 0}
+                        data-cursor="hover"
+                      >
+                        {status === 'sending' ? 'Sending…' : cooldown > 0 ? `Wait ${formatTime(cooldown)}` : 'Send Message'}
+                      </InteractiveHoverButton>
+                      <AnimatePresence>
+                        {status === 'sent' && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            className="font-mono text-xs text-accent"
+                          >
+                            ✓ message sent — I'll be in touch
+                          </motion.span>
+                        )}
+                        {status === 'error' && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            className="font-mono text-xs text-red-400"
+                          >
+                            ✕ something went wrong — try again
+                          </motion.span>
+                        )}
+                        {cooldown > 0 && status === 'idle' && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            className="font-mono text-xs text-muted"
+                          >
+                            you can send another message in {formatTime(cooldown)}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </section>
+    </>
   );
 }

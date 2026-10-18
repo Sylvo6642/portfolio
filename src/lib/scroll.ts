@@ -31,15 +31,25 @@ export function destroySmoothScroll() {
   lenis = null;
 }
 
+// Freeze page scroll while an overlay (the menu drawer) is open
+export function setScrollLocked(locked: boolean) {
+  if (locked) lenis?.stop();
+  else lenis?.start();
+  document.documentElement.style.overflow = locked ? 'hidden' : '';
+}
+
+// No fixed header any more, so sections land flush with the top of the viewport
+const SCROLL_OFFSET = 0;
+
 export function scrollToId(id: string) {
   const section = document.getElementById(id);
   // A contact CTA should arrive at the actionable content, below its intro.
   const el = section?.querySelector<HTMLElement>('[data-scroll-target]') ?? section;
   if (!el) return;
   if (lenis) {
-    lenis.scrollTo(el, { offset: -104, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
+    lenis.scrollTo(el, { offset: SCROLL_OFFSET, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
   } else {
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 104, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
 }
 

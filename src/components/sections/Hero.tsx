@@ -1,313 +1,159 @@
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ConnectingDots } from '../layout/ConnectingDots';
-import { scrollToId } from '../../lib/scroll';
-import { useIsCoarsePointer } from '../../hooks/useMousePosition';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
+import {
+  motion,
+  useAnimationFrame,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+} from 'framer-motion';
+import { useRef } from 'react';
 
-// Set to your CV URL to show the Download CV button, or leave empty to hide it
-const CV_URL = "";
+const EASE = [0.76, 0, 0.24, 1] as const;
+const NAME = 'Kevin Robin';
+// Percent of one copy's width travelled per second when the page is still
+const BASE_SPEED = 4;
 
-const ROTATING = [
-  "Full-Stack Developer",
-  "Building Scalable Web Systems",
-  "Crafting ERP & Web Solutions",
-  "Turning Ideas Into Production Code",
-];
-
-
-// Parallax layer configs: [dotsMultiplier, watermarkMultiplier, contentMultiplier]
-// Each value is how much the layer shifts relative to mouse (in px per half-screen)
-const LAYER_DOTS = 0.012;
-const LAYER_TEXT = 0.008;
-
-const SPRING_CFG = { stiffness: 60, damping: 18 };
-
-function MagneticButton({
-  children,
-  className,
-  onClick,
-  type,
-}: {
-  children: React.ReactNode;
-  className: string;
-  onClick?: () => void;
-  type?: 'button' | 'submit';
-}) {
-  return (
-    <button
-      type={type ?? 'button'}
-      onClick={onClick}
-      data-cursor="hover"
-      className={className}
-    >
-      {children}
-    </button>
-  );
+function wrap(min: number, max: number, v: number) {
+  const range = max - min;
+  return ((((v - min) % range) + range) % range) + min;
 }
 
-function MagneticAnchor({
-  children,
-  href,
-  download,
-  className,
-}: {
-  children: React.ReactNode;
-  href: string;
-  download?: boolean;
-  className: string;
-}) {
-  return (
-    <a
-      href={href}
-      download={download}
-      data-cursor="hover"
-      className={className}
-    >
-      {children}
-    </a>
-  );
-}
+/**
+ * Endless name ticker. Drifts left on its own; scrolling speeds it up and
+ * scrolling back up flips its direction.
+ */
+function NameMarquee() {
+  const reduced = useReducedMotion();
+  const baseX = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const velocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
+  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 4], { clamp: false });
+  const direction = useRef(1);
 
-const STAGGER_MS = 28;
-const EXIT_MS = 400;
+  // Four copies: shifting by one copy (25% of the row) loops seamlessly
+  const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
 
-function SplitPhrase({ text, phase }: { text: string; phase: 'in' | 'out' | 'idle' }) {
-  const words = text.split(' ');
-  return (
-    <>
-      {words.map((word, i) => {
-        let opacity = 0;
-        let transform = 'translateY(65%) rotate(8deg)';
-        let transition = '';
-
-        if (phase === 'in') {
-          opacity = 1;
-          transform = 'translateY(0) rotate(0deg)';
-          transition = `opacity .5s cubic-bezier(.22,1,.36,1) ${i * STAGGER_MS * 4}ms, transform .75s cubic-bezier(.22,1,.36,1) ${i * STAGGER_MS * 4}ms`;
-        } else if (phase === 'out') {
-          opacity = 0;
-          transform = 'translateY(-65%) rotate(-6deg)';
-          const rev = (words.length - 1 - i) * (STAGGER_MS * 2);
-          transition = `opacity .3s cubic-bezier(.55,0,1,.45) ${rev}ms, transform .4s cubic-bezier(.55,0,1,.45) ${rev}ms`;
-        } else {
-          transition = 'none';
-        }
-
-        return (
-          <span key={i} style={{ display: 'inline-block', whiteSpace: 'nowrap', marginRight: '0.25em' }}>
-            <span style={{ display: 'inline-block', opacity, transform, transition }}>
-              {word}
-            </span>
-          </span>
-        );
-      })}
-    </>
-  );
-}
-
-export function Hero() {
-  const coarse = useIsCoarsePointer();
-  const mobile = useMobileLayout();
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [phase, setPhase] = useState<'in' | 'out' | 'idle'>('idle');
-  const HOLD_MS = 2400;
-
-  useEffect(() => {
-    // brief idle so chars start from below on mount, then fly in
-    const t0 = window.setTimeout(() => setPhase('in'), 60);
-    return () => window.clearTimeout(t0);
-  }, []);
-
-  useEffect(() => {
-    if (mobile) return;
-    const flyInDuration = ROTATING[phraseIndex].length * STAGGER_MS + 750;
-    // after hold, fly out then advance index
-    const t1 = window.setTimeout(() => {
-      setPhase('out');
-      const t2 = window.setTimeout(() => {
-        setPhraseIndex(i => (i + 1) % ROTATING.length);
-        setPhase('idle');
-        const t3 = window.setTimeout(() => setPhase('in'), 40);
-        return () => window.clearTimeout(t3);
-      }, EXIT_MS + 100);
-      return () => window.clearTimeout(t2);
-    }, flyInDuration + HOLD_MS);
-    return () => window.clearTimeout(t1);
-  }, [phraseIndex, mobile]);
-
-  // Raw mouse position (normalized -1 … 1 relative to viewport center)
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const mx = useSpring(rawX, SPRING_CFG);
-  const my = useSpring(rawY, SPRING_CFG);
-
-  const handleMouse = useCallback(
-    (e: MouseEvent) => {
-      if (coarse) return;
-      rawX.set((e.clientX / window.innerWidth - 0.5) * 2);
-      rawY.set((e.clientY / window.innerHeight - 0.5) * 2);
-    },
-    [coarse, rawX, rawY],
-  );
-
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouse, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouse);
-  }, [handleMouse]);
-
-  // Derive per-layer translations (pixels)
-  const half = typeof window !== 'undefined' ? window.innerWidth / 2 : 768;
-  const dotsX = useTransform(mx, [-1, 1], [-half * LAYER_DOTS, half * LAYER_DOTS]);
-  const dotsY = useTransform(my, [-1, 1], [-half * LAYER_DOTS, half * LAYER_DOTS]);
-const textX  = useTransform(mx, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
-  const textY  = useTransform(my, [-1, 1], [-half * LAYER_TEXT,  half * LAYER_TEXT]);
-
-  const scrollTo = (id: string) => {
-    scrollToId(id);
-  };
-
-  // Exit transition — as the hero scrolls away, the content recedes:
-  // drifts up at half speed, shrinks slightly, and fades out.
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: exitProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start'],
+  useAnimationFrame((_, delta) => {
+    if (reduced) return;
+    const factor = velocityFactor.get();
+    if (factor < 0) direction.current = -1;
+    else if (factor > 0) direction.current = 1;
+    let moveBy = -direction.current * (BASE_SPEED / 4) * (delta / 1000);
+    moveBy += moveBy * Math.abs(factor);
+    baseX.set(baseX.get() + moveBy);
   });
-  const exitY = useTransform(exitProgress, [0, 1], [0, -110]);
-  const exitScale = useTransform(exitProgress, [0, 1], [1, 0.93]);
-  const exitOpacity = useTransform(exitProgress, [0, 0.7], [1, 0]);
+
+  return (
+    <div className="overflow-hidden select-none" aria-hidden>
+      <motion.div className="flex w-max whitespace-nowrap" style={{ x }}>
+        {Array.from({ length: 4 }, (_, i) => (
+          <span key={i} className="display-type pr-[0.3em] text-[28vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
+            {NAME} <span className="inline-block px-[0.12em]">—</span>
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+function Globe() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-7 w-7 globe-spin" fill="none" stroke="currentColor" strokeWidth="1.1" aria-hidden>
+      <circle cx="12" cy="12" r="9.5" />
+      <ellipse cx="12" cy="12" rx="4.2" ry="9.5" />
+      <path d="M2.5 12h19M4 7h16M4 17h16" />
+    </svg>
+  );
+}
+
+export function Hero({ ready = true }: { ready?: boolean }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
+
+  // The next section slides over the (sticky) hero — dim and settle it as it goes
+  const { scrollY } = useScroll();
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+  const shade = useTransform(scrollY, [0, vh], [0, 0.55]);
+  const photoY = useTransform(scrollY, [0, vh], [0, vh * 0.12]);
+  const contentScale = useTransform(scrollY, [0, vh], [1, 0.94]);
+
+  const enter = (delay: number) => ({
+    initial: { y: 60, opacity: 0 },
+    animate: ready ? { y: 0, opacity: 1 } : undefined,
+    transition: { duration: 1.1, ease: EASE, delay },
+  });
 
   return (
     <section
       id="hero"
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col justify-end overflow-hidden hairline-b"
+      className="relative h-[100svh] min-h-[560px] overflow-hidden bg-hero text-white"
+      aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
-      {/* Layer 1 — particles (slowest) */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-0"
-        style={coarse ? {} : { x: dotsX, y: dotsY }}
-      >
-        <ConnectingDots />
-      </motion.div>
-
-      {/* Vignette */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse at center, rgb(var(--bg) / 0) 0%, rgb(var(--bg) / 0.55) 70%, rgb(var(--bg) / 0.85) 100%)',
-        }}
-      />
-
-{/* Layer 3 — content (exit transforms on the outer layer, mouse parallax inside) */}
-      <motion.div
-        className="relative mx-auto max-w-[1400px] px-6 pt-32 pb-10 md:pb-14 w-full flex-1 flex flex-col justify-center"
-        style={mobile ? undefined : { y: exitY, scale: exitScale, opacity: exitOpacity }}
-      >
-      <motion.div style={coarse ? {} : { x: textX, y: textY }}>
-        {/* Meta row */}
-
-        {/* Giant stacked name */}
-        <h1
-          className="display-type"
-          style={{ fontSize: 'clamp(4rem, 14.5vw, 13rem)' }}
-          aria-label="Kevin Robin — Full-Stack Developer"
+      <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale }}>
+        {/* Portrait in an arch, anchored to the bottom edge */}
+        <motion.div
+          className="absolute inset-x-0 bottom-0 flex justify-center"
+          style={reduced ? undefined : { y: photoY }}
+          initial={{ opacity: 0 }}
+          animate={ready ? { opacity: 1 } : undefined}
+          transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <span className="block overflow-hidden pb-[0.06em] -mb-[0.06em]" aria-hidden>
-            <motion.span
-              initial={{ y: '110%' }}
-              animate={{ y: '0%' }}
-              transition={{ duration: 0.9, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
-              className="block"
-            >
-              Kevin
-            </motion.span>
+          <div className="w-[78vw] max-h-[72svh] md:w-auto md:h-[min(84svh,85vw)] aspect-[3/4] overflow-hidden rounded-t-full">
+            <img
+              src="/kevin.jpg"
+              alt=""
+              className="h-full w-full object-cover object-[50%_30%] select-none pointer-events-none"
+              draggable={false}
+              decoding="async"
+              fetchPriority="high"
+            />
+          </div>
+        </motion.div>
+
+        {/* Location pill */}
+        <motion.div
+          {...enter(0.15)}
+          className="hidden md:flex absolute left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
+        >
+          <p className="text-[15px] leading-[1.35]">
+            Located
+            <br />
+            in Kerala,
+            <br />
+            India
+          </p>
+          <span className="grid h-[68px] w-[68px] place-items-center rounded-full bg-hero">
+            <Globe />
           </span>
-          <span className="block overflow-hidden pb-[0.06em] -mb-[0.06em]" aria-hidden>
-            <motion.span
-              initial={{ y: '110%' }}
-              animate={{ y: '0%' }}
-              transition={{ duration: 0.9, delay: 0.28, ease: [0.76, 0, 0.24, 1] }}
-              className="block stroke-text"
-              style={{ color: 'rgb(var(--bg))', paintOrder: 'stroke fill' }}
-            >
-              Robin
-            </motion.span>
-          </span>
-        </h1>
+        </motion.div>
 
-        {/* Rotating role line + CTAs */}
-        <div className="mt-8 md:mt-12 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="font-mono text-xs md:text-sm tracking-[0.18em] uppercase text-fg/70 max-w-md"
-            aria-label={mobile ? ROTATING[0] : ROTATING[phraseIndex]}
-          >
-            <span className="text-muted mr-3" aria-hidden>—</span>
-            <span aria-hidden>
-              {mobile ? ROTATING[0] : <SplitPhrase text={ROTATING[phraseIndex]} phase={phase} />}
-            </span>
-          </motion.p>
+        {/* Role */}
+        <motion.div
+          {...enter(0.25)}
+          className="absolute left-5 sm:left-8 top-[18svh] md:left-auto md:right-[7%] md:top-[30%]"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="mb-5 md:mb-9" aria-hidden>
+            <path d="M6 6l12 12M18 8v10H8" />
+          </svg>
+          <p className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-[1.25] tracking-[-0.02em]">
+            Full-Stack &amp;
+            <br />
+            AI Engineer
+          </p>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-            className="flex flex-wrap items-center gap-3"
-          >
-            <MagneticButton
-              onClick={() => scrollTo('experience')}
-              className="group inline-flex items-center gap-3 bg-fg text-bg px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-transform hover:scale-[1.02]"
-            >
-              View Work
-              <svg className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M7 17L17 7M7 7h10v10" />
-              </svg>
-            </MagneticButton>
-
-            <MagneticButton
-              onClick={() => scrollTo('contact')}
-              className="inline-flex items-center gap-3 hairline px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:bg-fg hover:text-bg"
-            >
-              Get in Touch
-            </MagneticButton>
-
-            {CV_URL && (
-              <MagneticAnchor
-                href={CV_URL}
-                download
-                className="inline-flex items-center gap-3 hairline px-7 py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:bg-fg hover:text-bg"
-              >
-                Download CV
-              </MagneticAnchor>
-            )}
-          </motion.div>
-        </div>
-      </motion.div>
+        {/* Name ticker */}
+        <motion.div {...enter(0)} className="absolute inset-x-0 bottom-[3svh] md:bottom-[4svh]">
+          <NameMarquee />
+        </motion.div>
       </motion.div>
 
-      {/* Scroll cue */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.4 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted"
-      >
-        <span className="font-mono text-[10px] tracking-[0.2em] uppercase">scroll</span>
-        <div className="h-10 w-[1px] bg-fg/20 relative overflow-hidden">
-          <motion.div
-            className="absolute inset-x-0 top-0 h-3 bg-fg"
-            animate={{ y: [-12, 40] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
-      </motion.div>
+      <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: shade }} />
+      <h1 className="sr-only">Kevin Robin — Full-Stack Developer and AI Engineer based in Kerala, India</h1>
     </section>
   );
 }

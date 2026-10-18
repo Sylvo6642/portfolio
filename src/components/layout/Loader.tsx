@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const SESSION_KEY = 'kr-loader-seen';
 
@@ -14,199 +14,66 @@ export function useLoader() {
   return { done, dismiss };
 }
 
-// Glitch frames for the name
-const GLITCH_CHARS = '!<>-_\\/[]{}—=+*^?#█▓▒░│┼╫';
-function randomChar() {
-  return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-}
+const WORDS = ['Hello', 'നമസ്കാരം', 'नमस्ते', 'Bonjour', 'Hola', 'Ciao', 'こんにちは', 'Hallå', 'Guten Tag'];
 
-function GlitchText({ text, reveal }: { text: string; reveal: boolean }) {
-  const [display, setDisplay] = useState(text.split('').map(() => randomChar()));
-  const frameRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const iterRef = useRef(0);
+// First greeting lingers, the rest flick past; the last one holds briefly before the exit
+const FIRST_WORD_MS = 1000;
+const WORD_MS = 150;
+const LAST_WORD_MS = 250;
 
-  useEffect(() => {
-    if (!reveal) return;
-    const total = text.length;
-    const run = () => {
-      iterRef.current += 1;
-      const iter = iterRef.current;
-      setDisplay(text.split('').map((char, i) => {
-        if (i < iter / 2.5) return char;
-        return randomChar();
-      }));
-      if (iter < total * 2.8) {
-        frameRef.current = setTimeout(run, 38);
-      } else {
-        setDisplay(text.split(''));
-      }
-    };
-    frameRef.current = setTimeout(run, 60);
-    return () => { if (frameRef.current) clearTimeout(frameRef.current); };
-  }, [reveal, text]);
-
-  return (
-    <span className="inline-flex tracking-[0.12em]">
-      {display.map((c, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: reveal ? 1 : 0 }}
-          transition={{ delay: i * 0.03, duration: 0.2 }}
-          className="inline-block"
-        >
-          {c === ' ' ? ' ' : c}
-        </motion.span>
-      ))}
-    </span>
-  );
-}
-
-function Counter({ progress }: { progress: number }) {
-  const display = Math.round(progress * 100);
-  return (
-    <div className="font-mono tabular-nums" style={{ fontSize: 'clamp(3.5rem, 9vw, 7rem)', lineHeight: 1, letterSpacing: '-0.04em' }}>
-      <span style={{ color: 'rgb(var(--fg))' }}>{String(display).padStart(2, '0')}</span>
-      <span style={{ color: 'rgb(var(--accent) / 0.5)', fontSize: '0.45em', verticalAlign: 'super', marginLeft: '0.1em' }}>%</span>
-    </div>
-  );
-}
+const BG = '#1E1611';
+const EASE = [0.76, 0, 0.24, 1] as const;
 
 export function Loader({ onDone }: { onDone: () => void }) {
-  const [phase, setPhase] = useState<'counting' | 'name' | 'exit'>('counting');
-  const rawProgress = useMotionValue(0);
-  const springProgress = useSpring(rawProgress, { stiffness: 60, damping: 18 });
-  const [progressSnap, setProgressSnap] = useState(0);
-  const [nameReveal, setNameReveal] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [size] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
 
-  // Drive the progress bar
+  // onDone is recreated on every App render — keep the timers from resetting
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
   useEffect(() => {
-    // Ramp to ~0.7 in 1.2s, then slow, then burst to 1
-    const t1 = setTimeout(() => rawProgress.set(0.72), 50);
-    const t2 = setTimeout(() => rawProgress.set(0.88), 1100);
-    const t3 = setTimeout(() => rawProgress.set(1), 1400);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [rawProgress]);
+    if (index === WORDS.length - 1) {
+      const t = setTimeout(() => onDoneRef.current(), LAST_WORD_MS);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setIndex((i) => i + 1), index === 0 ? FIRST_WORD_MS : WORD_MS);
+    return () => clearTimeout(t);
+  }, [index]);
 
-  // Mirror spring value for counter display
-  useEffect(() => {
-    return springProgress.on('change', (v) => setProgressSnap(v));
-  }, [springProgress]);
-
-  // Sequence phases
-  useEffect(() => {
-    const t1 = setTimeout(() => setPhase('name'), 2000);
-    const t2 = setTimeout(() => setNameReveal(true), 2100);
-    const t3 = setTimeout(() => setPhase('exit'), 3200);
-    const t4 = setTimeout(() => onDone(), 3800);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, [onDone]);
-
-  const EXIT_DURATION = 0.65;
+  // The panel extends 300px below the viewport with a bowed bottom edge,
+  // which flattens as the panel slides up
+  const { w, h } = size;
+  const curvedPath = `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h + 300} 0 ${h} L0 0`;
+  const flatPath = `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h} 0 ${h} L0 0`;
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden select-none"
-      style={{ background: 'rgb(var(--bg))' }}
-      exit={{
-        clipPath: ['inset(0% 0% 0% 0%)', 'inset(0% 0% 100% 0%)'],
-        transition: { duration: EXIT_DURATION, ease: [0.76, 0, 0.24, 1] },
-      }}
+      className="fixed inset-0 z-[100] flex items-center justify-center select-none"
+      style={{ background: BG }}
+      initial={{ y: 0 }}
+      exit={{ y: '-100vh', transition: { duration: 0.8, ease: EASE, delay: 0.2 } }}
     >
-      {/* Exit edge line — sits at the bottom edge of the loader as it wipes up */}
-      {phase === 'exit' && (
-        <motion.div
-          className="fixed left-0 right-0 z-[102] pointer-events-none"
-          style={{
-            height: '2px',
-            bottom: 0,
-            background: `linear-gradient(90deg, transparent 0%, rgb(var(--accent)) 20%, rgb(var(--fg)) 50%, rgb(var(--accent)) 80%, transparent 100%)`,
-            boxShadow: '0 0 12px 2px rgb(var(--accent) / 0.6), 0 0 30px 6px rgb(var(--accent) / 0.2)',
-            originY: 0,
-          }}
-          initial={{ y: '0vh' }}
-          animate={{ y: '-100vh' }}
-          transition={{ duration: EXIT_DURATION, ease: [0.76, 0, 0.24, 1], delay: 0.6 }}
+      <motion.p
+        className="relative z-[1] text-white font-sans"
+        style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', lineHeight: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.75, transition: { duration: 1, delay: 0.2 } }}
+      >
+        {WORDS[index]}
+      </motion.p>
+
+      <svg
+        className="absolute top-0 left-0 w-full pointer-events-none"
+        style={{ height: 'calc(100% + 300px)' }}
+        aria-hidden="true"
+      >
+        <motion.path
+          fill={BG}
+          initial={{ d: curvedPath }}
+          exit={{ d: flatPath, transition: { duration: 0.7, ease: EASE, delay: 0.3 } }}
         />
-      )}
-      {/* Noise grain overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.035]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          backgroundSize: '128px',
-        }}
-      />
-
-      {/* Accent glow blob */}
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          width: '60vmax', height: '60vmax',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(ellipse at center, rgb(var(--accent) / 0.12) 0%, transparent 65%)',
-        }}
-      />
-
-
-      {/* Main center content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 gap-6">
-        <AnimatePresence mode="wait">
-          {phase === 'counting' && (
-            <motion.div
-              key="counter"
-              exit={{ opacity: 0, y: -20, transition: { duration: 0.35, ease: 'easeIn' } }}
-            >
-              <Counter progress={progressSnap} />
-            </motion.div>
-          )}
-
-          {phase !== 'counting' && (
-            <motion.div
-              key="name"
-              className="flex flex-col items-center gap-5"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-            >
-              <div
-                className="font-sans font-bold uppercase"
-                style={{
-                  fontSize: 'clamp(2.8rem, 9vw, 7.5rem)',
-                  letterSpacing: '-0.02em',
-                  color: 'rgb(var(--fg))',
-                  lineHeight: 1,
-                }}
-              >
-                <GlitchText text="Kevin Robin" reveal={nameReveal} />
-              </div>
-              <motion.div
-                className="flex items-center gap-3"
-                initial={{ opacity: 0, scaleX: 0.8 }}
-                animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                <span
-                  className="block h-[1px] w-12"
-                  style={{ background: 'rgb(var(--accent) / 0.6)' }}
-                />
-                <span
-                  className="font-mono text-[11px] tracking-[0.3em] uppercase"
-                  style={{ color: 'rgb(var(--accent))' }}
-                >
-                  Full-Stack Developer
-                </span>
-                <span
-                  className="block h-[1px] w-12"
-                  style={{ background: 'rgb(var(--accent) / 0.6)' }}
-                />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
+      </svg>
     </motion.div>
   );
 }

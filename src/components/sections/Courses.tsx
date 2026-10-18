@@ -10,7 +10,7 @@ export function Courses() {
           index="06"
           label="Courses"
           title="Always learning"
-          sub="What I've studied. What stuck."
+          sub="From full-stack foundations to LLMs, RAG and agents. What stuck."
         />
 
         <div className="mt-12 hairline-t">
@@ -20,7 +20,7 @@ export function Courses() {
                 <span className="col-span-12 md:col-span-1 font-mono text-xs text-muted">
                   ({String(i + 1).padStart(2, '0')})
                 </span>
-                <h3 className="col-span-12 md:col-span-6 text-lg font-bold tracking-tight uppercase transition-transform duration-300 group-hover:translate-x-2">
+                <h3 className="col-span-12 md:col-span-6 text-xl font-normal tracking-[-0.02em] transition-transform duration-300 group-hover:translate-x-2">
                   {c.title}
                 </h3>
                 <p className="col-span-7 md:col-span-3 text-sm text-fg/70">{c.org}</p>

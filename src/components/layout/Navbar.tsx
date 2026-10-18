@@ -1,36 +1,73 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { ThemeToggle } from './ThemeToggle';
+import { Magnetic } from '../shared/Magnetic';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
-import { scrollToId, scrollToTop } from '../../lib/scroll';
-import { useAutoHideNavbar } from '../../hooks/useAutoHideNavbar';
+import { scrollToId, scrollToTop, setScrollLocked } from '../../lib/scroll';
 
-const PRIMARY = [
+const HEADER_LINKS = [
+  { id: 'projects', label: 'Work' },
   { id: 'about', label: 'About' },
-  { id: 'projects', label: 'Projects' },
   { id: 'experience', label: 'Experience' },
+  { id: 'contact', label: 'Contact' },
+];
+const DRAWER_LINKS = [
+  { id: 'hero', label: 'Home' },
+  { id: 'projects', label: 'Work' },
+  { id: 'about', label: 'About' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'contributions', label: 'Activity' },
+  { id: 'courses', label: 'Courses' },
   { id: 'blog', label: 'Notes' },
+  { id: 'contact', label: 'Contact' },
 ];
-const MORE = [
-  { id: 'skills', label: 'Skills', detail: 'Tools & technologies' },
-  { id: 'contributions', label: 'Activity', detail: 'Building in public' },
-  { id: 'courses', label: 'Courses', detail: 'Always learning' },
+// Document order — the scroll spy needs it to pick the section in view
+const SECTIONS = ['hero', 'projects', 'about', 'skills', 'experience', 'contributions', 'courses', 'blog', 'contact'];
+export const SOCIALS = [
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/kevinsylvester6642' },
+  { label: 'GitHub', href: 'https://github.com/Sylvo6642' },
+  { label: 'Email', href: 'mailto:robinkevin648@gmail.com' },
 ];
-const SECTIONS = ['about', 'skills', 'experience', 'projects', 'contributions', 'courses', 'blog', 'contact'];
 
-function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={diagonal ? 'M7 17 17 7M7 7h10v10' : 'M5 12h14m-6-6 6 6-6 6'} /></svg>;
+const EASE = [0.76, 0, 0.24, 1] as const;
+
+function goTo(id: string) {
+  if (id === 'hero') scrollToTop();
+  else scrollToId(id);
 }
 
-export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
+/* Drawer panel's left edge bows outward while it slides in, then flattens */
+function DrawerCurve() {
+  const [h] = useState(() => window.innerHeight);
+  const curved = `M100 0 L100 ${h} Q-100 ${h / 2} 100 0`;
+  const flat = `M100 0 L100 ${h} Q100 ${h / 2} 100 0`;
+  return (
+    <svg className="absolute top-0 -left-[99px] w-[100px] h-full pointer-events-none" preserveAspectRatio="none" viewBox={`0 0 100 ${h}`} aria-hidden>
+      <motion.path
+        className="fill-ink"
+        initial={{ d: curved }}
+        animate={{ d: flat, transition: { duration: 1, ease: EASE } }}
+        exit={{ d: curved, transition: { duration: 0.8, ease: EASE } }}
+      />
+    </svg>
+  );
+}
+
+export function Navbar() {
   const [open, setOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [logoArmed, setLogoArmed] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const menuRef = useRef<HTMLButtonElement>(null);
-  const moreRef = useRef<HTMLButtonElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
   const activeId = useScrollSpy(SECTIONS);
-  const { hidden, reveal } = useAutoHideNavbar(headerRef, open || moreOpen || !loaderDone);
+
+  // The floating menu button takes over once the header has scrolled away
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > Math.min(160, window.innerHeight * 0.2));
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const onArm = () => setLogoArmed(true);
@@ -44,106 +81,179 @@ export function Navbar({ loaderDone = true }: { loaderDone?: boolean }) {
   }, []);
 
   useEffect(() => {
-    const onPointer = (event: PointerEvent) => {
-      if (!headerRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setMoreOpen(false);
-      }
-    };
+    if (!open) return;
+    setScrollLocked(true);
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      if (open) menuRef.current?.focus();
-      else if (moreOpen) moreRef.current?.focus();
       setOpen(false);
-      setMoreOpen(false);
+      burgerRef.current?.focus();
     };
-    let lastWidth = window.innerWidth;
-    const onResize = () => {
-      // Mobile browser toolbars change height while scrolling a menu.
-      if (window.innerWidth === lastWidth) return;
-      lastWidth = window.innerWidth;
-      setOpen(false);
-      setMoreOpen(false);
-    };
-    document.addEventListener('pointerdown', onPointer);
     document.addEventListener('keydown', onKey);
-    window.addEventListener('resize', onResize);
     return () => {
-      document.removeEventListener('pointerdown', onPointer);
       document.removeEventListener('keydown', onKey);
-      window.removeEventListener('resize', onResize);
+      setScrollLocked(false);
     };
-  }, [open, moreOpen]);
+  }, [open]);
 
   const go = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    scrollToId(id);
-    setOpen(false);
-    setMoreOpen(false);
+    if (open) {
+      setOpen(false);
+      // Let the scroll lock release before scrolling
+      window.setTimeout(() => goTo(id), 80);
+    } else {
+      goTo(id);
+    }
   };
 
   return (
-    <header ref={headerRef} className="site-header" data-hidden={hidden || !loaderDone}
-      aria-hidden={!loaderDone} style={{ visibility: loaderDone ? 'visible' : 'hidden' }}
-      onFocusCapture={reveal}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node)) { setOpen(false); setMoreOpen(false); }
-      }}>
-      <div className="nav-shell">
-        <a href="#" className="nav-brand" aria-label="Kevin Robin — back to top" data-secret-logo
-          onClick={(event) => { event.preventDefault(); scrollToTop(); setOpen(false); setMoreOpen(false); }}
-          onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}>
-          <motion.span className="nav-monogram" animate={{ opacity: logoArmed ? [1, 0.3, 1] : 1 }} transition={logoArmed ? { duration: 0.8, repeat: Infinity } : { duration: 0.2 }}>
-            <img src="/kevin.jpg" alt="" width="44" height="44" decoding="async" />
-          </motion.span>
-          <span className="nav-wordmark">Kevin Robin<span>Full-stack developer</span></span>
-        </a>
-        <nav className="nav-desktop" aria-label="Main navigation">
-          {PRIMARY.map((item) => (
-            <a key={item.id} href={`#${item.id}`} onClick={(event) => go(event, item.id)} className="nav-item" aria-current={activeId === item.id ? 'location' : undefined}>{item.label}</a>
-          ))}
-          <div className="nav-more">
-            <button ref={moreRef} type="button" className="nav-item nav-more-trigger"
-              data-active={MORE.some((item) => item.id === activeId)} aria-expanded={moreOpen} aria-controls="nav-more-links"
-              onClick={() => setMoreOpen((value) => !value)}>
-              More<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className={moreOpen ? 'is-open' : ''}><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    <>
+      {/* Top bar — sits over the hero and scrolls away with it */}
+      <header className="absolute top-0 inset-x-0 z-30 text-white">
+        <div className="flex items-center justify-between px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
+          <a
+            href="#"
+            className="group flex items-center gap-1.5 text-[15px] md:text-base"
+            aria-label="Kevin Robin — back to top"
+            data-secret-logo
+            onClick={(event) => { event.preventDefault(); scrollToTop(); }}
+            onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}
+          >
+            <motion.span
+              className="inline-block transition-transform duration-700 ease-out group-hover:rotate-[360deg]"
+              animate={{ opacity: logoArmed ? [1, 0.3, 1] : 1 }}
+              transition={logoArmed ? { duration: 0.8, repeat: Infinity } : { duration: 0.2 }}
+            >
+              ©
+            </motion.span>
+            <span className="relative block overflow-hidden h-[1.3em] leading-[1.3em]">
+              <span className="block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">Code by Kevin</span>
+              <span className="absolute left-0 top-full block whitespace-nowrap transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full" aria-hidden>Kevin Robin</span>
+            </span>
+          </a>
+
+          <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-base" aria-label="Main navigation">
+            {HEADER_LINKS.map((item) => (
+              <Magnetic key={item.id} strength={0.25}>
+                <a href={`#${item.id}`} onClick={(event) => go(event, item.id)} className="nav-link" aria-current={activeId === item.id ? 'location' : undefined}>
+                  {item.label}
+                </a>
+              </Magnetic>
+            ))}
+            <ThemeToggle />
+          </nav>
+
+          <div className="flex md:hidden items-center gap-1">
+            <ThemeToggle />
+            <button type="button" onClick={() => setOpen(true)} className="nav-link text-[15px] pl-2" aria-expanded={open} aria-controls="site-drawer">
+              Menu
             </button>
-            {moreOpen && (
-              <div id="nav-more-links" className="nav-dropdown">
-                <span className="nav-eyebrow">Explore more</span>
-                {MORE.map((item) => (
-                  <a key={item.id} href={`#${item.id}`} onClick={(event) => go(event, item.id)} aria-current={activeId === item.id ? 'location' : undefined}>
-                    <span>{item.label}<small>{item.detail}</small></span><Arrow diagonal />
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
-        </nav>
-        <div className="nav-actions">
-          <ThemeToggle />
-          <a href="#contact" className="nav-contact" onClick={(event) => go(event, 'contact')} aria-current={activeId === 'contact' ? 'location' : undefined}>Let’s talk<Arrow diagonal /></a>
-          <button ref={menuRef} type="button" className="nav-menu-toggle" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="nav-mobile-links" onClick={() => setOpen((value) => !value)}>
-            <span className={open ? 'is-open' : ''}><i /><i /></span>
-          </button>
         </div>
+      </header>
+
+      {/* Floating menu button — while hidden it must not swallow clicks meant for the header beneath */}
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 md:top-7 md:right-7 z-[70] pointer-events-none">
+        <motion.div
+          className={scrolled || open ? 'pointer-events-auto' : ''}
+          initial={false}
+          animate={{ scale: scrolled || open ? 1 : 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Magnetic strength={0.3}>
+            <button
+              ref={burgerRef}
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-expanded={open}
+              aria-controls="site-drawer"
+              tabIndex={scrolled || open ? 0 : -1}
+              className={`btn-round h-14 w-14 md:h-[76px] md:w-[76px] shadow-[0_8px_30px_rgb(0_0_0/0.18)] transition-colors duration-300 ${open ? 'bg-accent' : 'bg-ink ring-1 ring-white/10'} group`}
+              data-cursor="hover"
+            >
+              <span aria-hidden className="btn-fill bg-accent" />
+              <span className="relative z-[1] block w-5 md:w-6 h-3">
+                <span className={`absolute left-0 right-0 h-px transition-all duration-300 ${open ? 'top-1/2 rotate-45 bg-on-accent' : 'top-0 bg-white group-hover:bg-on-accent'}`} />
+                <span className={`absolute left-0 right-0 h-px transition-all duration-300 ${open ? 'top-1/2 -rotate-45 bg-on-accent' : 'top-full bg-white group-hover:bg-on-accent'}`} />
+              </span>
+            </button>
+          </Magnetic>
+        </motion.div>
       </div>
+
       <AnimatePresence>
         {open && (
-          <motion.nav id="nav-mobile-links" aria-label="Mobile navigation" className="nav-mobile" data-lenis-prevent
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
-            <div className="nav-mobile-heading"><span className="nav-eyebrow">Explore the portfolio</span><span>01 — 08</span></div>
-            {SECTIONS.map((id, index) => {
-              const item = [...PRIMARY, ...MORE, { id: 'contact', label: 'Contact' }].find((entry) => entry.id === id)!;
-              return <a key={id} href={`#${id}`} onClick={(event) => go(event, id)} aria-current={activeId === id ? 'location' : undefined}>
-                <span className="nav-mobile-number">{String(index + 1).padStart(2, '0')}</span><span>{item.label}</span><Arrow />
-              </a>;
-            })}
-            <p className="nav-mobile-footer">Have something in mind? <a href="#contact" onClick={(event) => go(event, 'contact')}>Let’s build it together <Arrow diagonal /></a></p>
-          </motion.nav>
+          <>
+            <motion.div
+              key="scrim"
+              className="fixed inset-0 z-[55] bg-black/30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              onClick={() => setOpen(false)}
+              aria-hidden
+            />
+            <motion.aside
+              key="drawer"
+              id="site-drawer"
+              aria-label="Site menu"
+              className="on-ink fixed top-0 right-0 bottom-0 z-[60] w-full sm:w-[min(500px,100vw)]"
+              initial={{ x: 'calc(100% + 100px)' }}
+              animate={{ x: 0, transition: { duration: 0.8, ease: EASE } }}
+              exit={{ x: 'calc(100% + 100px)', transition: { duration: 0.8, ease: EASE } }}
+            >
+              <DrawerCurve />
+              <div className="relative h-full overflow-y-auto overscroll-contain flex flex-col justify-between gap-12 px-8 pt-24 pb-10 sm:px-14 md:pt-28" data-lenis-prevent>
+                <div>
+                  <p className="eyebrow pb-5 mb-8 border-b border-fg/15">Navigation</p>
+                  <nav aria-label="All sections">
+                    <ul className="flex flex-col">
+                      {DRAWER_LINKS.map((item, i) => {
+                        const current = activeId === item.id;
+                        return (
+                          <motion.li
+                            key={item.id}
+                            initial={{ x: 80 }}
+                            animate={{ x: 0, transition: { duration: 0.8, ease: EASE, delay: 0.05 * i } }}
+                            exit={{ x: 80, transition: { duration: 0.8, ease: EASE, delay: 0.03 * i } }}
+                          >
+                            <a
+                              href={`#${item.id}`}
+                              onClick={(event) => go(event, item.id)}
+                              aria-current={current ? 'location' : undefined}
+                              className="group relative flex items-center py-1 text-[clamp(2rem,5.4vh,3.25rem)] leading-[1.15] tracking-[-0.03em]"
+                            >
+                              <span
+                                aria-hidden
+                                className={`absolute -left-6 h-2.5 w-2.5 rounded-full bg-white transition-transform duration-300 ${current ? 'scale-100' : 'scale-0 group-hover:scale-100'}`}
+                              />
+                              {item.label}
+                            </a>
+                          </motion.li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
+                </div>
+
+                <div>
+                  <p className="eyebrow mb-4">Socials</p>
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[15px]">
+                    {SOCIALS.map((s) => (
+                      <a key={s.label} href={s.href} className="nav-link" target={s.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+                        {s.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

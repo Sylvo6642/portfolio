@@ -55,7 +55,7 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
         className={`pl-10 md:pl-8 ${isLeft ? 'md:order-2' : 'md:order-1 md:pl-0 md:pr-8'}`}
       >
         <div className="hairline p-6 bg-bg/40 backdrop-blur-sm transition-all duration-200 hover:border-l-2 hover:border-l-fg hover:bg-fg/[0.03]">
-          <h3 className="text-xl font-bold tracking-tight uppercase">{entry.role}</h3>
+          <h3 className="text-2xl font-normal tracking-[-0.02em]">{entry.role}</h3>
           <p className="mt-1 font-mono text-xs tracking-[0.15em] uppercase text-muted">{entry.company}</p>
           <ul className="mt-4 space-y-2 text-sm text-fg/75">
             {entry.bullets.map((b) => (
@@ -83,7 +83,7 @@ export function Experience() {
     <section id="experience" className="relative py-32 hairline-b">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeader
-          index="03"
+          index="04"
           label="Experience"
           title="Where I've shipped"
           sub="Two years in. Still just getting started."
