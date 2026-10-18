@@ -11,3 +11,4 @@ supabase/.temp/
 !public/KR_light.png
 !public/concepts/**/*.png
 scroll-shot.mjs
+scripts/.font-cache/

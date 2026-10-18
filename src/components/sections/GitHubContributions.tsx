@@ -5,33 +5,9 @@ import { SectionHeader } from '../shared/SectionHeader';
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/github-contributions`;
 
-// ARTIFICIAL BOOST: inflates contribution counts for Oct 2025 – Apr 2026.
-// To revert: delete this function and change the setData call back to setData(cal)
-function boostContributions(cal: ContributionData): ContributionData {
-  const start = new Date('2025-10-01');
-  const end = new Date('2026-04-30');
-  let seed = 42;
-  const rand = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
-
-  const boosted = cal.weeks.map((week) => ({
-    ...week,
-    contributionDays: week.contributionDays.map((day) => {
-      const d = new Date(day.date);
-      if (d < start || d > end) return day;
-      // ~1 in 7 days stays empty to look natural
-      if (rand() < 1 / 7) return { ...day, contributionCount: 0 };
-      const dow = d.getDay();
-      const base = dow === 0 || dow === 6 ? 1 : 3;
-      const extra = Math.floor(rand() * 5) + base;
-      return { ...day, contributionCount: day.contributionCount + extra };
-    }),
-  }));
-
-  return { ...cal, weeks: boosted };
-}
-
-const DARK_COLORS: [string, string, string, string, string] = ['#0c1927', '#18324e', '#30649c', '#6397cf', '#b1cbe7'];
-const LIGHT_COLORS: [string, string, string, string, string] = ['#d8e5f3', '#8ab1db', '#3c7dc3', '#244b75', '#08121b'];
+// Walnut ramps from the site palette, empty day → busiest day
+const DARK_COLORS: [string, string, string, string, string] = ['#2A2019', '#4A3424', '#7A5232', '#B9803F', '#E8B887'];
+const LIGHT_COLORS: [string, string, string, string, string] = ['#EFE6DB', '#E2C8A6', '#C99766', '#9A6337', '#5E361C'];
 
 export function GitHubContributions() {
   const [data, setData] = useState<ContributionData | null>(null);
@@ -48,7 +24,7 @@ export function GitHubContributions() {
     })
       .then((r) => r.json())
       .then((cal) => {
-        if (!cal?.error) setData(boostContributions(cal));
+        if (!cal?.error) setData(cal);
       })
       .catch(() => {});
   }, []);
@@ -85,7 +61,7 @@ export function GitHubContributions() {
                 <div
                   key={i}
                   className="rounded-sm animate-pulse"
-                  style={{ width: CELL, height: CELL, background: DARK_COLORS[0] }}
+                  style={{ width: CELL, height: CELL, background: 'rgb(var(--edge))' }}
                 />
               ))}
             </div>
@@ -111,8 +87,8 @@ export function GitHubContributions() {
                 cellShape="square"
                 pulseIntensity={0.5}
                 pulseDuration={2.4}
-                pulseColor="#9b9994"
-                todayIndicatorColor="#9b9994"
+                pulseColor="#B9803F"
+                todayIndicatorColor="#B9803F"
               />
             </motion.div>
           )}

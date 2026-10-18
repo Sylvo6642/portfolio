@@ -57,7 +57,6 @@ function DrawerCurve() {
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoArmed, setLogoArmed] = useState(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const activeId = useScrollSpy(SECTIONS);
 
@@ -67,17 +66,6 @@ export function Navbar() {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    const onArm = () => setLogoArmed(true);
-    const onDisarm = () => setLogoArmed(false);
-    document.addEventListener('secret:arm', onArm);
-    document.addEventListener('secret:disarm', onDisarm);
-    return () => {
-      document.removeEventListener('secret:arm', onArm);
-      document.removeEventListener('secret:disarm', onDisarm);
-    };
   }, []);
 
   useEffect(() => {
@@ -111,27 +99,7 @@ export function Navbar() {
     <>
       {/* Top bar — sits over the hero and scrolls away with it */}
       <header className="absolute top-0 inset-x-0 z-30 text-white">
-        <div className="flex items-center justify-between px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
-          <a
-            href="#"
-            className="group flex items-center gap-1.5 text-[15px] md:text-base"
-            aria-label="Kevin Robin — back to top"
-            data-secret-logo
-            onClick={(event) => { event.preventDefault(); scrollToTop(); }}
-            onTouchStart={() => document.dispatchEvent(new CustomEvent('secret:logo-tap'))}
-          >
-            <motion.span
-              className="inline-block transition-transform duration-700 ease-out group-hover:rotate-[360deg]"
-              animate={{ opacity: logoArmed ? [1, 0.3, 1] : 1 }}
-              transition={logoArmed ? { duration: 0.8, repeat: Infinity } : { duration: 0.2 }}
-            >
-              ©
-            </motion.span>
-            <span className="relative block overflow-hidden h-[1.3em] leading-[1.3em]">
-              <span className="block transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">Code by Kevin</span>
-              <span className="absolute left-0 top-full block whitespace-nowrap transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full" aria-hidden>Kevin Robin</span>
-            </span>
-          </a>
+        <div className="flex items-center justify-end px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
 
           <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-base" aria-label="Main navigation">
             {HEADER_LINKS.map((item) => (

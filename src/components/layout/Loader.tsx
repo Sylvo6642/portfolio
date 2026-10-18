@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { GREETING_HEIGHT_EM, GREETING_SHAPES, GREETING_VIEWBOX } from '../../data/greetingPaths';
 
 const SESSION_KEY = 'kr-loader-seen';
 
@@ -14,32 +15,106 @@ export function useLoader() {
   return { done, dismiss };
 }
 
-const WORDS = ['Hello', 'നമസ്കാരം', 'नमस्ते', 'Bonjour', 'Hola', 'Ciao', 'こんにちは', 'Hallå', 'Guten Tag'];
+// Greeting outlines come from scripts/build-greeting-paths.mjs (npm run build:greetings):
+// every word is split into the same number of letter shapes
+const WORDS = GREETING_SHAPES;
 
-// First greeting lingers, the rest flick past; the last one holds briefly before the exit
-const FIRST_WORD_MS = 1000;
-const WORD_MS = 150;
+// First greeting lingers, then each letter morphs into a random letter of the next word,
+// starting at a random moment within SPREAD_MS; the last word holds briefly before the exit
+const FIRST_WORD_MS = 800;
+const MORPH_MS = 300;
+const SPREAD_MS = 120; // 0 = all letters transform together
+const HOLD_MS = 60;
 const LAST_WORD_MS = 250;
+
+// Fisher–Yates: a fresh random order of 0…n-1
+function shuffled(n: number) {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
 
 const BG = '#1E1611';
 const EASE = [0.76, 0, 0.24, 1] as const;
 
-export function Loader({ onDone }: { onDone: () => void }) {
-  const [index, setIndex] = useState(0);
-  const [size] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
-
-  // onDone is recreated on every App render — keep the timers from resetting
-  const onDoneRef = useRef(onDone);
-  onDoneRef.current = onDone;
+function MorphingWords({ onComplete }: { onComplete: () => void }) {
+  const pathRefs = useRef<(SVGPathElement | null)[]>([]);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    if (index === WORDS.length - 1) {
-      const t = setTimeout(() => onDoneRef.current(), LAST_WORD_MS);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setIndex((i) => i + 1), index === 0 ? FIRST_WORD_MS : WORD_MS);
-    return () => clearTimeout(t);
-  }, [index]);
+    const paths = pathRefs.current;
+    let cancelled = false;
+    let timeline: { kill: () => void } | null = null;
+    let exitTimer = 0;
+    const finish = () => {
+      exitTimer = window.setTimeout(() => !cancelled && onCompleteRef.current(), LAST_WORD_MS);
+    };
+
+    // GSAP loads while the first greeting is on screen
+    (async () => {
+      const [{ gsap }, { MorphSVGPlugin }] = await Promise.all([import('gsap'), import('gsap/MorphSVGPlugin')]);
+      if (cancelled) return;
+      gsap.registerPlugin(MorphSVGPlugin);
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // A step fits the latest-starting morph plus a beat where the word is fully formed,
+      // so one letter's morphs never overlap
+      const step = (SPREAD_MS + MORPH_MS + HOLD_MS) / 1000;
+      const tl = gsap.timeline({ delay: FIRST_WORD_MS / 1000, onComplete: finish });
+
+      WORDS.slice(1).forEach(({ shapes }, w) => {
+        const at = w * step;
+        // Every shape on screen becomes a randomly chosen shape of the next word; together
+        // they still spell it out, but pieces travel across instead of sweeping in order
+        const target = shuffled(shapes.length);
+        paths.forEach((path, i) => {
+          if (!path) return;
+          const d = shapes[target[i]];
+          // Reduced motion: swap outlines without the morph
+          if (reduced) tl.set(path, { attr: { d } }, at + step);
+          else tl.to(path, { morphSVG: { shape: d, type: 'linear' }, duration: MORPH_MS / 1000, ease: 'power2.inOut' }, at + (Math.random() * SPREAD_MS) / 1000);
+        });
+      });
+      // Keep the last word on screen for its hold before the exit
+      tl.to({}, { duration: HOLD_MS / 1000 });
+      timeline = tl;
+    })();
+
+    return () => {
+      cancelled = true;
+      timeline?.kill();
+      window.clearTimeout(exitTimer);
+    };
+  }, []);
+
+  return (
+    <>
+      <svg
+        viewBox={GREETING_VIEWBOX}
+        style={{ height: `${GREETING_HEIGHT_EM}em` }}
+        className="block w-auto max-w-[90vw] overflow-visible"
+        aria-hidden
+      >
+        {WORDS[0].shapes.map((d, i) => (
+          <path key={i} ref={(el) => { pathRefs.current[i] = el; }} d={d} fill="currentColor" />
+        ))}
+      </svg>
+      <span className="sr-only">Loading</span>
+    </>
+  );
+}
+
+export function Loader({ onDone }: { onDone: () => void }) {
+  const [size] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+
+  // index.html paints the page in the loader colour before React mounts; the loader
+  // covers the screen now, so hand the background back to the theme
+  useEffect(() => {
+    document.documentElement.style.removeProperty('background');
+  }, []);
 
   // The panel extends 300px below the viewport with a bowed bottom edge,
   // which flattens as the panel slides up
@@ -56,11 +131,11 @@ export function Loader({ onDone }: { onDone: () => void }) {
     >
       <motion.p
         className="relative z-[1] text-white font-sans"
-        style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', lineHeight: 1 }}
+        style={{ fontSize: 'clamp(2.4rem, 4.8vw, 3.3rem)', lineHeight: 1 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.75, transition: { duration: 1, delay: 0.2 } }}
       >
-        {WORDS[index]}
+        <MorphingWords onComplete={onDone} />
       </motion.p>
 
       <svg
