@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { initSmoothScroll, destroySmoothScroll } from './lib/scroll';
-import { useMobileLayout } from './hooks/useMobileLayout';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { useKonamiCode } from './hooks/useKonamiCode';
 import { useMobileSecret } from './hooks/useMobileSecret';
@@ -30,7 +29,6 @@ const isAdmin = path === '/admin';
 const isNotFound = !KNOWN_PATHS.includes(path);
 
 export default function App() {
-  const mobile = useMobileLayout();
   useVisitorTracking();
   const { done, dismiss } = useLoader();
   const [glitch, setGlitch] = useState(false);
@@ -41,7 +39,7 @@ export default function App() {
   useEffect(() => {
     initSmoothScroll();
     return destroySmoothScroll;
-  }, [mobile]);
+  }, []);
 
   if (isAdmin) {
     return (
@@ -76,22 +74,17 @@ export default function App() {
           <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
             <Hero ready={done} />
           </div>
-          {/* On mobile, sections render already revealed. Dozens of reveal
-              animations starting mid-scroll make iOS Safari re-rasterize text
-              as each one ends, which reads as shimmering on the first pass. */}
-          <AnimatePresence initial={!mobile}>
-            <div key="sections" className="relative bg-bg" style={{ zIndex: 1 }}>
-              <Intro />
-              <Projects />
-              <About />
-              <Skills />
-              <Experience />
-              <GitHubContributions />
-              <Courses />
-              <Blog />
-              <Contact />
-            </div>
-          </AnimatePresence>
+          <div className="relative bg-bg" style={{ zIndex: 1 }}>
+            <Intro />
+            <Projects />
+            <About />
+            <Skills />
+            <Experience />
+            <GitHubContributions />
+            <Courses />
+            <Blog />
+            <Contact />
+          </div>
         </main>
         <Footer />
         {done && <ScrollBar />}

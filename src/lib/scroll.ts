@@ -5,15 +5,16 @@ let animationFrame = 0;
 
 /**
  * Lenis inertia smooth scroll, phantom.land style.
- * Keep native scrolling on touch devices, small screens, and reduced motion.
+ * Touch swipes are smoothed too (syncTouch); only reduced motion keeps native scrolling.
  */
 export function initSmoothScroll() {
   if (lenis) return lenis;
-  if (window.matchMedia('(prefers-reduced-motion: reduce), (max-width: 767px), (pointer: coarse)').matches) return null;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
 
   lenis = new Lenis({
     lerp: 0.1,
     smoothWheel: true,
+    syncTouch: true,
   });
 
   const raf = (time: number) => {
