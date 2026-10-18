@@ -396,6 +396,7 @@ body {
 
 /* Avoid overlapping viewport-sized layers on the mobile scroll compositor. */
 @media (max-width: 767px), (pointer: coarse) {
+  .hero-curtain { position: relative; }
   #experience { overflow-x: clip; }
   /* Every blurred card, skill pill and badge is its own backdrop layer that the
      compositor re-samples each scroll frame, which flickers on mobile GPUs. They
