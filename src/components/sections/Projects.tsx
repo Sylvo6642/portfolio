@@ -3,10 +3,11 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useIsCoarsePointer } from '../../hooks/useMousePosition';
 import { VideoModal } from '../shared/VideoModal';
-import { PERSONAL_PROJECTS, PROFESSIONAL_CARDS, type PersonalProject } from '../../data/projects';
+import { PERSONAL_PROJECTS, PROFESSIONAL_CARDS, type PersonalProject, type ProjectStatus } from '../../data/projects';
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 const PROJECTS = PERSONAL_PROJECTS.filter((p) => !p.hidden);
+const STATUS_LABEL: Record<ProjectStatus, string> = { live: 'Live', wip: 'In development', private: 'Private build' };
 
 /* CommitGrid has no screenshot — draw a small contributions heatmap instead */
 function CommitGridArt() {
@@ -100,8 +101,16 @@ function ProjectDetails({ p, onVideoOpen }: { p: PersonalProject; onVideoOpen: (
           <PreviewArt p={p} />
         </div>
         <div className="flex flex-col">
-          <p className="eyebrow">{p.tag}</p>
-          <p className="mt-4 text-[15px] md:text-base leading-[1.75] text-fg/80">{p.description}</p>
+          <p className="eyebrow">{STATUS_LABEL[p.status]}</p>
+          <p className="mt-4 text-[17px] md:text-lg leading-[1.55] tracking-[-0.01em]">{p.summary}</p>
+          <ul className="mt-5 space-y-2.5">
+            {p.highlights.map((h) => (
+              <li key={h} className="flex gap-3 text-[15px] leading-[1.6] text-fg/75">
+                <span aria-hidden className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                {h}
+              </li>
+            ))}
+          </ul>
           <ul className="mt-6 flex flex-wrap gap-2" aria-label="Tech stack">
             {p.tech.map((t) => (
               <li key={t} className="rounded-full bg-accent-soft text-accent-soft-text px-3 py-1 text-[13px] text-fg/80">{t}</li>
