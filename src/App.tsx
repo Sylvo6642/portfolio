@@ -9,6 +9,7 @@ import { useMobileSecret } from './hooks/useMobileSecret';
 import { TerminalGlitch } from './components/layout/TerminalGlitch';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { ScrollBar } from './components/layout/ScrollBar';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { Intro } from './components/sections/Intro';
@@ -93,6 +94,7 @@ export default function App() {
           </AnimatePresence>
         </main>
         <Footer />
+        {done && <ScrollBar />}
       </MotionConfig>
     </ThemeProvider>
   );

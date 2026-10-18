@@ -53,6 +53,12 @@ export function scrollToId(id: string) {
   }
 }
 
+// Jump straight to a scroll position (dragging the custom scrollbar), bypassing smoothing
+export function scrollToY(y: number) {
+  if (lenis) lenis.scrollTo(y, { immediate: true });
+  else window.scrollTo({ top: y, behavior: 'instant' });
+}
+
 export function scrollToTop() {
   if (lenis) {
     lenis.scrollTo(0, { duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
