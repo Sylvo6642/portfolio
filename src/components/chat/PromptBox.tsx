@@ -97,9 +97,7 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
         )}
         </div>
         <div className="mt-2 flex items-center justify-between gap-3">
-          <span className="text-[12px] text-muted">
-            {nearLimit ? `${value.length}/${MAX_CHARS}` : 'AI can make mistakes'}
-          </span>
+          <span className="text-[12px] text-muted">{nearLimit && `${value.length}/${MAX_CHARS}`}</span>
           <button
             type="submit"
             disabled={!canSend}
