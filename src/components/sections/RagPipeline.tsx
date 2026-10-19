@@ -44,7 +44,7 @@ const QUERIES: Query[] = [
     reranked: [{ id: 1, score: 0.94 }, { id: 5, score: 0.91 }, { id: 2, score: 0.77 }],
     contextTokens: 1184,
     questionTokens: 9,
-    answer: 'He built Clausify, an LLM pipeline that flags risky contract clauses [1], and this site\'s tool-calling assistant on gpt-4o-mini [5].',
+    answer: "He built Clausify, an LLM pipeline that flags risky contract clauses [1], and this site's tool-calling assistant on gpt-4o-mini [5].",
   },
   {
     question: 'Which frontend frameworks does he ship with?',
@@ -94,13 +94,15 @@ const NOISE = (() => {
   return Array.from({ length: 46 }, () => ({ x: 6 + rand() * 188, y: 6 + rand() * 118 }));
 })();
 
-function Label({ children }: { children: ReactNode }) {
-  return <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted">{children}</p>;
+// Small uppercase label in the site's own style (as .eyebrow)
+function Label({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <p className={`mb-2 text-[11px] uppercase tracking-[0.08em] text-muted ${className}`}>{children}</p>;
 }
 
 export function RagPipeline({ className = '' }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
+  // Low threshold: on phones the card is taller than the screen
+  const inView = useInView(ref, { amount: 0.2 });
   const reduced = useReducedMotion();
 
   const [qi, setQi] = useState(0);
@@ -160,10 +162,10 @@ export function RagPipeline({ className = '' }: { className?: string }) {
         is embedded, the closest chunks of my portfolio are retrieved and reranked, packed into the prompt, and the
         answer is generated with citations.
       </p>
-      <div aria-hidden className="rounded-2xl hairline bg-surface/50 p-4 md:p-5">
+      <div aria-hidden className="rounded-2xl hairline bg-surface/50 p-4 md:p-6">
         {/* Header: pipeline stages */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted">RAG pipeline · trace</p>
+          <Label className="mb-0">RAG pipeline · trace</Label>
           <ol className="flex flex-wrap gap-1">
             {STAGES.map((name, i) => {
               const n = i + 1;
@@ -171,7 +173,7 @@ export function RagPipeline({ className = '' }: { className?: string }) {
               return (
                 <li
                   key={name}
-                  className={`rounded-md px-2 py-0.5 font-mono text-[10px] transition-colors duration-300 ${
+                  className={`rounded-md px-2.5 py-1 text-[12px] transition-colors duration-300 ${
                     state === 'active' ? 'bg-accent text-on-accent' : state === 'done' ? 'bg-fg/[0.08] text-fg/80' : 'text-muted/70'
                   }`}
                 >
@@ -182,17 +184,16 @@ export function RagPipeline({ className = '' }: { className?: string }) {
           </ol>
         </div>
 
-        {/* Query */}
-        <div className="mt-4 rounded-xl bg-bg px-3.5 py-2.5 ring-1 ring-edge">
-          <span className="font-mono text-[10px] text-muted">query › </span>
-          <span className="text-[14px] text-fg">{shownQuestion}</span>
-          {s === 0 && <span className="caret ml-px inline-block h-[1em] w-px translate-y-[2px] bg-fg" />}
-        </div>
+        <div className="mt-5 grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.25fr)] md:gap-6">
+          {/* 1: query, embedding, prompt assembly */}
+          <div className="flex flex-col">
+            <Label>Query</Label>
+            <div className="min-h-[68px] rounded-xl bg-bg px-3.5 py-2.5 text-[14px] leading-snug text-fg ring-1 ring-edge">
+              {shownQuestion}
+              {s === 0 && <span className="caret ml-px inline-block h-[1em] w-px translate-y-[2px] bg-fg" />}
+            </div>
 
-        <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          {/* Left: embedding + vector space */}
-          <div>
-            <Label>Embedding · {DIMS} of 1,536 dims</Label>
+            <Label className="mt-4">Embedding · {DIMS} of 1,536 dims</Label>
             <div className="flex h-10 items-center gap-[2px]">
               {vector.map((v, i) => (
                 <motion.span
@@ -205,106 +206,8 @@ export function RagPipeline({ className = '' }: { className?: string }) {
               ))}
             </div>
 
-            <div className="mt-4">
-              <Label>Vector space · top k = 4</Label>
-              <svg viewBox="0 0 200 130" className="w-full rounded-xl bg-bg ring-1 ring-edge">
-                {NOISE.map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r={1.1} fill="rgb(var(--fg) / 0.14)" />
-                ))}
-                {/* Similarity lines from the question to the retrieved chunks */}
-                {s >= 2 &&
-                  q.retrieved.map((r) => {
-                    const c = chunk(r.id);
-                    const dropped = s >= 3 && !kept.has(r.id);
-                    return (
-                      <g key={`${qi}-${r.id}`}>
-                        <motion.line
-                          x1={q.at.x} y1={q.at.y} x2={c.x} y2={c.y}
-                          stroke="rgb(var(--accent))"
-                          strokeWidth={lit(r.id) ? 1.1 : 0.7}
-                          strokeDasharray={dropped ? '2 2' : undefined}
-                          initial={{ pathLength: 0, opacity: 0 }}
-                          animate={{ pathLength: 1, opacity: dropped ? 0.25 : 0.8 }}
-                          transition={{ duration: 0.6, ease: EASE }}
-                        />
-                      </g>
-                    );
-                  })}
-                {CHUNKS.map((c) => {
-                  const inPlay = s >= 2 && q.retrieved.some((r) => r.id === c.id) && !(s >= 3 && !kept.has(c.id));
-                  return (
-                    <g key={c.id}>
-                      <motion.circle
-                        cx={c.x} cy={c.y}
-                        fill="rgb(var(--accent))"
-                        initial={false}
-                        animate={{ r: lit(c.id) ? 4.6 : inPlay ? 3.4 : 2.4, opacity: inPlay ? 1 : 0.45 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      <text x={c.x + 5} y={c.y + 2} fontSize="6" fontFamily="ui-monospace, monospace" fill="rgb(var(--fg) / 0.55)">
-                        {c.id}
-                      </text>
-                    </g>
-                  );
-                })}
-                {/* The question's embedding */}
-                <AnimatePresence>
-                  {s >= 2 && (
-                    <motion.g key={qi} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} style={{ transformOrigin: `${q.at.x}px ${q.at.y}px` }}>
-                      <circle cx={q.at.x} cy={q.at.y} r={7} fill="none" stroke="rgb(var(--fg))" strokeWidth={0.6} opacity={0.35} />
-                      <circle cx={q.at.x} cy={q.at.y} r={2.6} fill="rgb(var(--fg))" />
-                    </motion.g>
-                  )}
-                </AnimatePresence>
-              </svg>
-            </div>
-          </div>
-
-          {/* Right: retrieved / reranked context */}
-          <div>
-            <Label>{s >= 3 ? `Reranked · kept ${q.reranked.length}` : 'Retrieved chunks · cosine'}</Label>
-            <div className="flex min-h-[260px] flex-col gap-1.5">
-              {list.length === 0 && <p className="text-[12px] text-muted/70">Waiting for the query embedding…</p>}
-              <AnimatePresence mode="popLayout" initial={false}>
-                {list.map((r, i) => {
-                  const c = chunk(r.id);
-                  const inContext = s >= 4;
-                  return (
-                    <motion.div
-                      key={`${qi}-${r.id}`}
-                      layout
-                      initial={{ opacity: 0, x: 12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -12, transition: { duration: 0.25 } }}
-                      transition={{ duration: 0.45, ease: EASE, delay: s === 2 ? i * 0.12 : 0 }}
-                      onPointerEnter={() => setHovered(r.id)}
-                      onPointerLeave={() => setHovered(null)}
-                      className={`rounded-lg px-3 py-2 ring-1 transition-colors duration-300 ${
-                        lit(r.id) ? 'bg-accent/10 ring-accent' : inContext ? 'bg-bg ring-accent/40' : 'bg-bg ring-edge'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] text-accent">[{c.id}]</span>
-                        <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-muted">{c.source}</span>
-                        <span className="h-1 w-12 overflow-hidden rounded-full bg-fg/10">
-                          <motion.span
-                            className="block h-full rounded-full bg-accent"
-                            initial={false}
-                            animate={{ width: `${r.score * 100}%` }}
-                            transition={{ duration: 0.5, ease: EASE }}
-                          />
-                        </span>
-                        <span className="w-7 text-right font-mono text-[10px] tabular-nums text-fg/80">{r.score.toFixed(2)}</span>
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-fg/80">{c.text}</p>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </div>
-
-            {/* Prompt assembly */}
-            <div className={`mt-3 transition-opacity duration-300 ${s >= 4 ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`mt-auto pt-4 transition-opacity duration-300 ${s >= 4 ? 'opacity-100' : 'opacity-0'}`}>
+              <Label>Prompt</Label>
               <div className="flex h-1.5 overflow-hidden rounded-full bg-fg/10">
                 {[
                   { n: SYSTEM_TOKENS, c: 'bg-fg/40' },
@@ -321,18 +224,119 @@ export function RagPipeline({ className = '' }: { className?: string }) {
                   />
                 ))}
               </div>
-              <p className="mt-1.5 min-h-[2.6em] font-mono text-[10px] text-muted">
-                prompt = system {SYSTEM_TOKENS} + context {q.contextTokens.toLocaleString()} + query {q.questionTokens} ={' '}
+              <p className="mt-1.5 min-h-[2.8em] text-[12px] leading-snug text-muted tabular-nums">
+                system {SYSTEM_TOKENS} + context {q.contextTokens.toLocaleString()} + query {q.questionTokens} ={' '}
                 <span className="text-fg/80">{(SYSTEM_TOKENS + q.contextTokens + q.questionTokens).toLocaleString()} tokens</span>
               </p>
+            </div>
+          </div>
+
+          {/* 2: vector space */}
+          <div className="flex flex-col">
+            <Label>Vector space · top k = 4</Label>
+            <svg viewBox="0 0 200 130" className="w-full rounded-xl bg-bg ring-1 ring-edge">
+              {NOISE.map((p, i) => (
+                <circle key={i} cx={p.x} cy={p.y} r={1.1} fill="rgb(var(--fg) / 0.14)" />
+              ))}
+              {/* Similarity lines from the question to the retrieved chunks */}
+              {s >= 2 &&
+                q.retrieved.map((r) => {
+                  const c = chunk(r.id);
+                  const dropped = s >= 3 && !kept.has(r.id);
+                  return (
+                    <motion.line
+                      key={`${qi}-${r.id}`}
+                      x1={q.at.x} y1={q.at.y} x2={c.x} y2={c.y}
+                      stroke="rgb(var(--accent))"
+                      strokeWidth={lit(r.id) ? 1.1 : 0.7}
+                      strokeDasharray={dropped ? '2 2' : undefined}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: dropped ? 0.25 : 0.8 }}
+                      transition={{ duration: 0.6, ease: EASE }}
+                    />
+                  );
+                })}
+              {CHUNKS.map((c) => {
+                const inPlay = s >= 2 && q.retrieved.some((r) => r.id === c.id) && !(s >= 3 && !kept.has(c.id));
+                return (
+                  <g key={c.id}>
+                    <motion.circle
+                      cx={c.x} cy={c.y}
+                      fill="rgb(var(--accent))"
+                      initial={false}
+                      animate={{ r: lit(c.id) ? 4.6 : inPlay ? 3.4 : 2.4, opacity: inPlay ? 1 : 0.45 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <text x={c.x + 5} y={c.y + 2.5} fontSize="7" fill="rgb(var(--fg) / 0.55)">
+                      {c.id}
+                    </text>
+                  </g>
+                );
+              })}
+              {/* The question's embedding */}
+              <AnimatePresence>
+                {s >= 2 && (
+                  <motion.g key={qi} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} style={{ transformOrigin: `${q.at.x}px ${q.at.y}px` }}>
+                    <circle cx={q.at.x} cy={q.at.y} r={7} fill="none" stroke="rgb(var(--fg))" strokeWidth={0.6} opacity={0.35} />
+                    <circle cx={q.at.x} cy={q.at.y} r={2.6} fill="rgb(var(--fg))" />
+                  </motion.g>
+                )}
+              </AnimatePresence>
+            </svg>
+            <p className="mt-2 text-[12px] text-muted">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-fg align-middle" />query
+              <span className="ml-4 mr-1.5 inline-block h-2 w-2 rounded-full bg-accent align-middle" />chunks of my portfolio
+            </p>
+          </div>
+
+          {/* 3: retrieved / reranked context */}
+          <div>
+            <Label>{s >= 3 ? `Reranked · kept ${q.reranked.length}` : 'Retrieved · cosine similarity'}</Label>
+            <div className="flex min-h-[244px] flex-col gap-1.5">
+              {list.length === 0 && <p className="text-[13px] text-muted/70">Waiting for the query embedding…</p>}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {list.map((r, i) => {
+                  const c = chunk(r.id);
+                  return (
+                    <motion.div
+                      key={`${qi}-${r.id}`}
+                      layout
+                      initial={{ opacity: 0, x: 12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -12, transition: { duration: 0.25 } }}
+                      transition={{ duration: 0.45, ease: EASE, delay: s === 2 ? i * 0.12 : 0 }}
+                      onPointerEnter={() => setHovered(r.id)}
+                      onPointerLeave={() => setHovered(null)}
+                      className={`rounded-lg px-3 py-2 ring-1 transition-colors duration-300 ${
+                        lit(r.id) ? 'bg-accent/10 ring-accent' : s >= 4 ? 'bg-bg ring-accent/40' : 'bg-bg ring-edge'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-medium text-accent tabular-nums">{c.id}</span>
+                        <span className="min-w-0 flex-1 truncate text-[12px] text-muted">{c.source}</span>
+                        <span className="h-1 w-12 overflow-hidden rounded-full bg-fg/10">
+                          <motion.span
+                            className="block h-full rounded-full bg-accent"
+                            initial={false}
+                            animate={{ width: `${r.score * 100}%` }}
+                            transition={{ duration: 0.5, ease: EASE }}
+                          />
+                        </span>
+                        <span className="w-8 text-right text-[12px] tabular-nums text-fg/80">{r.score.toFixed(2)}</span>
+                      </div>
+                      <p className="mt-0.5 line-clamp-2 text-[13px] leading-snug text-fg/80">{c.text}</p>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
         {/* Generation */}
-        <div className="mt-4 min-h-[76px] rounded-xl bg-bg px-3.5 py-3 ring-1 ring-edge">
+        <div className="mt-5 rounded-xl bg-bg px-4 py-3 ring-1 ring-edge">
           <Label>Answer · grounded in {q.reranked.length} chunks</Label>
-          <p className="text-[14px] leading-relaxed text-fg">
+          <p className="min-h-[1.6em] text-[15px] leading-relaxed text-fg">
             {s < 5 && <span className="text-muted/70">—</span>}
             {s >= 5 &&
               answerWords.slice(0, shownWords).map((w, i) => {
@@ -344,7 +348,7 @@ export function RagPipeline({ className = '' }: { className?: string }) {
                     <span
                       onPointerEnter={() => setHovered(id)}
                       onPointerLeave={() => setHovered(null)}
-                      className="mx-0.5 inline-block cursor-default rounded bg-accent/15 px-1 font-mono text-[11px] text-accent"
+                      className="mx-0.5 inline-block cursor-default rounded bg-accent/15 px-1.5 text-[12px] font-medium text-accent tabular-nums"
                     >
                       {m[1]}
                     </span>
@@ -356,7 +360,7 @@ export function RagPipeline({ className = '' }: { className?: string }) {
           </p>
         </div>
 
-        <p className="mt-3 font-mono text-[10px] text-muted/70">Illustrative trace over my own portfolio content · hover a chunk or citation</p>
+        <p className="mt-3 text-[12px] text-muted/70">Illustrative trace over my own portfolio content · hover a chunk or citation</p>
       </div>
     </div>
   );
