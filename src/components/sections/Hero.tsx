@@ -21,8 +21,8 @@ function wrap(min: number, max: number, v: number) {
 }
 
 /**
- * Endless name ticker. Drifts left on its own; scrolling speeds it up and
- * scrolling back up flips its direction.
+ * Endless name ticker. Always drifts right to left, so the name reads naturally;
+ * scrolling either way speeds it up.
  */
 function NameMarquee() {
   const reduced = useReducedMotion();
@@ -31,18 +31,14 @@ function NameMarquee() {
   const velocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
   const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 4], { clamp: false });
-  const direction = useRef(1);
 
   // Four copies: shifting by one copy (25% of the row) loops seamlessly
   const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
 
   useAnimationFrame((_, delta) => {
     if (reduced) return;
-    const factor = velocityFactor.get();
-    if (factor < 0) direction.current = -1;
-    else if (factor > 0) direction.current = 1;
-    let moveBy = -direction.current * (BASE_SPEED / 4) * (delta / 1000);
-    moveBy += moveBy * Math.abs(factor);
+    let moveBy = -(BASE_SPEED / 4) * (delta / 1000);
+    moveBy += moveBy * Math.abs(velocityFactor.get());
     baseX.set(baseX.get() + moveBy);
   });
 
