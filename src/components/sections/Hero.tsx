@@ -94,7 +94,8 @@ export function Hero({ ready = true }: { ready?: boolean }) {
       aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
       <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale }}>
-        {/* Portrait in an arch, anchored to the bottom edge */}
+        {/* Cut-out portrait standing on the bottom edge; its edges are feathered and the cut-off
+            table fades out at the sides (baked into the image), so it sits straight on the hero */}
         <motion.div
           className="absolute inset-x-0 bottom-0 flex justify-center"
           style={reduced ? undefined : { y: photoY }}
@@ -102,11 +103,11 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           animate={ready ? { opacity: 1 } : undefined}
           transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <div className="w-[78vw] max-h-[72svh] md:w-auto md:h-[min(84svh,85vw)] aspect-[3/4] overflow-hidden rounded-t-full">
+          <div className="w-[96vw] max-h-[74svh] md:w-auto md:h-[min(86svh,90vw)] aspect-[1199/1312]">
             <img
-              src="/kevin-cafe.jpg"
+              src="/kevin-cutout.webp"
               alt=""
-              className="h-full w-full object-cover object-[50%_30%] select-none pointer-events-none"
+              className="h-full w-full object-contain object-bottom select-none pointer-events-none"
               draggable={false}
               decoding="async"
               fetchPriority="high"
