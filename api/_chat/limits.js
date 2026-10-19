@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Questions allowed in any rolling 24 hours
 export const LIMITS = {
-  browser: 5, // per visitor (browser id), the limit visitors see
-  ip: 25, // per IP: catches cleared storage without blocking a shared office network
+  browser: 10, // per visitor (browser id), the limit visitors see
+  ip: 40, // per IP: catches cleared storage without blocking a shared office network
   global: 300, // whole site: a hard ceiling on spend
 };
 

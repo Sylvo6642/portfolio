@@ -38,7 +38,8 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      return res.status(200).json(await getQuota(browserId, ipHash));
+      // `available` lets the page skip the chat home when the server has no key
+      return res.status(200).json({ ...(await getQuota(browserId, ipHash)), available: Boolean(process.env.OPENAI_API_KEY) });
     } catch (err) {
       console.error('chat quota failed:', err.message);
       return res.status(503).json({ error: 'unavailable' });

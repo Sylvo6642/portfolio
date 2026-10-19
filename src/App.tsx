@@ -11,6 +11,8 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollBar } from './components/layout/ScrollBar';
 import { ChatWidget } from './components/chat/ChatWidget';
+import { ChatHome } from './components/chat/ChatHome';
+import { fetchQuota } from './components/chat/quota';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { Intro } from './components/sections/Intro';
@@ -30,14 +32,35 @@ const path = window.location.pathname;
 const isAdmin = path === '/admin';
 const isNotFound = !KNOWN_PATHS.includes(path);
 
+// The chat home greets each new session on the bare home page; deep links skip it
+const HOME_KEY = 'kr-chat-home-seen';
+const wantsChatHome = (() => {
+  if (path !== '/' || window.location.hash) return false;
+  try { return sessionStorage.getItem(HOME_KEY) !== '1'; } catch { return true; }
+})();
+
 export default function App() {
   const mobile = useMobileLayout();
   useVisitorTracking();
   const { done, dismiss } = useLoader();
+  const [chatHome, setChatHome] = useState(wantsChatHome);
   const [glitch, setGlitch] = useState(false);
   const activate = () => { if (!glitch) setGlitch(true); };
   useKonamiCode(activate);
   useMobileSecret(activate);
+
+  // Without a working chat (no API key, API down) go straight to the portfolio
+  useEffect(() => {
+    if (wantsChatHome) fetchQuota().then((q) => { if (!q?.available) setChatHome(false); });
+  }, []);
+
+  const showPortfolio = () => {
+    try { sessionStorage.setItem(HOME_KEY, '1'); } catch {}
+    window.scrollTo(0, 0);
+    setChatHome(false);
+  };
+  // The hero, scrollbar and chat button make their entrance once the portfolio is in view
+  const portfolioReady = done && !chatHome;
 
   useEffect(() => {
     initSmoothScroll();
@@ -71,11 +94,14 @@ export default function App() {
         <AnimatePresence>
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
+        <AnimatePresence>
+          {chatHome && <ChatHome key="chat-home" ready={done} onExit={showPortfolio} />}
+        </AnimatePresence>
         <Navbar />
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
-            <Hero ready={done} />
+            <Hero ready={portfolioReady} />
           </div>
           {/* On mobile, sections render already revealed. Dozens of reveal
               animations starting mid-scroll make iOS Safari re-rasterize text
@@ -95,8 +121,8 @@ export default function App() {
           </AnimatePresence>
         </main>
         <Footer />
-        {done && <ScrollBar />}
-        <ChatWidget ready={done} />
+        {portfolioReady && <ScrollBar />}
+        <ChatWidget ready={portfolioReady} />
       </MotionConfig>
     </ThemeProvider>
   );

@@ -107,7 +107,15 @@ function IconButton({ label, onClick, children, active }: { label: string; onCli
   );
 }
 
-export default function ChatPanel({ onClose }: { onClose: () => void }) {
+type Props = {
+  onClose: () => void;
+  /** 'panel' is the floating chat; 'page' fills the screen as the chat home */
+  variant?: 'panel' | 'page';
+  /** Asked as soon as the panel opens (from the chat home's input) */
+  initialQuestion?: string;
+};
+
+export default function ChatPanel({ onClose, variant = 'panel', initialQuestion }: Props) {
   const { messages, sendMessage, status, error, clearError } = useChat<ChatMessage>({ chat });
   const [input, setInput] = useState('');
   const [quota, setQuota] = useState<Quota | null>(null);
@@ -116,9 +124,18 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
   });
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const asked = useRef(false);
+  const page = variant === 'page';
+  // Centres the conversation in a readable column on the full-screen page
+  const column = page ? 'mx-auto w-full max-w-2xl' : '';
 
   useEffect(() => { fetchQuota().then((q) => q && setQuota(q)); }, []);
-  useEffect(() => { inputRef.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => {
+    // Arriving with a question on a phone: let the answer show instead of the keyboard
+    if (initialQuestion && window.matchMedia('(pointer: coarse)').matches) return;
+    inputRef.current?.focus({ preventScroll: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // The latest answer carries the up-to-date quota
   const lastMeta = [...messages].reverse().find((m) => m.metadata)?.metadata;
@@ -146,6 +163,13 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
     setInput('');
   };
 
+  useEffect(() => {
+    if (!initialQuestion || asked.current) return;
+    asked.current = true;
+    ask(initialQuestion);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestion]);
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     ask(input);
@@ -159,8 +183,8 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="on-ink flex h-full flex-col overflow-hidden md:rounded-3xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10">
-      <header className="flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
+    <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-3xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
+      <header className={`flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 ${page ? 'md:px-8' : ''}`}>
         <img src="/kevin.jpg" alt="" className="h-9 w-9 rounded-full object-cover object-[50%_30%]" />
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-medium leading-tight">Ask AI Kevin</p>
@@ -169,13 +193,19 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
         <IconButton label={showInternals ? 'Hide behind the scenes' : 'Show behind the scenes'} onClick={toggleInternals} active={showInternals}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M8 6l-6 6 6 6M16 6l6 6-6 6" /></svg>
         </IconButton>
-        <IconButton label="Close chat" onClick={onClose}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M6 6l12 12M18 6L6 18" /></svg>
-        </IconButton>
+        {page ? (
+          <button type="button" onClick={onClose} className="ml-1 shrink-0 rounded-full hairline px-3.5 py-2 text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg">
+            View portfolio <span aria-hidden>↓</span>
+          </button>
+        ) : (
+          <IconButton label="Close chat" onClick={onClose}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </IconButton>
+        )}
       </header>
 
       <div ref={listRef} className="relative flex-1 overflow-y-auto overscroll-contain px-4 py-4" data-lenis-prevent aria-live="polite">
-        <div className="flex flex-col gap-4">
+        <div className={`flex flex-col gap-4 ${column}`}>
           <div className="flex max-w-[92%] flex-col gap-3">
             <p className="text-[14px] leading-relaxed text-fg/90">
               Hey, I'm an AI version of Kevin. Ask me about my projects, experience, stack, or whether I'm open to new roles.
@@ -211,36 +241,38 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
       </div>
 
       <form onSubmit={onSubmit} className="border-t border-edge px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
-        <div className="flex items-end gap-2 rounded-2xl bg-surface px-3 py-2 ring-1 ring-edge focus-within:ring-accent">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input); }
-            }}
-            rows={1}
-            maxLength={MAX_CHARS}
-            disabled={limited}
-            placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
-            aria-label="Your question"
-            // 16px keeps iOS Safari from zooming in on focus
-            className="max-h-28 min-h-[24px] flex-1 resize-none bg-transparent py-1 text-[16px] leading-6 text-fg placeholder:text-muted focus:outline-none disabled:opacity-50 md:text-[14px]"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || busy || limited}
-            aria-label="Send"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent transition-opacity disabled:opacity-30"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-          </button>
-        </div>
-        <div className="mt-2 flex items-center justify-between gap-3 px-1 font-mono text-[10px] text-muted">
-          <span>
-            {quota ? `${quota.remaining} of ${quota.limit} questions left today` : '5 questions a day'}
-          </span>
-          <span>{input.length > MAX_CHARS - 60 ? `${input.length}/${MAX_CHARS}` : 'AI can make mistakes'}</span>
+        <div className={column}>
+          <div className="flex items-end gap-2 rounded-2xl bg-surface px-3 py-2 ring-1 ring-edge focus-within:ring-accent">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input); }
+              }}
+              rows={1}
+              maxLength={MAX_CHARS}
+              disabled={limited}
+              placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
+              aria-label="Your question"
+              // 16px keeps iOS Safari from zooming in on focus
+              className="max-h-28 min-h-[24px] flex-1 resize-none bg-transparent py-1 text-[16px] leading-6 text-fg placeholder:text-muted focus:outline-none disabled:opacity-50 md:text-[14px]"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || busy || limited}
+              aria-label="Send"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent transition-opacity disabled:opacity-30"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+            </button>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-3 px-1 font-mono text-[10px] text-muted">
+            <span>
+              {quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
+            </span>
+            <span>{input.length > MAX_CHARS - 60 ? `${input.length}/${MAX_CHARS}` : 'AI can make mistakes'}</span>
+          </div>
         </div>
       </form>
     </div>
