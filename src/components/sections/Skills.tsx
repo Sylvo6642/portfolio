@@ -100,7 +100,6 @@ function SkillPill({ name, color }: { name: string; color: string }) {
       className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium hairline cursor-default select-none"
       style={{
         background: 'rgb(var(--bg) / 0.6)',
-        backdropFilter: 'blur(8px)',
         transition: 'background 0.25s, border-color 0.25s',
       }}
       onMouseEnter={(e) => {
@@ -181,7 +180,7 @@ export function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-              className="hairline p-5 bg-bg/40 backdrop-blur-sm flex flex-col gap-2 hover:bg-fg/[0.04] transition-colors"
+              className="hairline p-5 bg-bg/40 flex flex-col gap-2 hover:bg-fg/[0.04] transition-colors"
             >
               <h4 className="font-medium text-base tracking-[-0.01em]">{item.title}</h4>
               <p className="text-xs text-fg/55 leading-relaxed">{item.description}</p>

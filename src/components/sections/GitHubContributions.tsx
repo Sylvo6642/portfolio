@@ -14,6 +14,8 @@ export function GitHubContributions() {
   const ref = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
+  // The busiest days glow on a loop; only run it while the graph is on screen
+  const onScreen = useInView(ref);
 
   useEffect(() => {
     fetch(EDGE_FN_URL, {
@@ -56,11 +58,12 @@ export function GitHubContributions() {
 
         <div ref={ref} className="mt-12">
           {!data && (
-            <div className="flex gap-1 flex-wrap">
+            // One pulse for the whole placeholder rather than one per cell
+            <div className="flex gap-1 flex-wrap animate-pulse">
               {Array.from({ length: 52 * 7 }).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-sm animate-pulse"
+                  className="rounded-sm"
                   style={{ width: CELL, height: CELL, background: 'rgb(var(--edge))' }}
                 />
               ))}
@@ -85,6 +88,7 @@ export function GitHubContributions() {
                 lightColors={LIGHT_COLORS}
                 theme="auto"
                 cellShape="square"
+                pulseHighActivity={onScreen}
                 pulseIntensity={0.5}
                 pulseDuration={2.4}
                 pulseColor="#B9803F"

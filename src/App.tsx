@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { initSmoothScroll, destroySmoothScroll } from './lib/scroll';
@@ -79,6 +79,24 @@ export default function App() {
     return destroySmoothScroll;
   }, [mobile]);
 
+  // Once the sections have slid all the way over the sticky hero, stop drawing it: its ticker
+  // and spinning globe otherwise keep costing frames behind the rest of the page
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [heroCovered, setHeroCovered] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const height = heroRef.current?.offsetHeight ?? window.innerHeight;
+      setHeroCovered(window.scrollY > height + 50);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
+  }, []);
+
   if (isAdmin) {
     return (
       <ThemeProvider>
@@ -112,7 +130,7 @@ export default function App() {
         <Navbar />
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
-          <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
+          <div ref={heroRef} className="hero-curtain sticky top-0" style={{ zIndex: 0, visibility: heroCovered ? 'hidden' : undefined }}>
             <Hero ready={portfolioReady} delay={fromChatHome ? 0.5 : 0} />
           </div>
           {/* On mobile, sections render already revealed. Dozens of reveal
