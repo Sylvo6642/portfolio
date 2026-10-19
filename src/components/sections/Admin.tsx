@@ -21,6 +21,21 @@ type Message = {
   created_at: string;
 };
 
+type ChatLog = {
+  id: string;
+  created_at: string;
+  browser_id: string;
+  status: 'pending' | 'ok' | 'error';
+  question: string;
+  answer: string | null;
+  tools: string[];
+  input_tokens: number | null;
+  output_tokens: number | null;
+  latency_ms: number | null;
+  cost_usd: number | null;
+  error: string | null;
+};
+
 function parseBrowser(ua: string | null): string {
   if (!ua) return '—';
   const u = ua.toLowerCase();
@@ -81,7 +96,8 @@ export function Admin() {
   const [error, setError] = useState('');
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [tab, setTab] = useState<'visitors' | 'messages'>('visitors');
+  const [chats, setChats] = useState<ChatLog[]>([]);
+  const [tab, setTab] = useState<'visitors' | 'messages' | 'chats'>('visitors');
   const [loading, setLoading] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
 
@@ -131,15 +147,19 @@ export function Admin() {
     Promise.all([
       supabase.from('visitor_logs').select('*').order('visited_at', { ascending: false }).limit(100),
       supabase.from('messages').select('*').order('created_at', { ascending: false }),
-    ]).then(([v, m]) => {
+      supabase.from('chat_logs').select('*').order('created_at', { ascending: false }).limit(200),
+    ]).then(([v, m, c]) => {
       setVisitors((v.data as Visitor[]) ?? []);
       setMessages((m.data as Message[]) ?? []);
+      setChats((c.data as ChatLog[]) ?? []);
       setLoading(false);
     });
   }, [authed]);
 
   const uniqueIPs = new Set(visitors.map(v => v.ip)).size;
   const uniqueCountries = new Set(visitors.map(v => v.country).filter(Boolean)).size;
+  const chatSpend = chats.reduce((sum, c) => sum + Number(c.cost_usd ?? 0), 0);
+  const chatVisitors = new Set(chats.map(c => c.browser_id)).size;
 
   if (!authed) {
     return (
@@ -228,15 +248,16 @@ export function Admin() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
             <StatCard label="Total Visits" value={visitors.length} />
             <StatCard label="Unique IPs" value={uniqueIPs} />
             <StatCard label="Countries" value={uniqueCountries} />
             <StatCard label="Messages" value={messages.length} />
+            <StatCard label="AI Chats" value={chats.length} />
           </div>
 
           <div className="flex gap-1 mb-6 border-b border-fg/10">
-            {(['visitors', 'messages'] as const).map(t => (
+            {(['visitors', 'messages', 'chats'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
@@ -311,6 +332,43 @@ export function Admin() {
                 ))}
                 {messages.length === 0 && (
                   <p className="py-12 text-center text-muted font-mono text-xs">no messages yet</p>
+                )}
+              </motion.div>
+            )}
+
+            {tab === 'chats' && (
+              <motion.div
+                key="chats"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                className="space-y-4"
+              >
+                <p className="font-mono text-xs text-muted">
+                  {chatVisitors} visitors · ${chatSpend.toFixed(4)} spent on the last {chats.length} questions
+                </p>
+                {chats.map(c => (
+                  <div key={c.id} className="rounded-xl border border-fg/10 bg-fg/[0.02] p-6">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <p className="font-medium">{c.question}</p>
+                      <p className="font-mono text-xs text-muted whitespace-nowrap">{formatDate(c.created_at)}</p>
+                    </div>
+                    {c.answer && <p className="text-sm text-fg/80 leading-relaxed whitespace-pre-wrap">{c.answer}</p>}
+                    {c.error && <p className="font-mono text-xs text-red-400">{c.error}</p>}
+                    <p className="mt-3 font-mono text-[10px] text-muted">
+                      {[
+                        c.status,
+                        c.tools.length ? c.tools.join(', ') : null,
+                        c.input_tokens != null ? `${c.input_tokens} → ${c.output_tokens} tokens` : null,
+                        c.latency_ms != null ? `${(c.latency_ms / 1000).toFixed(1)}s` : null,
+                        c.cost_usd != null ? `$${Number(c.cost_usd).toFixed(5)}` : null,
+                        `visitor ${c.browser_id.slice(0, 8)}`,
+                      ].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                ))}
+                {chats.length === 0 && (
+                  <p className="py-12 text-center text-muted font-mono text-xs">no chats yet</p>
                 )}
               </motion.div>
             )}
