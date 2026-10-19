@@ -14,19 +14,18 @@ type Props = {
   disabled?: boolean;
   /** Sending is blocked (an answer is still streaming) */
   busy?: boolean;
-  /** Small text under the box: left (quota) and right (model) */
-  footerLeft?: ReactNode;
-  footerRight?: ReactNode;
+  /** Small text under the box (the quota) */
+  footer?: ReactNode;
   /** 'lg' on the chat home, 'md' in the conversation */
   size?: 'lg' | 'md';
 };
 
 /**
  * Rounded prompt box: the question on top, a toolbar row with the send button
- * underneath, and quiet details below the box.
+ * underneath, and the quota below the box.
  */
 export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptBox(
-  { value, onChange, onSubmit, placeholder, disabled, busy, footerLeft, footerRight, size = 'md' },
+  { value, onChange, onSubmit, placeholder, disabled, busy, footer, size = 'md' },
   ref,
 ) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -111,12 +110,7 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
           </button>
         </div>
       </div>
-      {(footerLeft || footerRight) && (
-        <div className="mt-2 flex items-center justify-between gap-3 px-3 text-[12px] text-muted">
-          <span>{footerLeft}</span>
-          <span>{footerRight}</span>
-        </div>
-      )}
+      {footer && <p className="mt-2 px-3 text-[12px] text-muted">{footer}</p>}
     </form>
   );
 });

@@ -99,7 +99,6 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
 
             <motion.div {...enter(0)} className="relative">
               <img src="/kevin.jpg" alt="" className="h-20 w-20 rounded-full object-cover object-[50%_30%] md:h-24 md:w-24" />
-              <span aria-hidden className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-[#5BB974] ring-[3px] ring-bg" />
             </motion.div>
 
             <motion.p {...enter(1)} className="mt-6 text-center text-[17px] text-muted md:text-xl">
@@ -118,8 +117,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
                 onChange={setInput}
                 onSubmit={ask}
                 placeholder={HINTS}
-                footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
-                footerRight={quota?.model}
+                footer={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
               />
             </motion.div>
 

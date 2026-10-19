@@ -142,7 +142,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
   // The latest answer carries the up-to-date quota
   const lastMeta = [...messages].reverse().find((m) => m.metadata)?.metadata;
   useEffect(() => {
-    if (lastMeta) setQuota({ remaining: lastMeta.remaining, limit: lastMeta.limit, resetAt: lastMeta.resetAt, model: lastMeta.model });
+    if (lastMeta) setQuota({ remaining: lastMeta.remaining, limit: lastMeta.limit, resetAt: lastMeta.resetAt });
   }, [lastMeta]);
 
   // Pin the newest question to the top so a tall card streams in below it
@@ -248,8 +248,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
             disabled={limited}
             busy={busy}
             placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
-            footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
-            footerRight={page ? quota?.model : undefined}
+            footer={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
           />
         </div>
       </div>
