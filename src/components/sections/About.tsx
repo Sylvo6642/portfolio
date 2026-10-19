@@ -14,9 +14,12 @@ const STATS = [
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
 
-// The stretch of the pinned scroll where the slides move sideways; it holds on the first
-// slide a little longer, so its reveal can finish before sliding
-const TRAVEL: [number, number] = [0.12, 0.94];
+// The pinned scroll, in stages: the first slide writes itself in (see HorizontalAbout), then
+// fades out while the second fades in over it and writes itself in the same way, then the
+// remaining slides move in sideways
+const FADE: [number, number] = [0.12, 0.18];
+const TRAVEL_REVEAL: [number, number] = [0.18, 0.37];
+const SLIDE: [number, number] = [0.42, 0.94];
 
 const PANELS = [
   { id: 'intro' },
@@ -164,9 +167,9 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
 }
 
 /* ─── Panel 2: Travel ─── */
-// Writes itself in as the slide arrives from the right (see HorizontalAbout)
+// Fades in over the first slide and writes itself in the same way (see HorizontalAbout)
 function PanelTravel({ progress }: { progress: MotionValue<number> }) {
-  const photoStyle = useRevealStyle(progress, 0.1, 0.5, { x: 40 });
+  const photoStyle = useRevealStyle(progress, 0, 0.4, { x: 40 });
   const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
 
   return (
@@ -178,7 +181,7 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
         <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
           <RevealText
             progress={progress}
-            range={[0, 0.5]}
+            range={[0.05, 0.5]}
             segments={['Building from ', { text: 'Kerala', className: 'stroke-text' }, ', happiest ', { text: 'somewhere new', className: 'stroke-text' }, '.']}
           />
         </h2>
@@ -466,20 +469,9 @@ function PanelBeyond() {
   );
 }
 
-/* ─── Progress dot — derives its own active range from its index ─── */
-function ProgressDot({ progress, index, count }: { progress: MotionValue<number>; index: number; count: number }) {
-  // Map overall scroll progress (within the travel window) to this dot's band.
-  const [start, end] = TRAVEL;
-  const span = (end - start) / count;
-  const lo = start + index * span;
-  const hi = lo + span;
-  const mid = (lo + hi) / 2;
-
-  const opacity = useTransform(
-    progress,
-    [lo - span * 0.5, mid, hi + span * 0.5],
-    [0.35, 1, 0.35],
-  );
+/* ─── Progress dot — lights up while its slide is the one on screen ─── */
+function ProgressDot({ position, index }: { position: MotionValue<number>; index: number }) {
+  const opacity = useTransform(position, [index - 1, index, index + 1], [0.35, 1, 0.35]);
   const width = useTransform(opacity, [0.35, 1], [6, 20]);
 
   return (
@@ -514,15 +506,25 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   // The first slide reveals from when its heading is well into view (section top 20% down)
   // until partway into the pinned stretch, before the slides start moving sideways
   const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -45%']);
-  // The travel slide writes itself in while it slides into place: from a little after the
-  // slides start moving until it's fully on screen
-  const step = (TRAVEL[1] - TRAVEL[0]) / (PANELS.length - 1);
-  const travelProgress = useForwardOnly(useTransform(scrollYProgress, [TRAVEL[0] + step * 0.3, TRAVEL[0] + step], [0, 1]));
+  // The travel slide writes itself in once the first has faded out
+  const travelProgress = useForwardOnly(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
+
+  // The first two slides share a screen and cross-fade; this follows the scroll both ways (only
+  // the writing-in is one-way), so scrolling back up brings the first slide back
+  const introOpacity = useTransform(scrollYProgress, FADE, [1, 0]);
+  const introY = useTransform(scrollYProgress, FADE, [0, -24]);
+  const travelOpacity = useTransform(scrollYProgress, FADE, [0, 1]);
+  // Only the visible one takes the mouse (the photo tilts on hover)
+  const introPointer = useTransform(introOpacity, (v) => (v > 0.5 ? 'auto' : 'none'));
+  const travelPointer = useTransform(travelOpacity, (v) => (v > 0.5 ? 'auto' : 'none'));
+
+  // Which slide is on screen, 0 to 4, for the progress dots
+  const position = useTransform(scrollYProgress, [FADE[0], FADE[1], SLIDE[0], SLIDE[1]], [0, 1, 1, PANELS.length - 1]);
 
   // Follows scroll directly: Lenis already smooths the page, and a spring on top of it
   // made the slides trail behind the scroll
-  const totalShift = -(PANELS.length - 1) * vw;
-  const x = useTransform(scrollYProgress, TRAVEL, [0, totalShift]);
+  const totalShift = -(PANELS.length - 2) * vw;
+  const x = useTransform(scrollYProgress, SLIDE, [0, totalShift]);
 
   // Native document flow avoids resizing/scaling an entire sticky track as
   // mobile browser chrome expands and collapses during a swipe.
@@ -556,7 +558,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
           <div className="flex items-center gap-2">
             {PANELS.map((_, i) => (
-              <ProgressDot key={i} progress={scrollYProgress} index={i} count={PANELS.length} />
+              <ProgressDot key={i} position={position} index={i} />
             ))}
           </div>
         </div>
@@ -567,17 +569,15 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
           style={{ x, willChange: 'transform' }}
           className="flex h-full"
         >
-          {/* Panel 1 — Intro */}
+          {/* Panels 1 and 2 — Intro, then Travel, stacked on one screen */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelIntro progress={introProgress} />
-            </div>
-          </div>
-
-          {/* Panel 2 — Travel */}
-          <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelTravel progress={travelProgress} />
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 grid items-center">
+              <motion.div style={{ opacity: introOpacity, y: introY, pointerEvents: introPointer }} className="col-start-1 row-start-1">
+                <PanelIntro progress={introProgress} />
+              </motion.div>
+              <motion.div style={{ opacity: travelOpacity, pointerEvents: travelPointer }} className="col-start-1 row-start-1">
+                <PanelTravel progress={travelProgress} />
+              </motion.div>
             </div>
           </div>
 
