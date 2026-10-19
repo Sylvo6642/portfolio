@@ -20,6 +20,51 @@ const themeToggle = (
   </div>
 );
 
+const SHRINK_S = 0.6;
+const FULL = 'inset(0px 0px 0px 0px round 0px)';
+
+/**
+ * Where the screen shrinks to on "View portfolio": the floating chat button, which mounts in
+ * the same commit. Measured when the exit starts (variant functions run then); its centre is
+ * unaffected by its scale-in, and offsetWidth/Height ignore transforms.
+ */
+function launcherTarget() {
+  const el = document.querySelector<HTMLElement>('[data-chat-launcher]');
+  if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  const r = el.getBoundingClientRect();
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
+  const left = r.left + r.width / 2 - w / 2;
+  const top = r.top + r.height / 2 - h / 2;
+  return { left, top, w, h, vw: window.innerWidth, vh: window.innerHeight };
+}
+
+// The edges close in on the button while the content is pulled towards it, then it all fades
+// into the button. Without a button (or with Reduce Motion) it simply fades.
+const shrinkFrame = {
+  exit: () => {
+    const t = launcherTarget();
+    if (!t) return { opacity: 0, transition: { duration: 0.3 } };
+    return {
+      clipPath: `inset(${t.top}px ${t.vw - t.left - t.w}px ${t.vh - t.top - t.h}px ${t.left}px round ${t.h / 2}px)`,
+      opacity: [1, 1, 0],
+      transition: { duration: SHRINK_S, ease: EASE, opacity: { duration: SHRINK_S, times: [0, 0.7, 1] } },
+    };
+  },
+};
+const shrinkContent = {
+  exit: () => {
+    const t = launcherTarget();
+    if (!t) return {};
+    return {
+      x: t.left + t.w / 2 - t.vw / 2,
+      y: t.top + t.h / 2 - t.vh / 2,
+      scale: 0.2,
+      transition: { duration: SHRINK_S, ease: EASE },
+    };
+  },
+};
+
 const QUICK = [
   { label: 'Me', question: 'Who are you and what do you do?' },
   { label: 'Projects', question: 'Show me your projects' },
@@ -83,7 +128,9 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
     <motion.div
       ref={rootRef}
       className="fixed inset-0 z-[85] h-[100dvh] bg-bg text-fg"
-      exit={{ y: '-100%', transition: { duration: 0.9, ease: EASE } }}
+      style={{ clipPath: FULL }}
+      variants={shrinkFrame}
+      exit="exit"
       data-lenis-prevent
     >
       {/* The 404 page's network of dots, linking up around the cursor; only behind the prompt,
@@ -102,81 +149,84 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
           </motion.div>
         )}
       </AnimatePresence>
-      <AnimatePresence mode="wait" initial={false}>
-        {question === null ? (
-          <motion.section
-            key="home"
-            aria-label="Ask AI Kevin"
-            className="relative flex h-full flex-col items-center justify-center overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]"
-            exit={{ opacity: 0, y: -16, transition: { duration: 0.3, ease: 'easeIn' } }}
-          >
-            <motion.div {...enter(0)} className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] sm:right-6 md:right-8 md:top-7">
-              {themeToggle}
-            </motion.div>
-
-            <motion.div {...enter(0)} className="relative">
-              <img src="/ai-kevin.webp" alt="" className="h-28 w-28 object-contain md:h-36 md:w-36" />
-            </motion.div>
-
-            <motion.p {...enter(1)} className="mt-6 text-center text-[17px] text-muted md:text-xl">
-              Hey, I'm Kevin <span aria-hidden>👋</span> Full-Stack &amp; AI Engineer
-            </motion.p>
-
-            <motion.h2 {...enter(2)} className="display-type mt-3 text-center text-[clamp(3rem,11vw,8.5rem)]">
-              Ask me <span className="stroke-text">anything</span>
-            </motion.h2>
-
-            <motion.div {...enter(3)} className="mt-8 w-full max-w-2xl md:mt-12">
-              <PromptBox
-                ref={inputRef}
-                size="lg"
-                value={input}
-                onChange={setInput}
-                onSubmit={ask}
-                placeholder={HINTS}
-                footer={quota ? `${quota.remaining} of ${quota.limit} questions left` : '10 questions'}
-              />
-            </motion.div>
-
-            <motion.div {...enter(4)} className="mt-5 flex max-w-xl flex-wrap justify-center gap-2">
-              {QUICK.map((q) => (
+      {/* Inherits the "exit" variant from the frame, so the content is pulled in with it */}
+      <motion.div variants={shrinkContent} className="relative h-full">
+        <AnimatePresence mode="wait" initial={false}>
+          {question === null ? (
+            <motion.section
+              key="home"
+              aria-label="Ask AI Kevin"
+              className="relative flex h-full flex-col items-center justify-center overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]"
+              exit={{ opacity: 0, y: -16, transition: { duration: 0.3, ease: 'easeIn' } }}
+            >
+              <motion.div {...enter(0)} className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] sm:right-6 md:right-8 md:top-7">
+                {themeToggle}
+              </motion.div>
+  
+              <motion.div {...enter(0)} className="relative">
+                <img src="/ai-kevin.webp" alt="" className="h-28 w-28 object-contain md:h-36 md:w-36" />
+              </motion.div>
+  
+              <motion.p {...enter(1)} className="mt-6 text-center text-[17px] text-muted md:text-xl">
+                Hey, I'm Kevin <span aria-hidden>👋</span> Full-Stack &amp; AI Engineer
+              </motion.p>
+  
+              <motion.h2 {...enter(2)} className="display-type mt-3 text-center text-[clamp(3rem,11vw,8.5rem)]">
+                Ask me <span className="stroke-text">anything</span>
+              </motion.h2>
+  
+              <motion.div {...enter(3)} className="mt-8 w-full max-w-2xl md:mt-12">
+                <PromptBox
+                  ref={inputRef}
+                  size="lg"
+                  value={input}
+                  onChange={setInput}
+                  onSubmit={ask}
+                  placeholder={HINTS}
+                  footer={quota ? `${quota.remaining} of ${quota.limit} questions left` : '10 questions'}
+                />
+              </motion.div>
+  
+              <motion.div {...enter(4)} className="mt-5 flex max-w-xl flex-wrap justify-center gap-2">
+                {QUICK.map((q) => (
+                  <button
+                    key={q.label}
+                    type="button"
+                    onClick={() => ask(q.question)}
+                    className="rounded-lg hairline bg-bg px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
+                  >
+                    {q.label}
+                  </button>
+                ))}
+              </motion.div>
+  
+              <motion.div {...enter(5)} className="mt-12 flex flex-col items-center gap-3 md:mt-16">
+                <span className="eyebrow">or</span>
                 <button
-                  key={q.label}
                   type="button"
-                  onClick={() => ask(q.question)}
-                  className="rounded-lg hairline bg-bg px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
+                  onClick={onExit}
+                  className="group inline-flex items-center gap-2 rounded-lg bg-fg px-6 py-3 text-[15px] text-bg transition-opacity hover:opacity-90"
                 >
-                  {q.label}
+                  View portfolio
+                  <span aria-hidden className="transition-transform group-hover:translate-y-0.5">↓</span>
                 </button>
-              ))}
+              </motion.div>
+            </motion.section>
+          ) : (
+            <motion.div
+              key="chat"
+              className="h-full"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: RISE }}
+            >
+              <Suspense fallback={<div className="h-full bg-bg" />}>
+                <ChatPanel variant="page" initialQuestion={question} onClose={onExit} headerExtra={themeToggle} />
+              </Suspense>
             </motion.div>
-
-            <motion.div {...enter(5)} className="mt-12 flex flex-col items-center gap-3 md:mt-16">
-              <span className="eyebrow">or</span>
-              <button
-                type="button"
-                onClick={onExit}
-                className="group inline-flex items-center gap-2 rounded-lg bg-fg px-6 py-3 text-[15px] text-bg transition-opacity hover:opacity-90"
-              >
-                View portfolio
-                <span aria-hidden className="transition-transform group-hover:translate-y-0.5">↓</span>
-              </button>
-            </motion.div>
-          </motion.section>
-        ) : (
-          <motion.div
-            key="chat"
-            className="h-full"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: RISE }}
-          >
-            <Suspense fallback={<div className="h-full bg-bg" />}>
-              <ChatPanel variant="page" initialQuestion={question} onClose={onExit} headerExtra={themeToggle} />
-            </Suspense>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 }
