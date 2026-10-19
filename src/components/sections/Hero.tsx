@@ -1,4 +1,5 @@
 import {
+  animate,
   motion,
   useAnimationFrame,
   useMotionValue,
@@ -7,12 +8,21 @@ import {
   useSpring,
   useTransform,
   useVelocity,
+  type MotionValue,
 } from 'framer-motion';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
+import { RevealText, type Segment } from '../shared/ScrollReveal';
 
 const NAME = 'Kevin Robin';
 // Percent of one copy's width travelled per second when the page is still
 const BASE_SPEED = 4;
+
+/** Written in letter by letter like the About page when there's a `progress`, else plain text */
+function Write({ segments, progress, range }: { segments: Segment[]; progress: MotionValue<number> | null; range: [number, number] }) {
+  if (progress) return <RevealText segments={segments} progress={progress} range={range} />;
+  return <>{segments.map((s) => (typeof s === 'string' ? s : <span key={s.text} className={`inline-block ${s.className ?? ''}`}>{s.text}</span>))}</>;
+}
 
 function wrap(min: number, max: number, v: number) {
   const range = max - min;
@@ -23,7 +33,7 @@ function wrap(min: number, max: number, v: number) {
  * Endless name ticker. Always drifts right to left, so the name reads naturally;
  * scrolling either way speeds it up.
  */
-function NameMarquee() {
+function NameMarquee({ write }: { write: MotionValue<number> | null }) {
   const reduced = useReducedMotion();
   const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
@@ -46,7 +56,8 @@ function NameMarquee() {
       <motion.div className="flex w-max whitespace-nowrap" style={{ x }}>
         {Array.from({ length: 4 }, (_, i) => (
           <span key={i} className="display-type pr-[0.3em] text-[22vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
-            {NAME} <span className="inline-block px-[0.12em]">—</span>
+            {/* The first copy (the one on screen) writes in first */}
+            <Write segments={[`${NAME} `, { text: '—', className: 'px-[0.12em]' }]} progress={write} range={i === 0 ? [0, 0.7] : [0.3, 1]} />
           </span>
         ))}
       </motion.div>
@@ -75,7 +86,18 @@ export function Hero({ ready = true, delay = 0 }: { ready?: boolean; delay?: num
   const photoY = useTransform(scrollY, [0, vh], [0, vh * 0.12]);
   const contentScale = useTransform(scrollY, [0, vh], [1, 0.94]);
 
-  // The photo fades in first, then the text after it
+  // The photo fades in first, then the text after it, letter by letter (a plain fade on phones,
+  // where per-letter motion made iOS flicker, and with Reduce Motion)
+  const mobile = useMobileLayout();
+  const writes = !mobile && !reduced;
+  const textProgress = useMotionValue(0);
+  useEffect(() => {
+    if (!ready || !writes) return;
+    const controls = animate(textProgress, 1, { duration: 1.8, ease: 'linear', delay: delay + 0.5 });
+    return () => controls.stop();
+  }, [ready, writes, delay, textProgress]);
+  const write = writes ? textProgress : null;
+
   const enter = (after: number) => ({
     initial: { opacity: 0 },
     animate: ready ? { opacity: 1 } : undefined,
@@ -117,11 +139,11 @@ export function Hero({ ready = true, delay = 0 }: { ready?: boolean; delay?: num
           className="hidden md:flex absolute z-[2] left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
         >
           <p className="text-[15px] leading-[1.35]">
-            Located
+            <Write segments={['Located']} progress={write} range={[0.45, 0.7]} />
             <br />
-            in Kerala,
+            <Write segments={['in Kerala,']} progress={write} range={[0.55, 0.85]} />
             <br />
-            India
+            <Write segments={['India']} progress={write} range={[0.75, 1]} />
           </p>
           <span className="grid h-[68px] w-[68px] place-items-center rounded-full bg-hero">
             <Globe />
@@ -137,16 +159,16 @@ export function Hero({ ready = true, delay = 0 }: { ready?: boolean; delay?: num
             <path d="M6 6l12 12M18 8v10H8" />
           </svg>
           <p className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-[1.25] tracking-[-0.02em]">
-            Full-Stack &amp;
+            <Write segments={['Full-Stack &']} progress={write} range={[0.2, 0.6]} />
             <br />
-            AI Engineer
+            <Write segments={['AI Engineer']} progress={write} range={[0.4, 0.8]} />
           </p>
         </motion.div>
 
         {/* Name ticker, behind the cut-out so it scrolls past behind me: across the table on
             desktop, behind my head on phones (where the figure fills the width) */}
         <motion.div {...enter(0)} className="absolute inset-x-0 top-[31svh] z-0 md:top-auto md:bottom-[4svh]">
-          <NameMarquee />
+          <NameMarquee write={write} />
         </motion.div>
       </motion.div>
 
