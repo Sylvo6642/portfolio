@@ -117,9 +117,8 @@ function PhotoFrame() {
 // Revealed by scrolling (see HorizontalAbout): the heading writes itself letter by letter,
 // then the tagline and story fade in; it never reverses
 function PanelIntro({ progress }: { progress: MotionValue<number> }) {
-  const photoStyle = useRevealStyle(progress, 0, 0.45, { x: 40 });
-  const taglineStyle = useRevealStyle(progress, 0.6, 0.85, { y: 12 });
-  const storyStyle = useRevealStyle(progress, 0.7, 1, { y: 12 });
+  const photoStyle = useRevealStyle(progress, 0, 0.4, { x: 40 });
+  const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
@@ -130,21 +129,25 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
         <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
           <RevealText
             progress={progress}
-            range={[0.1, 0.75]}
-            segments={['A ', { text: 'security brain', className: 'stroke-text' }, ' and an ', { text: 'AI brain', className: 'stroke-text' }, ', in the same developer.']}
+            range={[0.05, 0.5]}
+            segments={['Building from ', { text: 'Kerala', className: 'stroke-text' }, ', happiest ', { text: 'somewhere new', className: 'stroke-text' }, '.']}
           />
         </h2>
         <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
-          Quiet. Notices a lot. Remembers what you said three conversations ago.
+          Quiet. Notices a lot. Usually planning the next trip.
         </motion.p>
-        <motion.p style={storyStyle} className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
-          Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
-          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span>{' — '}
-          Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over
-          vector databases, tool-calling agents, and LLM features with schema-validated output —
-          alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a
-          coincidence.
-        </motion.p>
+        <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
+          <RevealText
+            progress={progress}
+            range={[0.55, 1]}
+            unit="word"
+            segments={[
+              "Based in Kozhikode, Kerala, and at my best somewhere I've never been: new places, new food, new ways of seeing a problem. I came up through cybersecurity, now ship full-stack at ",
+              { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
+              ' with Django, Angular and MongoDB, and am expanding into AI engineering: RAG pipelines, tool-calling agents and LLM features with validated output. Travel keeps me curious; security keeps me careful.',
+            ]}
+          />
+        </p>
       </div>
     </div>
   );
@@ -463,15 +466,16 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
     offset: ['start start', 'end end'],
   });
   // The first slide reveals from when its heading is well into view (section top 20% down)
-  // until a little into the pinned stretch, before the slides start moving sideways
-  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -25%']);
+  // until partway into the pinned stretch, before the slides start moving sideways
+  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -45%']);
 
   const springConfig = isMobile
     ? { stiffness: 500, damping: 38, restDelta: 0.001 }
     : { stiffness: 280, damping: 32, restDelta: 0.001 };
   const smoothProgress = useSpring(scrollYProgress, springConfig);
   const totalShift = -(PANELS.length - 1) * vw;
-  const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
+  // Holds on the first slide a little longer, so its reveal can finish before sliding
+  const x = useTransform(smoothProgress, [0.12, 0.94], [0, totalShift]);
 
   // Native document flow avoids resizing/scaling an entire sticky track as
   // mobile browser chrome expands and collapses during a swipe.
