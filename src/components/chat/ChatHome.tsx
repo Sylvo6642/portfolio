@@ -117,7 +117,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
                 onChange={setInput}
                 onSubmit={ask}
                 placeholder={HINTS}
-                footer={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
+                footer={quota ? `${quota.remaining} of ${quota.limit} questions left` : '10 questions'}
               />
             </motion.div>
 

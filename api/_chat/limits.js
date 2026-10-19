@@ -1,11 +1,10 @@
 import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
-// Questions allowed in any rolling 24 hours
 export const LIMITS = {
-  browser: 10, // per visitor (browser id), the limit visitors see
-  ip: 40, // per IP: catches cleared storage without blocking a shared office network
-  global: 300, // whole site: a hard ceiling on spend
+  browser: 10, // per visitor (browser id), for good: the limit visitors see
+  ip: 40, // per IP in any 24 hours: catches cleared storage without blocking a shared office network
+  global: 300, // whole site in any 24 hours: a hard ceiling on spend
 };
 
 const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -38,21 +37,27 @@ const memory = [];
 const DAY = 24 * 60 * 60 * 1000;
 
 function memoryQuota(browserId, ipHash) {
-  const since = Date.now() - DAY;
-  while (memory.length && memory[0].at < since) memory.shift();
-  const mine = memory.filter((r) => r.browserId === browserId);
+  const recent = memory.filter((r) => r.at > Date.now() - DAY);
+  const ipRows = recent.filter((r) => r.ipHash === ipHash);
   return {
-    browser: mine.length,
-    ip: memory.filter((r) => r.ipHash === ipHash).length,
-    global: memory.length,
-    oldest: mine[0]?.at ?? null,
+    browser: memory.filter((r) => r.browserId === browserId).length,
+    ip: ipRows.length,
+    global: recent.length,
+    ip_oldest: ipRows[0]?.at ?? null,
+    global_oldest: recent[0]?.at ?? null,
   };
 }
 
-function verdict({ browser, ip, global, oldest }) {
-  const resetAt = oldest ? new Date(new Date(oldest).getTime() + DAY).toISOString() : null;
-  const remaining = Math.max(0, Math.min(LIMITS.browser - browser, LIMITS.ip - ip, LIMITS.global - global));
-  const reason = global >= LIMITS.global ? 'global' : ip >= LIMITS.ip ? 'ip' : browser >= LIMITS.browser ? 'browser' : null;
+const plusDay = (at) => (at ? new Date(new Date(at).getTime() + DAY).toISOString() : null);
+
+function verdict({ browser, ip, global, ip_oldest, global_oldest }) {
+  const left = { browser: LIMITS.browser - browser, global: LIMITS.global - global, ip: LIMITS.ip - ip };
+  const remaining = Math.max(0, Math.min(left.browser, left.global, left.ip));
+  const reason = left.browser <= 0 ? 'browser' : left.global <= 0 ? 'global' : left.ip <= 0 ? 'ip' : null;
+  // Whichever limit runs out first decides whether the visitor can come back later:
+  // a visitor's own 10 never come back, the daily IP and site-wide limits do
+  const binding = reason ?? (remaining === left.browser ? 'browser' : remaining === left.global ? 'global' : 'ip');
+  const resetAt = binding === 'ip' ? plusDay(ip_oldest) : binding === 'global' ? plusDay(global_oldest) : null;
   return { ok: !reason, reason, remaining, limit: LIMITS.browser, resetAt };
 }
 

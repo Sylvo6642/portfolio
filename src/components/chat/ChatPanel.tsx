@@ -77,17 +77,20 @@ function Message({ message, showInternals }: { message: ChatMessage; showInterna
   );
 }
 
-function formatReset(iso: string | null | undefined) {
-  if (!iso) return 'tomorrow';
+function formatReset(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+/** Out of questions: for good (their 10 are used), or for now (the daily IP or site-wide limit) */
 function LimitNotice({ resetAt }: { resetAt: string | null | undefined }) {
+  const email = <a href={`mailto:${EMAIL}`} className="underline decoration-accent underline-offset-2">{EMAIL}</a>;
   return (
     <div className="rounded-2xl hairline bg-surface p-4 text-[14px] leading-relaxed">
-      That's all the questions I can answer today. Email me at{' '}
-      <a href={`mailto:${EMAIL}`} className="underline decoration-accent underline-offset-2">{EMAIL}</a>{' '}
-      and I'll reply personally. The chat opens again around {formatReset(resetAt)}.
+      {resetAt ? (
+        <>The chat is taking a breather. It opens again around {formatReset(resetAt)}, or email me at {email} and I'll reply personally.</>
+      ) : (
+        <>That's all the questions I can answer here. For anything else, email me at {email} and I'll reply personally.</>
+      )}
     </div>
   );
 }
@@ -247,8 +250,8 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
             onSubmit={ask}
             disabled={limited}
             busy={busy}
-            placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
-            footer={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
+            placeholder={limited ? 'Out of questions' : 'Ask me anything…'}
+            footer={quota ? `${quota.remaining} of ${quota.limit} questions left` : '10 questions'}
           />
         </div>
       </div>
