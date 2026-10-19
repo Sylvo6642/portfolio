@@ -50,9 +50,10 @@ function Char({ char, index, progress }: { char: string; index: number; progress
 export function Intro() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  // The statement writes itself as it travels from the lower part of the screen to the upper middle
-  const textProgress = useRevealProgress(headingRef, ['start 85%', 'start 35%']);
-  const cardProgress = useRevealProgress(cardRef, ['start end', 'start 55%']);
+  // The statement writes itself once it's well into view, finishing near the top, so the
+  // whole reveal happens where the visitor is reading
+  const textProgress = useRevealProgress(headingRef, ['start 70%', 'start 25%']);
+  const cardProgress = useRevealProgress(cardRef, ['start 90%', 'start 50%']);
   const cardOpacity = useTransform(cardProgress, [0, 1], [0, 1]);
   const cardX = useTransform(cardProgress, [0, 1], [48, 0]);
 
