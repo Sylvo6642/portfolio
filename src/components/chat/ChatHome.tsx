@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, usePresence } from 'framer-motion';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setScrollLocked } from '../../lib/scroll';
 import { ConnectingDots } from '../layout/ConnectingDots';
@@ -10,7 +10,6 @@ import type { Quota } from './quota';
 const loadPanel = () => import('./ChatPanel');
 const ChatPanel = lazy(loadPanel);
 
-const EASE = [0.76, 0, 0.24, 1] as const;
 const RISE = [0.22, 1, 0.36, 1] as const;
 
 // The portfolio's toggle, with a hover tint that shows on light backgrounds too
@@ -20,50 +19,72 @@ const themeToggle = (
   </div>
 );
 
-const SHRINK_S = 0.6;
-const FULL = 'inset(0px 0px 0px 0px round 0px)';
+const DRAIN_MS = 850;
+const POINTS = 72;
 
 /**
- * Where the screen shrinks to on "View portfolio": the floating chat button, which mounts in
- * the same commit. Measured when the exit starts (variant functions run then); its centre is
- * unaffected by its scale-in, and offsetWidth/Height ignore transforms.
+ * Where the screen drains to on "View portfolio": the floating chat button, which mounts in
+ * the same commit. Its centre is unaffected by its scale-in, and offsetHeight ignores transforms.
  */
 function launcherTarget() {
   const el = document.querySelector<HTMLElement>('[data-chat-launcher]');
   if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
   const r = el.getBoundingClientRect();
-  const w = el.offsetWidth;
-  const h = el.offsetHeight;
-  const left = r.left + r.width / 2 - w / 2;
-  const top = r.top + r.height / 2 - h / 2;
-  return { left, top, w, h, vw: window.innerWidth, vh: window.innerHeight };
+  return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, h: el.offsetHeight, vw: window.innerWidth, vh: window.innerHeight };
 }
 
-// The edges close in on the button while the content is pulled towards it, then it all fades
-// into the button. Without a button (or with Reduce Motion) it simply fades.
-const shrinkFrame = {
-  exit: () => {
-    const t = launcherTarget();
-    if (!t) return { opacity: 0, transition: { duration: 0.3 } };
-    return {
-      clipPath: `inset(${t.top}px ${t.vw - t.left - t.w}px ${t.vh - t.top - t.h}px ${t.left}px round ${t.h / 2}px)`,
-      opacity: [1, 1, 0],
-      transition: { duration: SHRINK_S, ease: EASE, opacity: { duration: SHRINK_S, times: [0, 0.7, 1] } },
-    };
-  },
-};
-const shrinkContent = {
-  exit: () => {
-    const t = launcherTarget();
-    if (!t) return {};
-    return {
-      x: t.left + t.w / 2 - t.vw / 2,
-      y: t.top + t.h / 2 - t.vh / 2,
-      scale: 0.2,
-      transition: { duration: SHRINK_S, ease: EASE },
-    };
-  },
-};
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+/**
+ * The screen drains into the chat button like liquid: a blob covering the screen shrinks
+ * towards the button, its edge rippling and stretching towards it like a drop being pulled in,
+ * while the content is drawn in with it, then it fades into the button. The shape changes
+ * every frame, so it's a polygon clip-path set per frame rather than a CSS animation.
+ * Without a button (or with Reduce Motion) it simply fades. Returns a cancel function.
+ */
+function drain(frame: HTMLElement, content: HTMLElement, done: () => void) {
+  const t = launcherTarget();
+  if (!t) {
+    frame.animate({ opacity: [1, 0] }, { duration: 300, fill: 'forwards' }).finished.then(done, done);
+    return () => {};
+  }
+  const sx = t.vw / 2;
+  const sy = t.vh / 2;
+  const r0 = Math.hypot(sx, sy) * 1.02;
+  const r1 = t.h / 2;
+  const toward = Math.atan2(t.cy - sy, t.cx - sx);
+  const start = performance.now();
+  let raf = 0;
+
+  const step = (now: number) => {
+    const p = Math.min(1, (now - start) / DRAIN_MS);
+    const e = easeInOut(p);
+    const cx = sx + (t.cx - sx) * e;
+    const cy = sy + (t.cy - sy) * e;
+    const r = r0 + (r1 - r0) * e;
+    // Ripples and stretch build up and settle again, so it starts and lands calmly
+    const swell = Math.sin(Math.PI * p);
+    const time = (now - start) / 1000;
+    const points: string[] = [];
+    for (let i = 0; i < POINTS; i++) {
+      const a = (i / POINTS) * Math.PI * 2;
+      const ripple = 0.5 * Math.sin(3 * a + time * 5) + 0.3 * Math.sin(5 * a - time * 7) + 0.2 * Math.sin(8 * a + time * 11);
+      const facing = Math.max(0, Math.cos(a - toward));
+      const k = 1 + swell * (0.09 * ripple + 0.35 * facing * facing);
+      points.push(`${(cx + Math.cos(a) * r * k).toFixed(1)}px ${(cy + Math.sin(a) * r * k).toFixed(1)}px`);
+    }
+    const clip = `polygon(${points.join(',')})`;
+    frame.style.clipPath = clip;
+    frame.style.setProperty('-webkit-clip-path', clip);
+    frame.style.opacity = String(p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3);
+    content.style.transform = `translate(${cx - sx}px, ${cy - sy}px) scale(${Math.max(0.12, r / r0)}) rotate(${-8 * e}deg)`;
+
+    if (p < 1) raf = requestAnimationFrame(step);
+    else done();
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+}
 
 const QUICK = [
   { label: 'Me', question: 'Who are you and what do you do?' },
@@ -92,6 +113,15 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Leaving runs the custom drain, and AnimatePresence waits for it to finish
+  const [isPresent, safeToRemove] = usePresence();
+  useEffect(() => {
+    if (isPresent || !rootRef.current || !contentRef.current) return;
+    return drain(rootRef.current, contentRef.current, () => safeToRemove?.());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPresent]);
 
   useEffect(() => { loadPanel(); }, []);
 
@@ -128,9 +158,6 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
     <motion.div
       ref={rootRef}
       className="fixed inset-0 z-[85] h-[100dvh] bg-bg text-fg"
-      style={{ clipPath: FULL }}
-      variants={shrinkFrame}
-      exit="exit"
       data-lenis-prevent
     >
       {/* The 404 page's network of dots, linking up around the cursor; only behind the prompt,
@@ -149,8 +176,8 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Inherits the "exit" variant from the frame, so the content is pulled in with it */}
-      <motion.div variants={shrinkContent} className="relative h-full">
+      {/* Drawn into the button along with the frame when the visitor heads to the portfolio */}
+      <div ref={contentRef} className="relative h-full">
         <AnimatePresence mode="wait" initial={false}>
           {question === null ? (
             <motion.section
@@ -226,7 +253,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
