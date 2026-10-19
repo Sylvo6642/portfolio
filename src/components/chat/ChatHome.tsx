@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setScrollLocked } from '../../lib/scroll';
+import { ConnectingDots } from '../layout/ConnectingDots';
 import { ThemeToggle } from '../layout/ThemeToggle';
 import { MAX_CHARS, PromptBox } from './PromptBox';
 import type { Quota } from './quota';
@@ -85,6 +86,22 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
       exit={{ y: '-100%', transition: { duration: 0.9, ease: EASE } }}
       data-lenis-prevent
     >
+      {/* The 404 page's network of dots, linking up around the cursor; only behind the prompt,
+          so it stops once the conversation (which has its own background) takes over */}
+      <AnimatePresence>
+        {question === null && (
+          <motion.div
+            key="network"
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={ready ? { opacity: 1 } : undefined}
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
+          >
+            <ConnectingDots className="opacity-40" />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence mode="wait" initial={false}>
         {question === null ? (
           <motion.section
@@ -127,7 +144,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
                   key={q.label}
                   type="button"
                   onClick={() => ask(q.question)}
-                  className="rounded-lg hairline px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
+                  className="rounded-lg hairline bg-bg px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
                 >
                   {q.label}
                 </button>
