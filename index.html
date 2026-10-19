@@ -22,11 +22,11 @@
           document.documentElement.classList.add('dark');
         }
       } catch (e) {}
-      // The loader opens on espresso: paint it from the first frame so the page
+      // The loader opens on latte: paint it from the first frame so the page
       // background never flashes first (the loader removes this once mounted)
       try {
         if (sessionStorage.getItem('kr-loader-seen') !== '1') {
-          document.documentElement.style.background = '#1E1611';
+          document.documentElement.style.background = '#A8967F';
         }
       } catch (e) {}
     </script>

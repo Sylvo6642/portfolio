@@ -21,8 +21,8 @@ function wrap(min: number, max: number, v: number) {
 }
 
 /**
- * Endless name ticker. Drifts left on its own; scrolling speeds it up and
- * scrolling back up flips its direction.
+ * Endless name ticker. Always drifts right to left, so the name reads naturally;
+ * scrolling either way speeds it up.
  */
 function NameMarquee() {
   const reduced = useReducedMotion();
@@ -31,18 +31,14 @@ function NameMarquee() {
   const velocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
   const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 4], { clamp: false });
-  const direction = useRef(1);
 
   // Four copies: shifting by one copy (25% of the row) loops seamlessly
   const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
 
   useAnimationFrame((_, delta) => {
     if (reduced) return;
-    const factor = velocityFactor.get();
-    if (factor < 0) direction.current = -1;
-    else if (factor > 0) direction.current = 1;
-    let moveBy = -direction.current * (BASE_SPEED / 4) * (delta / 1000);
-    moveBy += moveBy * Math.abs(factor);
+    let moveBy = -(BASE_SPEED / 4) * (delta / 1000);
+    moveBy += moveBy * Math.abs(velocityFactor.get());
     baseX.set(baseX.get() + moveBy);
   });
 
@@ -50,7 +46,7 @@ function NameMarquee() {
     <div className="overflow-hidden select-none" aria-hidden>
       <motion.div className="flex w-max whitespace-nowrap" style={{ x }}>
         {Array.from({ length: 4 }, (_, i) => (
-          <span key={i} className="display-type pr-[0.3em] text-[28vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
+          <span key={i} className="display-type pr-[0.3em] text-[22vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
             {NAME} <span className="inline-block px-[0.12em]">—</span>
           </span>
         ))}
@@ -94,19 +90,20 @@ export function Hero({ ready = true }: { ready?: boolean }) {
       aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
       <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale }}>
-        {/* Portrait in an arch, anchored to the bottom edge */}
+        {/* Cut-out portrait standing on the bottom edge; its edges are feathered and the cut-off
+            table fades out at the sides (baked into the image), so it sits straight on the hero */}
         <motion.div
-          className="absolute inset-x-0 bottom-0 flex justify-center"
+          className="absolute inset-x-0 bottom-0 z-[1] flex justify-center"
           style={reduced ? undefined : { y: photoY }}
           initial={{ opacity: 0 }}
           animate={ready ? { opacity: 1 } : undefined}
           transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <div className="w-[78vw] max-h-[72svh] md:w-auto md:h-[min(84svh,85vw)] aspect-[3/4] overflow-hidden rounded-t-full">
+          <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1199/1312]">
             <img
-              src="/kevin.jpg"
+              src="/kevin-cutout.webp"
               alt=""
-              className="h-full w-full object-cover object-[50%_30%] select-none pointer-events-none"
+              className="h-full w-full object-contain object-bottom select-none pointer-events-none"
               draggable={false}
               decoding="async"
               fetchPriority="high"
@@ -117,7 +114,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Location pill */}
         <motion.div
           {...enter(0.15)}
-          className="hidden md:flex absolute left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
+          className="hidden md:flex absolute z-[2] left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
         >
           <p className="text-[15px] leading-[1.35]">
             Located
@@ -134,7 +131,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Role */}
         <motion.div
           {...enter(0.25)}
-          className="absolute left-5 sm:left-8 top-[18svh] md:left-auto md:right-[7%] md:top-[30%]"
+          className="absolute z-[2] left-5 sm:left-8 top-[11svh] md:left-auto md:right-[7%] md:top-[30%]"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="mb-5 md:mb-9" aria-hidden>
             <path d="M6 6l12 12M18 8v10H8" />
@@ -146,8 +143,9 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           </p>
         </motion.div>
 
-        {/* Name ticker */}
-        <motion.div {...enter(0)} className="absolute inset-x-0 bottom-[3svh] md:bottom-[4svh]">
+        {/* Name ticker, behind the cut-out so it scrolls past behind me: across the table on
+            desktop, behind my head on phones (where the figure fills the width) */}
+        <motion.div {...enter(0)} className="absolute inset-x-0 top-[31svh] z-0 md:top-auto md:bottom-[4svh]">
           <NameMarquee />
         </motion.div>
       </motion.div>

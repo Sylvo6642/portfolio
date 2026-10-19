@@ -1,6 +1,7 @@
 import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { RevealText, useForwardOnly, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
@@ -13,8 +14,18 @@ const STATS = [
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
 
+// The pinned scroll, in stages: the first slide writes itself in (see HorizontalAbout), then
+// fades out while the second fades in over it and writes itself in the same way, then the
+// remaining slides move in sideways. Positions are in screen heights scrolled since pinning.
+const SCROLL_VH = 6.8;
+const at = (vh: number) => vh / SCROLL_VH;
+const FADE: [number, number] = [at(1.2), at(1.6)];
+const TRAVEL_REVEAL: [number, number] = [at(1.6), at(3.4)];
+const SLIDE: [number, number] = [at(3.7), at(6.6)];
+
 const PANELS = [
   { id: 'intro' },
+  { id: 'travel' },
   { id: 'stats' },
   { id: 'philosophy' },
   { id: 'beyond' },
@@ -35,7 +46,12 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
   );
 }
 
-function TiltPhoto() {
+type Photo = { src: string; alt: string; badge: string };
+
+const WORK_PHOTO: Photo = { src: '/kevin.jpg', alt: 'Kevin Robin', badge: 'Full-Stack Dev' };
+const TRAVEL_PHOTO: Photo = { src: '/kevin-snow.jpg', alt: 'Kevin Robin in ski goggles on a snowy mountain trail', badge: 'Off the grid' };
+
+function TiltPhoto({ photo }: { photo: Photo }) {
   const ref = useRef<HTMLDivElement>(null);
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
@@ -65,8 +81,8 @@ function TiltPhoto() {
     >
       <div className="overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <motion.img
-          src="/kevin.jpg"
-          alt="Kevin Robin"
+          src={photo.src}
+          alt={photo.alt}
           className="w-full h-full object-cover object-top"
           whileHover={{ scale: 1.04 }}
           transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
@@ -79,20 +95,20 @@ function TiltPhoto() {
         />
       </div>
       <motion.div
-        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline backdrop-blur-sm"
+        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline"
         style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay: 0.8, duration: 0.5 }}
       >
-        Full-Stack Dev
+        {photo.badge}
       </motion.div>
     </motion.div>
   );
 }
 
-function PhotoFrame() {
+function PhotoFrame({ photo }: { photo: Photo }) {
   return (
     <div className="relative flex items-center justify-center">
       <div
@@ -107,58 +123,88 @@ function PhotoFrame() {
           filter: 'blur(24px)',
         }}
       />
-      <TiltPhoto />
+      <TiltPhoto photo={photo} />
     </div>
   );
 }
 
 /* ─── Panel 1: Intro ─── */
-function PanelIntro() {
+// Revealed by scrolling (see HorizontalAbout): the heading writes itself letter by letter,
+// then the tagline and story fade in; it never reverses
+function PanelIntro({ progress }: { progress: MotionValue<number> }) {
+  const photoStyle = useRevealStyle(progress, 0, 0.4, { x: 40 });
+  const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
-      <div className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
-        <PhotoFrame />
-      </div>
+      <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
+        <PhotoFrame photo={WORK_PHOTO} />
+      </motion.div>
       <div className="flex flex-col">
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]"
-        >
-          A <span className="stroke-text">security brain</span> and an{' '}
-          <span className="stroke-text">AI brain</span>, in the same developer.
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide"
-        >
+        <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
+          <RevealText
+            progress={progress}
+            range={[0.05, 0.5]}
+            segments={['A ', { text: 'security brain', className: 'stroke-text' }, ' and an ', { text: 'AI brain', className: 'stroke-text' }, ', in the same developer.']}
+          />
+        </h2>
+        <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
           Quiet. Notices a lot. Remembers what you said three conversations ago.
         </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed"
-        >
-          Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
-          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> 
-          Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over
-          vector databases, tool-calling agents, and LLM features with schema-validated output —
-          alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a
-          coincidence.
-        </motion.p>
+        <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
+          <RevealText
+            progress={progress}
+            range={[0.55, 1]}
+            unit="word"
+            segments={[
+              'Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at ',
+              { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
+              " — Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over vector databases, tool-calling agents, and LLM features with schema-validated output — alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a coincidence.",
+            ]}
+          />
+        </p>
       </div>
     </div>
   );
 }
 
-/* ─── Panel: Stats ─── */
+/* ─── Panel 2: Travel ─── */
+// Fades in over the first slide and writes itself in the same way (see HorizontalAbout)
+function PanelTravel({ progress }: { progress: MotionValue<number> }) {
+  const photoStyle = useRevealStyle(progress, 0, 0.4, { x: 40 });
+  const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 md:ml-auto w-full md:order-2">
+        <PhotoFrame photo={TRAVEL_PHOTO} />
+      </motion.div>
+      <div className="flex flex-col md:order-1">
+        <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
+          <RevealText
+            progress={progress}
+            range={[0.05, 0.5]}
+            segments={['Building from ', { text: 'Kerala', className: 'stroke-text' }, ', happiest ', { text: 'somewhere new', className: 'stroke-text' }, '.']}
+          />
+        </h2>
+        <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
+          Quiet. Notices a lot. Usually planning the next trip.
+        </motion.p>
+        <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
+          <RevealText
+            progress={progress}
+            range={[0.55, 1]}
+            unit="word"
+            segments={[
+              "Home is Kozhikode, Kerala, but I'm at my best somewhere I've never been: snowy trails, unfamiliar streets, food I can't pronounce yet. Getting a little lost is how I reset, and it's how I learn to look at a problem from a new angle. I bring that back to my desk: the curiosity to try new things, and the patience to get the details right.",
+            ]}
+          />
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   return (
     <div className="flex flex-col justify-center items-center h-full max-w-3xl mx-auto w-full">
@@ -186,7 +232,7 @@ function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
   );
 }
 
-/* ─── Panel 2: Philosophy ─── */
+/* ─── Panel 4: Philosophy ─── */
 function PanelPhilosophy() {
   const principles = [
     {
@@ -265,7 +311,7 @@ function PanelPhilosophy() {
   );
 }
 
-/* ─── Panel 3: Beyond Code ─── */
+/* ─── Panel 5: Beyond Code ─── */
 function PanelBeyond() {
   const offKeyboard = [
     {
@@ -425,21 +471,9 @@ function PanelBeyond() {
   );
 }
 
-/* ─── Progress dot — derives its own active range from its index ─── */
-function ProgressDot({ progress, index, count }: { progress: MotionValue<number>; index: number; count: number }) {
-  // Map overall scroll progress (within the 0.06–0.94 travel window) to this dot's band.
-  const start = 0.06;
-  const end = 0.94;
-  const span = (end - start) / count;
-  const lo = start + index * span;
-  const hi = lo + span;
-  const mid = (lo + hi) / 2;
-
-  const opacity = useTransform(
-    progress,
-    [lo - span * 0.5, mid, hi + span * 0.5],
-    [0.35, 1, 0.35],
-  );
+/* ─── Progress dot — lights up while its slide is the one on screen ─── */
+function ProgressDot({ position, index }: { position: MotionValue<number>; index: number }) {
+  const opacity = useTransform(position, [index - 1, index, index + 1], [0.35, 1, 0.35]);
   const width = useTransform(opacity, [0.35, 1], [6, 20]);
 
   return (
@@ -471,13 +505,28 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
     target: trackRef,
     offset: ['start start', 'end end'],
   });
+  // The first slide reveals from when its heading is well into view (section top 20% down)
+  // until a screen into the pinned stretch, before it fades out
+  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -100%']);
+  // The travel slide writes itself in once the first has faded out
+  const travelProgress = useForwardOnly(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
 
-  const springConfig = isMobile
-    ? { stiffness: 500, damping: 38, restDelta: 0.001 }
-    : { stiffness: 280, damping: 32, restDelta: 0.001 };
-  const smoothProgress = useSpring(scrollYProgress, springConfig);
-  const totalShift = -(PANELS.length - 1) * vw;
-  const x = useTransform(smoothProgress, [0.06, 0.94], [0, totalShift]);
+  // The first two slides share a screen and cross-fade; this follows the scroll both ways (only
+  // the writing-in is one-way), so scrolling back up brings the first slide back
+  const introOpacity = useTransform(scrollYProgress, FADE, [1, 0]);
+  const introY = useTransform(scrollYProgress, FADE, [0, -24]);
+  const travelOpacity = useTransform(scrollYProgress, FADE, [0, 1]);
+  // Only the visible one takes the mouse (the photo tilts on hover)
+  const introPointer = useTransform(introOpacity, (v) => (v > 0.5 ? 'auto' : 'none'));
+  const travelPointer = useTransform(travelOpacity, (v) => (v > 0.5 ? 'auto' : 'none'));
+
+  // Which slide is on screen, 0 to 4, for the progress dots
+  const position = useTransform(scrollYProgress, [FADE[0], FADE[1], SLIDE[0], SLIDE[1]], [0, 1, 1, PANELS.length - 1]);
+
+  // Follows scroll directly: Lenis already smooths the page, and a spring on top of it
+  // made the slides trail behind the scroll
+  const totalShift = -(PANELS.length - 2) * vw;
+  const x = useTransform(scrollYProgress, SLIDE, [0, totalShift]);
 
   // Native document flow avoids resizing/scaling an entire sticky track as
   // mobile browser chrome expands and collapses during a swipe.
@@ -486,7 +535,8 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
       <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
         <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
-          <PanelIntro />
+          <PanelIntro progress={introProgress} />
+          <PanelTravel progress={travelProgress} />
           <PanelStats statsRef={statsRef} inView={inView} />
           <PanelPhilosophy />
           <PanelBeyond />
@@ -496,8 +546,8 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   }
 
   return (
-    /* Outer — tall enough to provide scroll distance: 100vh per panel */
-    <div ref={trackRef} style={{ height: `${PANELS.length * 100 + 150}vh` }}>
+    /* Outer — one screen for the pinned view plus the scroll distance of all the stages */
+    <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
       {/* Sticky viewport — use dvh so mobile browser chrome doesn't cause jumps */}
       <div className="sticky top-0 overflow-hidden" style={{ height: '100dvh' }}>
         {/* Section label + progress dots */}
@@ -510,38 +560,44 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
           <div className="flex items-center gap-2">
             {PANELS.map((_, i) => (
-              <ProgressDot key={i} progress={smoothProgress} index={i} count={PANELS.length} />
+              <ProgressDot key={i} position={position} index={i} />
             ))}
           </div>
         </div>
 
         {/* Sliding track */}
+        {/* Own GPU layer, so moving the four-screen-wide track doesn't repaint it every frame */}
         <motion.div
-          style={{ x }}
+          style={{ x, willChange: 'transform' }}
           className="flex h-full"
         >
-          {/* Panel 1 — Intro */}
+          {/* Panels 1 and 2 — Intro, then Travel, stacked on one screen */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelIntro />
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 grid items-center">
+              <motion.div style={{ opacity: introOpacity, y: introY, pointerEvents: introPointer }} className="col-start-1 row-start-1">
+                <PanelIntro progress={introProgress} />
+              </motion.div>
+              <motion.div style={{ opacity: travelOpacity, pointerEvents: travelPointer }} className="col-start-1 row-start-1">
+                <PanelTravel progress={travelProgress} />
+              </motion.div>
             </div>
           </div>
 
-          {/* Panel 2 — Stats */}
+          {/* Panel 3 — Stats */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelStats statsRef={statsRef} inView={inView} />
             </div>
           </div>
 
-          {/* Panel 3 — Philosophy */}
+          {/* Panel 4 — Philosophy */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelPhilosophy />
             </div>
           </div>
 
-          {/* Panel 4 — Beyond */}
+          {/* Panel 5 — Beyond */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelBeyond />
