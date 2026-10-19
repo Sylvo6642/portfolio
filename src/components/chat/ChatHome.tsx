@@ -10,6 +10,7 @@ import type { Quota } from './quota';
 const loadPanel = () => import('./ChatPanel');
 const ChatPanel = lazy(loadPanel);
 
+const EASE = [0.76, 0, 0.24, 1] as const;
 const RISE = [0.22, 1, 0.36, 1] as const;
 
 // The portfolio's toggle, with a hover tint that shows on light backgrounds too
@@ -82,7 +83,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
     <motion.div
       ref={rootRef}
       className="fixed inset-0 z-[85] h-[100dvh] bg-bg text-fg"
-      exit={{ opacity: 0, transition: { duration: 0.6, ease: 'easeInOut' } }}
+      exit={{ y: '-100%', transition: { duration: 0.9, ease: EASE } }}
       data-lenis-prevent
     >
       {/* The 404 page's network of dots, linking up around the cursor; only behind the prompt,
