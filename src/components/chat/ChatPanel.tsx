@@ -189,7 +189,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M8 6l-6 6 6 6M16 6l6 6-6 6" /></svg>
         </IconButton>
         {page ? (
-          <button type="button" onClick={onClose} className="ml-1 shrink-0 rounded-full hairline px-3.5 py-2 text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg">
+          <button type="button" onClick={onClose} className="ml-1 shrink-0 rounded-lg hairline px-3.5 py-2 text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg">
             View portfolio <span aria-hidden>↓</span>
           </button>
         ) : (
@@ -208,7 +208,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
             {messages.length === 0 && (
               <div className="flex flex-wrap gap-2">
                 {SUGGESTIONS.map((s) => (
-                  <button key={s} type="button" onClick={() => ask(s)} disabled={limited} className="rounded-full hairline px-3 py-1.5 text-left text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg disabled:opacity-40">
+                  <button key={s} type="button" onClick={() => ask(s)} disabled={limited} className="rounded-lg hairline px-3 py-1.5 text-left text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg disabled:opacity-40">
                     {s}
                   </button>
                 ))}

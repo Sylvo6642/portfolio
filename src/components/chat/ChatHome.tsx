@@ -19,6 +19,16 @@ const QUICK = [
   { label: 'Contact', question: 'How can I contact you?' },
 ];
 
+const HINTS = [
+  'Ask about my work, stack or availability…',
+  'What are you building right now?',
+  'Which project are you proudest of?',
+  'Are you open to AI Engineer roles?',
+  "What's your tech stack?",
+  'Tell me about Clausify…',
+  'What do you do outside of work?',
+];
+
 /**
  * The first screen after the loader: a big "ask me anything" prompt, with the classic
  * portfolio one click away underneath. Asking turns the screen into the full chat.
@@ -86,7 +96,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
                 value={input}
                 onChange={setInput}
                 onSubmit={ask}
-                placeholder="Ask about my work, stack or availability…"
+                placeholder={HINTS}
                 footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
                 footerRight={quota?.model}
               />
@@ -98,7 +108,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
                   key={q.label}
                   type="button"
                   onClick={() => ask(q.question)}
-                  className="rounded-full hairline px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
+                  className="rounded-lg hairline px-4 py-2 text-[14px] text-fg/80 transition-colors hover:border-accent hover:text-fg"
                 >
                   {q.label}
                 </button>
@@ -110,7 +120,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
               <button
                 type="button"
                 onClick={onExit}
-                className="group inline-flex items-center gap-2 rounded-full bg-fg px-6 py-3 text-[15px] text-bg transition-opacity hover:opacity-90"
+                className="group inline-flex items-center gap-2 rounded-lg bg-fg px-6 py-3 text-[15px] text-bg transition-opacity hover:opacity-90"
               >
                 View portfolio
                 <span aria-hidden className="transition-transform group-hover:translate-y-0.5">↓</span>
