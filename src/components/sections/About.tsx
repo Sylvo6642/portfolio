@@ -1,7 +1,7 @@
 import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
-import { RevealText, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
+import { RevealText, useForwardOnly, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
@@ -20,6 +20,7 @@ const TRAVEL: [number, number] = [0.12, 0.94];
 
 const PANELS = [
   { id: 'intro' },
+  { id: 'travel' },
   { id: 'stats' },
   { id: 'philosophy' },
   { id: 'beyond' },
@@ -40,7 +41,12 @@ function Stat({ value, suffix, label, start }: { value: number | null; suffix: s
   );
 }
 
-function TiltPhoto() {
+type Photo = { src: string; alt: string; badge: string };
+
+const WORK_PHOTO: Photo = { src: '/kevin.jpg', alt: 'Kevin Robin', badge: 'Full-Stack Dev' };
+const TRAVEL_PHOTO: Photo = { src: '/kevin-snow.jpg', alt: 'Kevin Robin in ski goggles on a snowy mountain trail', badge: 'Off the grid' };
+
+function TiltPhoto({ photo }: { photo: Photo }) {
   const ref = useRef<HTMLDivElement>(null);
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
@@ -70,8 +76,8 @@ function TiltPhoto() {
     >
       <div className="overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <motion.img
-          src="/kevin-snow.jpg"
-          alt="Kevin Robin in ski goggles on a snowy mountain trail"
+          src={photo.src}
+          alt={photo.alt}
           className="w-full h-full object-cover object-top"
           whileHover={{ scale: 1.04 }}
           transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
@@ -91,13 +97,13 @@ function TiltPhoto() {
         viewport={{ once: true }}
         transition={{ delay: 0.8, duration: 0.5 }}
       >
-        Full-Stack Dev
+        {photo.badge}
       </motion.div>
     </motion.div>
   );
 }
 
-function PhotoFrame() {
+function PhotoFrame({ photo }: { photo: Photo }) {
   return (
     <div className="relative flex items-center justify-center">
       <div
@@ -112,7 +118,7 @@ function PhotoFrame() {
           filter: 'blur(24px)',
         }}
       />
-      <TiltPhoto />
+      <TiltPhoto photo={photo} />
     </div>
   );
 }
@@ -127,13 +133,52 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
       <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
-        <PhotoFrame />
+        <PhotoFrame photo={WORK_PHOTO} />
       </motion.div>
       <div className="flex flex-col">
         <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
           <RevealText
             progress={progress}
             range={[0.05, 0.5]}
+            segments={['A ', { text: 'security brain', className: 'stroke-text' }, ' and an ', { text: 'AI brain', className: 'stroke-text' }, ', in the same developer.']}
+          />
+        </h2>
+        <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
+          Quiet. Notices a lot. Remembers what you said three conversations ago.
+        </motion.p>
+        <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
+          <RevealText
+            progress={progress}
+            range={[0.55, 1]}
+            unit="word"
+            segments={[
+              'Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at ',
+              { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
+              " — Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over vector databases, tool-calling agents, and LLM features with schema-validated output — alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a coincidence.",
+            ]}
+          />
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Panel 2: Travel ─── */
+// Writes itself in as the slide arrives from the right (see HorizontalAbout)
+function PanelTravel({ progress }: { progress: MotionValue<number> }) {
+  const photoStyle = useRevealStyle(progress, 0.1, 0.5, { x: 40 });
+  const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 md:ml-auto w-full md:order-2">
+        <PhotoFrame photo={TRAVEL_PHOTO} />
+      </motion.div>
+      <div className="flex flex-col md:order-1">
+        <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
+          <RevealText
+            progress={progress}
+            range={[0, 0.5]}
             segments={['Building from ', { text: 'Kerala', className: 'stroke-text' }, ', happiest ', { text: 'somewhere new', className: 'stroke-text' }, '.']}
           />
         </h2>
@@ -146,9 +191,7 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
             range={[0.55, 1]}
             unit="word"
             segments={[
-              "Based in Kozhikode, Kerala, and at my best somewhere I've never been: new places, new food, new ways of seeing a problem. I came up through cybersecurity, now ship full-stack at ",
-              { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
-              ' with Django, Angular and MongoDB, and am expanding into AI engineering: RAG pipelines, tool-calling agents and LLM features with validated output. Travel keeps me curious; security keeps me careful.',
+              "Home is Kozhikode, Kerala, but I'm at my best somewhere I've never been: snowy trails, unfamiliar streets, food I can't pronounce yet. Getting a little lost is how I reset, and it's how I learn to look at a problem from a new angle. I bring that back to my desk: the curiosity to try new things, and the patience to get the details right.",
             ]}
           />
         </p>
@@ -184,7 +227,7 @@ function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>;
   );
 }
 
-/* ─── Panel 2: Philosophy ─── */
+/* ─── Panel 4: Philosophy ─── */
 function PanelPhilosophy() {
   const principles = [
     {
@@ -263,7 +306,7 @@ function PanelPhilosophy() {
   );
 }
 
-/* ─── Panel 3: Beyond Code ─── */
+/* ─── Panel 5: Beyond Code ─── */
 function PanelBeyond() {
   const offKeyboard = [
     {
@@ -471,6 +514,10 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   // The first slide reveals from when its heading is well into view (section top 20% down)
   // until partway into the pinned stretch, before the slides start moving sideways
   const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -45%']);
+  // The travel slide writes itself in while it slides into place: from a little after the
+  // slides start moving until it's fully on screen
+  const step = (TRAVEL[1] - TRAVEL[0]) / (PANELS.length - 1);
+  const travelProgress = useForwardOnly(useTransform(scrollYProgress, [TRAVEL[0] + step * 0.3, TRAVEL[0] + step], [0, 1]));
 
   // Follows scroll directly: Lenis already smooths the page, and a spring on top of it
   // made the slides trail behind the scroll
@@ -485,6 +532,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
         <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
           <PanelIntro progress={introProgress} />
+          <PanelTravel progress={travelProgress} />
           <PanelStats statsRef={statsRef} inView={inView} />
           <PanelPhilosophy />
           <PanelBeyond />
@@ -526,21 +574,28 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
             </div>
           </div>
 
-          {/* Panel 2 — Stats */}
+          {/* Panel 2 — Travel */}
+          <div className="flex-shrink-0 w-screen h-full">
+            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
+              <PanelTravel progress={travelProgress} />
+            </div>
+          </div>
+
+          {/* Panel 3 — Stats */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelStats statsRef={statsRef} inView={inView} />
             </div>
           </div>
 
-          {/* Panel 3 — Philosophy */}
+          {/* Panel 4 — Philosophy */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelPhilosophy />
             </div>
           </div>
 
-          {/* Panel 4 — Beyond */}
+          {/* Panel 5 — Beyond */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
               <PanelBeyond />

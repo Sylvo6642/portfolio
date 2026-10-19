@@ -1,30 +1,35 @@
 import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { useEffect, type RefObject } from 'react';
+import { Fragment, useEffect, type RefObject } from 'react';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 type Edge = 'start' | 'end';
 type Offset = [`${Edge} ${Edge}` | `${Edge} ${number}%`, `${Edge} ${Edge}` | `${Edge} ${number}%`];
 
 /**
- * Scroll progress through `offset` that only ever moves forward: scrolling back up doesn't
- * undo it, so once something has been revealed it stays revealed. Phones and Reduce Motion
- * start complete (scroll-linked motion is what made iOS flicker).
+ * A copy of `source` (0–1) that only ever moves forward: going back doesn't undo it, so once
+ * something has been revealed it stays revealed. Phones and Reduce Motion start complete
+ * (scroll-linked motion is what made iOS flicker).
  */
-export function useRevealProgress(target: RefObject<HTMLElement>, offset: Offset) {
+export function useForwardOnly(source: MotionValue<number>) {
   const mobile = useMobileLayout();
   const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target, offset });
   const skip = mobile || !!reduced;
   // Start complete when skipping, so nothing relies on a later update reaching the letters
   const progress = useMotionValue(skip ? 1 : 0);
 
   useEffect(() => {
-    progress.set(skip ? 1 : Math.max(progress.get(), scrollYProgress.get()));
-  }, [skip, progress, scrollYProgress]);
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    progress.set(skip ? 1 : Math.max(progress.get(), source.get()));
+  }, [skip, progress, source]);
+  useMotionValueEvent(source, 'change', (v) => {
     if (!skip && v > progress.get()) progress.set(v);
   });
   return progress;
+}
+
+/** Forward-only scroll progress of `target` through `offset` */
+export function useRevealProgress(target: RefObject<HTMLElement>, offset: Offset) {
+  const { scrollYProgress } = useScroll({ target, offset });
+  return useForwardOnly(scrollYProgress);
 }
 
 /** Opacity and a short slide, driven by a slice [from, to] of a reveal progress */
@@ -78,20 +83,25 @@ export function RevealText({ segments, progress, range = [0, 1], unit = 'char' }
   const filled = words.filter((w) => w.length);
   return (
     <>
-      <span className="sr-only">{chars.map((c) => c.char).join('')}</span>
+      {/* Not selectable, so copying the visible text doesn't paste it twice */}
+      <span className="sr-only select-none">{chars.map((c) => c.char).join('')}</span>
       <span aria-hidden>
-        {filled.map((word, w) =>
-          unit === 'word' ? (
-            // A word may mix styles (rare); it takes the styling of its first letter
-            <Piece key={w} text={word.map((c) => c.char).join('')} at={w / filled.length} progress={progress} range={range} className={`mr-[0.25em] ${word[0].className ?? ''}`} span={WORD_SPAN} />
-          ) : (
-            <span key={w} className="mr-[0.25em] inline-block whitespace-nowrap">
-              {word.map((c, i) => (
-                <Piece key={i} text={c.char} at={c.at} progress={progress} range={range} className={c.className} span={CHAR_SPAN} />
-              ))}
-            </span>
-          ),
-        )}
+        {filled.map((word, w) => (
+          // Real spaces between words, so copied text reads normally
+          <Fragment key={w}>
+            {w > 0 && ' '}
+            {unit === 'word' ? (
+              // A word may mix styles (rare); it takes the styling of its first letter
+              <Piece text={word.map((c) => c.char).join('')} at={w / filled.length} progress={progress} range={range} className={word[0].className} span={WORD_SPAN} />
+            ) : (
+              <span className="inline-block whitespace-nowrap">
+                {word.map((c, i) => (
+                  <Piece key={i} text={c.char} at={c.at} progress={progress} range={range} className={c.className} span={CHAR_SPAN} />
+                ))}
+              </span>
+            )}
+          </Fragment>
+        ))}
       </span>
     </>
   );
