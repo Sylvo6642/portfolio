@@ -1,4 +1,5 @@
 import { useChat } from '@ai-sdk/react';
+import { motion } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ToolCard } from './ChatCards';
 import { MAX_CHARS, PromptBox } from './PromptBox';
@@ -73,6 +74,27 @@ function Message({ message, showInternals }: { message: ChatMessage; showInterna
       })}
       {showInternals && message.metadata && <Internals meta={message.metadata} />}
     </div>
+  );
+}
+
+/** While an answer is on its way: my photo with a warm arc circling it */
+function Thinking() {
+  return (
+    <motion.div
+      role="status"
+      aria-label="Thinking"
+      className="relative h-10 w-10"
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <img src="/kevin.jpg" alt="" className="absolute inset-[5px] h-[30px] w-[30px] rounded-full object-cover object-[50%_30%]" />
+      {/* r = 18.5, so the circumference (stroke-dasharray in index.css) is 116.24 */}
+      <svg viewBox="0 0 40 40" className="think-ring absolute inset-0 h-full w-full" aria-hidden>
+        <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgb(var(--edge))" strokeWidth="1.5" />
+        <circle className="arc" cx="20" cy="20" r="18.5" fill="none" stroke="rgb(var(--accent))" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </motion.div>
   );
 }
 
@@ -235,13 +257,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
             </div>
           ))}
 
-          {status === 'submitted' && (
-            <div className="flex gap-1 py-2" aria-label="Thinking">
-              {[0, 1, 2].map((i) => (
-                <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted" style={{ animationDelay: `${i * 120}ms` }} />
-              ))}
-            </div>
-          )}
+          {status === 'submitted' && <Thinking />}
 
           {problem?.kind === 'error' && <p className="text-[13px] text-[#E39A9A]">{problem.message}</p>}
           {limited && <LimitNotice resetAt={problem?.resetAt ?? quota?.resetAt} />}
