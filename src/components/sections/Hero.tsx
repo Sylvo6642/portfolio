@@ -10,7 +10,6 @@ import {
 } from 'framer-motion';
 import { useRef } from 'react';
 
-const EASE = [0.76, 0, 0.24, 1] as const;
 const NAME = 'Kevin Robin';
 // Percent of one copy's width travelled per second when the page is still
 const BASE_SPEED = 4;
@@ -65,7 +64,7 @@ function Globe() {
   );
 }
 
-export function Hero({ ready = true }: { ready?: boolean }) {
+export function Hero({ ready = true, delay = 0 }: { ready?: boolean; delay?: number }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -76,10 +75,11 @@ export function Hero({ ready = true }: { ready?: boolean }) {
   const photoY = useTransform(scrollY, [0, vh], [0, vh * 0.12]);
   const contentScale = useTransform(scrollY, [0, vh], [1, 0.94]);
 
-  const enter = (delay: number) => ({
-    initial: { y: 60, opacity: 0 },
-    animate: ready ? { y: 0, opacity: 1 } : undefined,
-    transition: { duration: 1.1, ease: EASE, delay },
+  // The photo fades in first, then the text after it
+  const enter = (after: number) => ({
+    initial: { opacity: 0 },
+    animate: ready ? { opacity: 1 } : undefined,
+    transition: { duration: 1.1, ease: 'easeOut', delay: delay + 0.4 + after },
   });
 
   return (
@@ -97,7 +97,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           style={reduced ? undefined : { y: photoY }}
           initial={{ opacity: 0 }}
           animate={ready ? { opacity: 1 } : undefined}
-          transition={{ duration: 1.4, ease: 'easeOut' }}
+          transition={{ duration: 1.2, ease: 'easeOut', delay }}
         >
           <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1199/1312]">
             <img

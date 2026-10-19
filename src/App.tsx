@@ -46,6 +46,8 @@ export default function App() {
   // 'checking' until the API confirms the chat works, so the home never flashes up and away
   const [chatHome, setChatHome] = useState<'checking' | 'show' | 'hidden'>(wantsChatHome ? 'checking' : 'hidden');
   const [quota, setQuota] = useState<Quota | null>(null);
+  // Leaving the chat home, the hero waits for it to fade out before fading in
+  const [fromChatHome, setFromChatHome] = useState(false);
   const chatAvailable = !!quota?.available;
   const [glitch, setGlitch] = useState(false);
   const activate = () => { if (!glitch) setGlitch(true); };
@@ -66,6 +68,7 @@ export default function App() {
   const showPortfolio = () => {
     try { sessionStorage.setItem(HOME_KEY, '1'); } catch {}
     window.scrollTo(0, 0);
+    setFromChatHome(true);
     setChatHome('hidden');
   };
   // The hero, scrollbar and chat button make their entrance once the portfolio is in view
@@ -110,7 +113,7 @@ export default function App() {
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div className="hero-curtain sticky top-0" style={{ zIndex: 0 }}>
-            <Hero ready={portfolioReady} />
+            <Hero ready={portfolioReady} delay={fromChatHome ? 0.5 : 0} />
           </div>
           {/* On mobile, sections render already revealed. Dozens of reveal
               animations starting mid-scroll make iOS Safari re-rasterize text
