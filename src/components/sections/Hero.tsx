@@ -46,7 +46,7 @@ function NameMarquee() {
     <div className="overflow-hidden select-none" aria-hidden>
       <motion.div className="flex w-max whitespace-nowrap" style={{ x }}>
         {Array.from({ length: 4 }, (_, i) => (
-          <span key={i} className="display-type pr-[0.3em] text-[28vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
+          <span key={i} className="display-type pr-[0.3em] text-[22vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
             {NAME} <span className="inline-block px-[0.12em]">—</span>
           </span>
         ))}
@@ -93,7 +93,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Cut-out portrait standing on the bottom edge; its edges are feathered and the cut-off
             table fades out at the sides (baked into the image), so it sits straight on the hero */}
         <motion.div
-          className="absolute inset-x-0 bottom-0 flex justify-center"
+          className="absolute inset-x-0 bottom-0 z-[1] flex justify-center"
           style={reduced ? undefined : { y: photoY }}
           initial={{ opacity: 0 }}
           animate={ready ? { opacity: 1 } : undefined}
@@ -114,7 +114,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Location pill */}
         <motion.div
           {...enter(0.15)}
-          className="hidden md:flex absolute left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
+          className="hidden md:flex absolute z-[2] left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
         >
           <p className="text-[15px] leading-[1.35]">
             Located
@@ -131,7 +131,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Role */}
         <motion.div
           {...enter(0.25)}
-          className="absolute left-5 sm:left-8 top-[18svh] md:left-auto md:right-[7%] md:top-[30%]"
+          className="absolute z-[2] left-5 sm:left-8 top-[11svh] md:left-auto md:right-[7%] md:top-[30%]"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="mb-5 md:mb-9" aria-hidden>
             <path d="M6 6l12 12M18 8v10H8" />
@@ -143,8 +143,9 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           </p>
         </motion.div>
 
-        {/* Name ticker */}
-        <motion.div {...enter(0)} className="absolute inset-x-0 bottom-[3svh] md:bottom-[4svh]">
+        {/* Name ticker, behind the cut-out so it scrolls past behind me: across the table on
+            desktop, behind my head on phones (where the figure fills the width) */}
+        <motion.div {...enter(0)} className="absolute inset-x-0 top-[31svh] z-0 md:top-auto md:bottom-[4svh]">
           <NameMarquee />
         </motion.div>
       </motion.div>
