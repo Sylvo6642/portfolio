@@ -1,6 +1,7 @@
 import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
+import { RevealText, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
@@ -65,8 +66,8 @@ function TiltPhoto() {
     >
       <div className="overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <motion.img
-          src="/kevin.jpg"
-          alt="Kevin Robin"
+          src="/kevin-snow.jpg"
+          alt="Kevin Robin in ski goggles on a snowy mountain trail"
           className="w-full h-full object-cover object-top"
           whileHover={{ scale: 1.04 }}
           transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
@@ -113,41 +114,32 @@ function PhotoFrame() {
 }
 
 /* ─── Panel 1: Intro ─── */
-function PanelIntro() {
+// Revealed by scrolling (see HorizontalAbout): the heading writes itself letter by letter,
+// then the tagline and story fade in; it never reverses
+function PanelIntro({ progress }: { progress: MotionValue<number> }) {
+  const photoStyle = useRevealStyle(progress, 0, 0.45, { x: 40 });
+  const taglineStyle = useRevealStyle(progress, 0.6, 0.85, { y: 12 });
+  const storyStyle = useRevealStyle(progress, 0.7, 1, { y: 12 });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
-      <div className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
+      <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
         <PhotoFrame />
-      </div>
+      </motion.div>
       <div className="flex flex-col">
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]"
-        >
-          A <span className="stroke-text">security brain</span> and an{' '}
-          <span className="stroke-text">AI brain</span>, in the same developer.
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide"
-        >
+        <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
+          <RevealText
+            progress={progress}
+            range={[0.1, 0.75]}
+            segments={['A ', { text: 'security brain', className: 'stroke-text' }, ' and an ', { text: 'AI brain', className: 'stroke-text' }, ', in the same developer.']}
+          />
+        </h2>
+        <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
           Quiet. Notices a lot. Remembers what you said three conversations ago.
         </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed"
-        >
+        <motion.p style={storyStyle} className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
           Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at{' '}
-          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span> 
+          <span className="text-fg font-medium">Indeeya® (Lidex Tech)</span>{' — '}
           Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over
           vector databases, tool-calling agents, and LLM features with schema-validated output —
           alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a
@@ -158,7 +150,6 @@ function PanelIntro() {
   );
 }
 
-/* ─── Panel: Stats ─── */
 function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
   return (
     <div className="flex flex-col justify-center items-center h-full max-w-3xl mx-auto w-full">
@@ -471,6 +462,9 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
     target: trackRef,
     offset: ['start start', 'end end'],
   });
+  // The first slide reveals from when its heading is well into view (section top 20% down)
+  // until a little into the pinned stretch, before the slides start moving sideways
+  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -25%']);
 
   const springConfig = isMobile
     ? { stiffness: 500, damping: 38, restDelta: 0.001 }
@@ -486,7 +480,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
       <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
         <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
-          <PanelIntro />
+          <PanelIntro progress={introProgress} />
           <PanelStats statsRef={statsRef} inView={inView} />
           <PanelPhilosophy />
           <PanelBeyond />
@@ -523,7 +517,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
           {/* Panel 1 — Intro */}
           <div className="flex-shrink-0 w-screen h-full">
             <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelIntro />
+              <PanelIntro progress={introProgress} />
             </div>
           </div>
 
