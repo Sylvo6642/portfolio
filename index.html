@@ -26,7 +26,8 @@
       // background never flashes first (the loader removes this once mounted)
       try {
         if (sessionStorage.getItem('kr-loader-seen') !== '1') {
-          document.documentElement.style.background = '#A8967F';
+          // Same glow as the loader (its circle reaches 1.18x the farthest corner)
+          document.documentElement.style.background = 'radial-gradient(circle at 50% 48%, #D9CBB9 0%, #A8967F 65%, #8F7E6E 118%) fixed';
         }
       } catch (e) {}
     </script>
