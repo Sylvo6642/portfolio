@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { lazy, Suspense, useEffect, useRef, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setScrollLocked } from '../../lib/scroll';
+import { MAX_CHARS, PromptBox } from './PromptBox';
+import type { Quota } from './quota';
 
 // The panel (and the AI SDK with it) starts loading while the loader is still on screen
 const loadPanel = () => import('./ChatPanel');
@@ -8,7 +10,6 @@ const ChatPanel = lazy(loadPanel);
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 const RISE = [0.22, 1, 0.36, 1] as const;
-const MAX_CHARS = 300;
 
 const QUICK = [
   { label: 'Me', question: 'Who are you and what do you do?' },
@@ -22,10 +23,10 @@ const QUICK = [
  * The first screen after the loader: a big "ask me anything" prompt, with the classic
  * portfolio one click away underneath. Asking turns the screen into the full chat.
  */
-export function ChatHome({ ready, onExit }: { ready: boolean; onExit: () => void }) {
+export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quota | null; onExit: () => void }) {
   const [question, setQuestion] = useState<string | null>(null);
   const [input, setInput] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { loadPanel(); }, []);
 
@@ -42,11 +43,6 @@ export function ChatHome({ ready, onExit }: { ready: boolean; onExit: () => void
   const ask = (text: string) => {
     const q = text.trim().slice(0, MAX_CHARS);
     if (q) setQuestion(q);
-  };
-
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    ask(input);
   };
 
   // Staggered entrance once the loader has lifted
@@ -83,31 +79,20 @@ export function ChatHome({ ready, onExit }: { ready: boolean; onExit: () => void
               Ask me <span className="stroke-text">anything</span>
             </motion.h2>
 
-            <motion.form {...enter(3)} onSubmit={onSubmit} className="mt-8 w-full max-w-xl md:mt-12">
-              <div className="flex items-center gap-2 rounded-full bg-surface py-2 pl-5 pr-2 ring-1 ring-edge transition-shadow focus-within:ring-accent">
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
-                  maxLength={MAX_CHARS}
-                  placeholder="Ask about my work, stack or availability…"
-                  aria-label="Your question"
-                  enterKeyHint="send"
-                  // 16px keeps iOS Safari from zooming in on focus
-                  className="min-w-0 flex-1 bg-transparent py-2 text-[16px] text-fg placeholder:text-muted focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim()}
-                  aria-label="Send"
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-on-accent transition-opacity disabled:opacity-30"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-                </button>
-              </div>
-            </motion.form>
+            <motion.div {...enter(3)} className="mt-8 w-full max-w-2xl md:mt-12">
+              <PromptBox
+                ref={inputRef}
+                size="lg"
+                value={input}
+                onChange={setInput}
+                onSubmit={ask}
+                placeholder="Ask about my work, stack or availability…"
+                footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
+                footerRight={quota?.model}
+              />
+            </motion.div>
 
-            <motion.div {...enter(4)} className="mt-4 flex max-w-xl flex-wrap justify-center gap-2">
+            <motion.div {...enter(4)} className="mt-5 flex max-w-xl flex-wrap justify-center gap-2">
               {QUICK.map((q) => (
                 <button
                   key={q.label}
@@ -130,7 +115,6 @@ export function ChatHome({ ready, onExit }: { ready: boolean; onExit: () => void
                 View portfolio
                 <span aria-hidden className="transition-transform group-hover:translate-y-0.5">↓</span>
               </button>
-              <p className="mt-1 text-center font-mono text-[10px] text-muted">An AI version of me · answers come from my portfolio</p>
             </motion.div>
           </motion.section>
         ) : (

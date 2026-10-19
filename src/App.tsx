@@ -12,7 +12,7 @@ import { Footer } from './components/layout/Footer';
 import { ScrollBar } from './components/layout/ScrollBar';
 import { ChatWidget } from './components/chat/ChatWidget';
 import { ChatHome } from './components/chat/ChatHome';
-import { fetchQuota } from './components/chat/quota';
+import { fetchQuota, type Quota } from './components/chat/quota';
 import { Loader, useLoader } from './components/layout/Loader';
 import { Hero } from './components/sections/Hero';
 import { Intro } from './components/sections/Intro';
@@ -45,6 +45,7 @@ export default function App() {
   const { done, dismiss } = useLoader();
   // 'checking' until the API confirms the chat works, so the home never flashes up and away
   const [chatHome, setChatHome] = useState<'checking' | 'show' | 'hidden'>(wantsChatHome ? 'checking' : 'hidden');
+  const [quota, setQuota] = useState<Quota | null>(null);
   const [glitch, setGlitch] = useState(false);
   const activate = () => { if (!glitch) setGlitch(true); };
   useKonamiCode(activate);
@@ -55,7 +56,10 @@ export default function App() {
     if (!wantsChatHome) return;
     // A slow API shouldn't hold the portfolio back
     const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-    Promise.race([fetchQuota(), timeout]).then((q) => setChatHome(q?.available ? 'show' : 'hidden'));
+    Promise.race([fetchQuota(), timeout]).then((q) => {
+      setQuota(q);
+      setChatHome(q?.available ? 'show' : 'hidden');
+    });
   }, []);
 
   const showPortfolio = () => {
@@ -99,7 +103,7 @@ export default function App() {
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
         <AnimatePresence>
-          {chatHome === 'show' && <ChatHome key="chat-home" ready={done} onExit={showPortfolio} />}
+          {chatHome === 'show' && <ChatHome key="chat-home" ready={done} quota={quota} onExit={showPortfolio} />}
         </AnimatePresence>
         <Navbar />
         <main className="relative bg-bg" style={{ zIndex: 1 }}>

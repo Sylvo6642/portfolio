@@ -1,9 +1,9 @@
 import { useChat } from '@ai-sdk/react';
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ToolCard } from './ChatCards';
+import { MAX_CHARS, PromptBox } from './PromptBox';
 import { chat, describeError, fetchQuota, type ChatMessage, type ChatMetadata, type Quota } from './chatClient';
 
-const MAX_CHARS = 300;
 const EMAIL = 'robinkevin648@gmail.com';
 const INTERNALS_KEY = 'kr-chat-internals';
 
@@ -140,7 +140,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
   // The latest answer carries the up-to-date quota
   const lastMeta = [...messages].reverse().find((m) => m.metadata)?.metadata;
   useEffect(() => {
-    if (lastMeta) setQuota({ remaining: lastMeta.remaining, limit: lastMeta.limit, resetAt: lastMeta.resetAt });
+    if (lastMeta) setQuota({ remaining: lastMeta.remaining, limit: lastMeta.limit, resetAt: lastMeta.resetAt, model: lastMeta.model });
   }, [lastMeta]);
 
   // Pin the newest question to the top so a tall card streams in below it
@@ -169,11 +169,6 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
     ask(initialQuestion);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
-
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    ask(input);
-  };
 
   const toggleInternals = () => {
     setShowInternals((v) => {
@@ -240,41 +235,21 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="border-t border-edge px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+      <div className={`border-t border-edge px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 ${page ? 'md:pb-6' : ''}`}>
         <div className={column}>
-          <div className="flex items-end gap-2 rounded-2xl bg-surface px-3 py-2 ring-1 ring-edge focus-within:ring-accent">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input); }
-              }}
-              rows={1}
-              maxLength={MAX_CHARS}
-              disabled={limited}
-              placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
-              aria-label="Your question"
-              // 16px keeps iOS Safari from zooming in on focus
-              className="max-h-28 min-h-[24px] flex-1 resize-none bg-transparent py-1 text-[16px] leading-6 text-fg placeholder:text-muted focus:outline-none disabled:opacity-50 md:text-[14px]"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || busy || limited}
-              aria-label="Send"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent transition-opacity disabled:opacity-30"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-            </button>
-          </div>
-          <div className="mt-2 flex items-center justify-between gap-3 px-1 font-mono text-[10px] text-muted">
-            <span>
-              {quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
-            </span>
-            <span>{input.length > MAX_CHARS - 60 ? `${input.length}/${MAX_CHARS}` : 'AI can make mistakes'}</span>
-          </div>
+          <PromptBox
+            ref={inputRef}
+            value={input}
+            onChange={setInput}
+            onSubmit={ask}
+            disabled={limited}
+            busy={busy}
+            placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
+            footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
+            footerRight={quota?.model}
+          />
         </div>
-      </form>
+      </div>
     </div>
   );
 }

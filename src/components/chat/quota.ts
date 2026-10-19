@@ -1,6 +1,6 @@
 // Kept free of the AI SDK so the chat home can check the quota before the SDK loads
 
-export type Quota = { remaining: number; limit: number; resetAt: string | null; available?: boolean };
+export type Quota = { remaining: number; limit: number; resetAt: string | null; available?: boolean; model?: string };
 
 const ID_KEY = 'kr-chat-browser-id';
 
