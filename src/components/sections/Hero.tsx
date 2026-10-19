@@ -104,7 +104,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         >
           <div className="w-[78vw] max-h-[72svh] md:w-auto md:h-[min(84svh,85vw)] aspect-[3/4] overflow-hidden rounded-t-full">
             <img
-              src="/kevin.jpg"
+              src="/kevin-cafe.jpg"
               alt=""
               className="h-full w-full object-cover object-[50%_30%] select-none pointer-events-none"
               draggable={false}
