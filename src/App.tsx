@@ -46,19 +46,20 @@ export default function App() {
   // 'checking' until the API confirms the chat works, so the home never flashes up and away
   const [chatHome, setChatHome] = useState<'checking' | 'show' | 'hidden'>(wantsChatHome ? 'checking' : 'hidden');
   const [quota, setQuota] = useState<Quota | null>(null);
+  const chatAvailable = !!quota?.available;
   const [glitch, setGlitch] = useState(false);
   const activate = () => { if (!glitch) setGlitch(true); };
   useKonamiCode(activate);
   useMobileSecret(activate);
 
-  // Without a working chat (no API key, API down) go straight to the portfolio
+  // Without a working chat (no API key, API down) skip the chat home and the chat button
   useEffect(() => {
-    if (!wantsChatHome) return;
+    if (path !== '/') return;
     // A slow API shouldn't hold the portfolio back
     const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
     Promise.race([fetchQuota(), timeout]).then((q) => {
       setQuota(q);
-      setChatHome(q?.available ? 'show' : 'hidden');
+      if (wantsChatHome) setChatHome(q?.available ? 'show' : 'hidden');
     });
   }, []);
 
@@ -130,7 +131,7 @@ export default function App() {
         </main>
         <Footer />
         {portfolioReady && <ScrollBar />}
-        <ChatWidget ready={portfolioReady} />
+        <ChatWidget ready={portfolioReady && chatAvailable} />
       </MotionConfig>
     </ThemeProvider>
   );
