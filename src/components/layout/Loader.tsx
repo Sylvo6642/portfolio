@@ -39,8 +39,6 @@ function shuffled(n: number) {
 
 // Latte: the palette's taupe (dark-mode --muted), between the browns and the creams
 const BG = '#A8967F';
-// A soft glow behind the greeting: sand at the centre, latte, then mocha in the corners
-const GLOW: [string, number][] = [['#D9CBB9', 0], [BG, 0.55], ['#8F7E6E', 1]];
 const EASE = [0.76, 0, 0.24, 1] as const;
 
 function MorphingWords({ onComplete }: { onComplete: () => void }) {
@@ -124,14 +122,11 @@ export function Loader({ onDone }: { onDone: () => void }) {
   const { w, h } = size;
   const curvedPath = `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h + 300} 0 ${h} L0 0`;
   const flatPath = `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h} 0 ${h} L0 0`;
-  // Measured in pixels, so the glow stays put while the panel's edge flattens
-  const glow = { cx: w / 2, cy: h * 0.48, r: Math.hypot(w, h) * 0.6 };
-  const glowCss = `radial-gradient(circle ${glow.r}px at ${glow.cx}px ${glow.cy}px, ${GLOW.map(([c, at]) => `${c} ${at * 100}%`).join(', ')})`;
 
   return (
     <motion.div
       className="fixed inset-0 z-[100] flex items-center justify-center select-none"
-      style={{ background: glowCss }}
+      style={{ background: BG }}
       initial={{ y: 0 }}
       exit={{ y: '-100vh', transition: { duration: 0.8, ease: EASE, delay: 0.2 } }}
     >
@@ -149,13 +144,8 @@ export function Loader({ onDone }: { onDone: () => void }) {
         style={{ height: 'calc(100% + 300px)' }}
         aria-hidden="true"
       >
-        <defs>
-          <radialGradient id="loader-glow" gradientUnits="userSpaceOnUse" cx={glow.cx} cy={glow.cy} r={glow.r}>
-            {GLOW.map(([color, at]) => <stop key={color} offset={at} stopColor={color} />)}
-          </radialGradient>
-        </defs>
         <motion.path
-          fill="url(#loader-glow)"
+          fill={BG}
           initial={{ d: curvedPath }}
           exit={{ d: flatPath, transition: { duration: 0.7, ease: EASE, delay: 0.3 } }}
         />
