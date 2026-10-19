@@ -97,16 +97,24 @@ function LimitNotice({ resetAt }: { resetAt: string | null | undefined }) {
 
 function IconButton({ label, onClick, children, active }: { label: string; onClick: () => void; children: ReactNode; active?: boolean }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={active}
-      title={label}
-      className={`grid h-9 w-9 place-items-center rounded-full transition-colors ${active ? 'bg-accent text-on-accent' : 'text-fg/70 hover:bg-fg/10 hover:text-fg'}`}
-    >
-      {children}
-    </button>
+    <span className="group relative">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        aria-pressed={active}
+        className={`grid h-9 w-9 place-items-center rounded-full transition-colors ${active ? 'bg-accent text-on-accent' : 'text-fg/70 hover:bg-fg/10 hover:text-fg'}`}
+      >
+        {children}
+      </button>
+      {/* Site-styled tooltip in place of the browser's; hover only, so it never sticks after a tap */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-full z-10 mt-2 whitespace-nowrap rounded-md bg-fg px-2 py-1 text-[11px] text-bg opacity-0 shadow-sm transition-opacity duration-150 group-has-[:focus-visible]:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
+      >
+        {label}
+      </span>
+    </span>
   );
 }
 
