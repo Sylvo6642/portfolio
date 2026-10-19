@@ -113,9 +113,11 @@ type Props = {
   variant?: 'panel' | 'page';
   /** Asked as soon as the panel opens (from the chat home's input) */
   initialQuestion?: string;
+  /** Extra header controls before "View portfolio" (the theme toggle on the page) */
+  headerExtra?: ReactNode;
 };
 
-export default function ChatPanel({ onClose, variant = 'panel', initialQuestion }: Props) {
+export default function ChatPanel({ onClose, variant = 'panel', initialQuestion, headerExtra }: Props) {
   const { messages, sendMessage, status, error, clearError } = useChat<ChatMessage>({ chat });
   const [input, setInput] = useState('');
   const [quota, setQuota] = useState<Quota | null>(null);
@@ -188,6 +190,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
         <IconButton label={showInternals ? 'Hide behind the scenes' : 'Show behind the scenes'} onClick={toggleInternals} active={showInternals}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M8 6l-6 6 6 6M16 6l6 6-6 6" /></svg>
         </IconButton>
+        {headerExtra}
         {page ? (
           <button type="button" onClick={onClose} className="ml-1 shrink-0 rounded-lg hairline px-3.5 py-2 text-[13px] text-fg/85 transition-colors hover:border-accent hover:text-fg">
             View portfolio <span aria-hidden>↓</span>
@@ -203,7 +206,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
         <div className={`flex flex-col gap-4 ${column}`}>
           <div className="flex max-w-[92%] flex-col gap-3">
             <p className="text-[14px] leading-relaxed text-fg/90">
-              Hey, I'm an AI version of Kevin. Ask me about my projects, experience, stack, or whether I'm open to new roles.
+              Hey, I'm Kevin <span aria-hidden>👋</span> Ask me about my projects, experience, stack, or whether I'm open to new roles.
             </p>
             {messages.length === 0 && (
               <div className="flex flex-wrap gap-2">
@@ -246,7 +249,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion 
             busy={busy}
             placeholder={limited ? 'Out of questions for today' : 'Ask me anything…'}
             footerLeft={quota ? `${quota.remaining} of ${quota.limit} questions left today` : '10 questions a day'}
-            footerRight={quota?.model}
+            footerRight={page ? quota?.model : undefined}
           />
         </div>
       </div>

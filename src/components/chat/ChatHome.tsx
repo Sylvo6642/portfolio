@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { setScrollLocked } from '../../lib/scroll';
+import { ThemeToggle } from '../layout/ThemeToggle';
 import { MAX_CHARS, PromptBox } from './PromptBox';
 import type { Quota } from './quota';
 
@@ -10,6 +11,13 @@ const ChatPanel = lazy(loadPanel);
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 const RISE = [0.22, 1, 0.36, 1] as const;
+
+// The portfolio's toggle, with a hover tint that shows on light backgrounds too
+const themeToggle = (
+  <div className="text-fg [&_.nav-theme-toggle:hover]:bg-fg/10">
+    <ThemeToggle />
+  </div>
+);
 
 const QUICK = [
   { label: 'Me', question: 'Who are you and what do you do?' },
@@ -37,13 +45,21 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
   const [question, setQuestion] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { loadPanel(); }, []);
 
-  // The portfolio sits underneath; keep it still until the visitor heads there
+  // The portfolio sits underneath; keep it still, and out of reach of the keyboard and
+  // screen readers, until the visitor heads there
   useEffect(() => {
     setScrollLocked(true);
-    return () => setScrollLocked(false);
+    const self = rootRef.current;
+    const behind = [...(self?.parentElement?.children ?? [])].filter((el) => el !== self && !el.hasAttribute('inert'));
+    behind.forEach((el) => el.setAttribute('inert', ''));
+    return () => {
+      setScrollLocked(false);
+      behind.forEach((el) => el.removeAttribute('inert'));
+    };
   }, []);
 
   useEffect(() => {
@@ -64,6 +80,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
 
   return (
     <motion.div
+      ref={rootRef}
       className="fixed inset-0 z-[85] h-[100dvh] bg-bg text-fg"
       exit={{ y: '-100%', transition: { duration: 0.9, ease: EASE } }}
       data-lenis-prevent
@@ -73,9 +90,13 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
           <motion.section
             key="home"
             aria-label="Ask AI Kevin"
-            className="flex h-full flex-col items-center justify-center overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]"
+            className="relative flex h-full flex-col items-center justify-center overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]"
             exit={{ opacity: 0, y: -16, transition: { duration: 0.3, ease: 'easeIn' } }}
           >
+            <motion.div {...enter(0)} className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] sm:right-6 md:right-8 md:top-7">
+              {themeToggle}
+            </motion.div>
+
             <motion.div {...enter(0)} className="relative">
               <img src="/kevin.jpg" alt="" className="h-20 w-20 rounded-full object-cover object-[50%_30%] md:h-24 md:w-24" />
               <span aria-hidden className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-[#5BB974] ring-[3px] ring-bg" />
@@ -136,7 +157,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
             transition={{ duration: 0.45, ease: RISE }}
           >
             <Suspense fallback={<div className="h-full bg-bg" />}>
-              <ChatPanel variant="page" initialQuestion={question} onClose={onExit} />
+              <ChatPanel variant="page" initialQuestion={question} onClose={onExit} headerExtra={themeToggle} />
             </Suspense>
           </motion.div>
         )}
