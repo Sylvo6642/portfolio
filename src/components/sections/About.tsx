@@ -14,6 +14,10 @@ const STATS = [
   { value: null, suffix: '∞', label: 'Tabs Open' },
 ];
 
+// The stretch of the pinned scroll where the slides move sideways; it holds on the first
+// slide a little longer, so its reveal can finish before sliding
+const TRAVEL: [number, number] = [0.12, 0.94];
+
 const PANELS = [
   { id: 'intro' },
   { id: 'stats' },
@@ -80,7 +84,7 @@ function TiltPhoto() {
         />
       </div>
       <motion.div
-        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline backdrop-blur-sm"
+        className="absolute -bottom-4 -right-4 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-2 hairline"
         style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -421,9 +425,8 @@ function PanelBeyond() {
 
 /* ─── Progress dot — derives its own active range from its index ─── */
 function ProgressDot({ progress, index, count }: { progress: MotionValue<number>; index: number; count: number }) {
-  // Map overall scroll progress (within the 0.06–0.94 travel window) to this dot's band.
-  const start = 0.06;
-  const end = 0.94;
+  // Map overall scroll progress (within the travel window) to this dot's band.
+  const [start, end] = TRAVEL;
   const span = (end - start) / count;
   const lo = start + index * span;
   const hi = lo + span;
@@ -469,13 +472,10 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   // until partway into the pinned stretch, before the slides start moving sideways
   const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -45%']);
 
-  const springConfig = isMobile
-    ? { stiffness: 500, damping: 38, restDelta: 0.001 }
-    : { stiffness: 280, damping: 32, restDelta: 0.001 };
-  const smoothProgress = useSpring(scrollYProgress, springConfig);
+  // Follows scroll directly: Lenis already smooths the page, and a spring on top of it
+  // made the slides trail behind the scroll
   const totalShift = -(PANELS.length - 1) * vw;
-  // Holds on the first slide a little longer, so its reveal can finish before sliding
-  const x = useTransform(smoothProgress, [0.12, 0.94], [0, totalShift]);
+  const x = useTransform(scrollYProgress, TRAVEL, [0, totalShift]);
 
   // Native document flow avoids resizing/scaling an entire sticky track as
   // mobile browser chrome expands and collapses during a swipe.
@@ -508,14 +508,15 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
           <div className="flex items-center gap-2">
             {PANELS.map((_, i) => (
-              <ProgressDot key={i} progress={smoothProgress} index={i} count={PANELS.length} />
+              <ProgressDot key={i} progress={scrollYProgress} index={i} count={PANELS.length} />
             ))}
           </div>
         </div>
 
         {/* Sliding track */}
+        {/* Own GPU layer, so moving the four-screen-wide track doesn't repaint it every frame */}
         <motion.div
-          style={{ x }}
+          style={{ x, willChange: 'transform' }}
           className="flex h-full"
         >
           {/* Panel 1 — Intro */}
