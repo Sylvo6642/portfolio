@@ -16,10 +16,12 @@ const STATS = [
 
 // The pinned scroll, in stages: the first slide writes itself in (see HorizontalAbout), then
 // fades out while the second fades in over it and writes itself in the same way, then the
-// remaining slides move in sideways
-const FADE: [number, number] = [0.12, 0.18];
-const TRAVEL_REVEAL: [number, number] = [0.18, 0.37];
-const SLIDE: [number, number] = [0.42, 0.94];
+// remaining slides move in sideways. Positions are in screen heights scrolled since pinning.
+const SCROLL_VH = 6.8;
+const at = (vh: number) => vh / SCROLL_VH;
+const FADE: [number, number] = [at(1.2), at(1.6)];
+const TRAVEL_REVEAL: [number, number] = [at(1.6), at(3.4)];
+const SLIDE: [number, number] = [at(3.7), at(6.6)];
 
 const PANELS = [
   { id: 'intro' },
@@ -504,8 +506,8 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
     offset: ['start start', 'end end'],
   });
   // The first slide reveals from when its heading is well into view (section top 20% down)
-  // until partway into the pinned stretch, before the slides start moving sideways
-  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -45%']);
+  // until a screen into the pinned stretch, before it fades out
+  const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -100%']);
   // The travel slide writes itself in once the first has faded out
   const travelProgress = useForwardOnly(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
 
@@ -544,8 +546,8 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   }
 
   return (
-    /* Outer — tall enough to provide scroll distance: 100vh per panel */
-    <div ref={trackRef} style={{ height: `${PANELS.length * 100 + 150}vh` }}>
+    /* Outer — one screen for the pinned view plus the scroll distance of all the stages */
+    <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
       {/* Sticky viewport — use dvh so mobile browser chrome doesn't cause jumps */}
       <div className="sticky top-0 overflow-hidden" style={{ height: '100dvh' }}>
         {/* Section label + progress dots */}

@@ -9,9 +9,10 @@ export function Intro() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   // The statement writes itself once it's well into view, finishing near the top, so the
-  // whole reveal happens where the visitor is reading
-  const textProgress = useRevealProgress(headingRef, ['start 70%', 'start 25%']);
-  const cardProgress = useRevealProgress(cardRef, ['start 90%', 'start 50%']);
+  // whole reveal happens where the visitor is reading; spread over most of a screen of
+  // scrolling, so it doesn't rush past at a normal pace
+  const textProgress = useRevealProgress(headingRef, ['start 75%', 'start 5%']);
+  const cardProgress = useRevealProgress(cardRef, ['start 95%', 'start 35%']);
   const cardStyle = useRevealStyle(cardProgress, 0, 1, { x: 48 });
 
   return (
