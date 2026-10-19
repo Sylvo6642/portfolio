@@ -99,7 +99,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           animate={ready ? { opacity: 1 } : undefined}
           transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <div className="w-[96vw] max-h-[74svh] md:w-auto md:h-[min(86svh,90vw)] aspect-[1199/1312]">
+          <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1199/1312]">
             <img
               src="/kevin-cutout.webp"
               alt=""
