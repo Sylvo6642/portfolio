@@ -39,7 +39,6 @@ function Internals({ meta }: { meta: ChatMetadata }) {
     `${meta.inputTokens.toLocaleString()} → ${meta.outputTokens.toLocaleString()} tokens`,
     `${(meta.latencyMs / 1000).toFixed(1)} s`,
     meta.costUsd != null ? `$${meta.costUsd.toFixed(5)}` : null,
-    meta.model,
   ].filter(Boolean);
   return (
     <div className="mt-1.5 flex flex-wrap gap-1">
