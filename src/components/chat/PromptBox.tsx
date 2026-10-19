@@ -61,7 +61,7 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
     return (
       <form onSubmit={submit} className="w-full">
         <div
-          className={`rounded-2xl bg-surface ring-1 ring-edge transition-shadow focus-within:ring-edge-strong focus-within:shadow-[0_4px_24px_rgb(0_0_0/0.06)] ${lg ? 'px-4 pb-3 pt-3.5' : 'px-3.5 pb-2.5 pt-3'} ${disabled ? 'opacity-60' : ''}`}
+          className={`${lg ? 'rounded-2xl' : 'rounded-xl'} bg-surface ring-1 ring-edge transition-shadow focus-within:ring-edge-strong focus-within:shadow-[0_4px_24px_rgb(0_0_0/0.06)] ${lg ? 'px-4 pb-3 pt-3.5' : 'px-3.5 pb-2.5 pt-3'} ${disabled ? 'opacity-60' : ''}`}
         >
           <div className="relative">
           <textarea

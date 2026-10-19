@@ -183,7 +183,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
   };
 
   return (
-    <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-3xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
+    <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
       <header className={`flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 ${page ? 'md:px-8' : ''}`}>
         <img src="/kevin.jpg" alt="" className="h-9 w-9 rounded-full object-cover object-[50%_30%]" />
         <div className="min-w-0 flex-1">

@@ -60,7 +60,7 @@ export function ChatWidget({ ready }: { ready: boolean }) {
             transition={{ duration: 0.35, ease: EASE }}
             className="fixed inset-0 z-[75] h-[100dvh] md:inset-auto md:bottom-8 md:right-8 md:h-[min(680px,calc(100vh-4rem))] md:w-[400px]"
           >
-            <Suspense fallback={<div className="on-ink h-full md:rounded-3xl" />}>
+            <Suspense fallback={<div className="on-ink h-full md:rounded-xl" />}>
               <ChatPanel onClose={() => setOpen(false)} />
             </Suspense>
           </motion.div>
