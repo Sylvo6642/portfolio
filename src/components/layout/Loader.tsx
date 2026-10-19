@@ -37,8 +37,8 @@ function shuffled(n: number) {
   return order;
 }
 
-// The dark-mode hero colour (--hero), a step lighter than ink
-const BG = '#3A2E25';
+// Latte: the palette's taupe (dark-mode --muted), between the browns and the creams
+const BG = '#A8967F';
 const EASE = [0.76, 0, 0.24, 1] as const;
 
 function MorphingWords({ onComplete }: { onComplete: () => void }) {
@@ -131,10 +131,10 @@ export function Loader({ onDone }: { onDone: () => void }) {
       exit={{ y: '-100vh', transition: { duration: 0.8, ease: EASE, delay: 0.2 } }}
     >
       <motion.p
-        className="relative z-[1] text-white font-sans"
+        className="relative z-[1] text-[#1E1611] font-sans"
         style={{ fontSize: 'clamp(2.4rem, 4.8vw, 3.3rem)', lineHeight: 1 }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.75, transition: { duration: 1, delay: 0.2 } }}
+        animate={{ opacity: 0.9, transition: { duration: 1, delay: 0.2 } }}
       >
         <MorphingWords onComplete={onDone} />
       </motion.p>
