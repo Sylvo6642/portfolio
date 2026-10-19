@@ -43,7 +43,8 @@ export default function App() {
   const mobile = useMobileLayout();
   useVisitorTracking();
   const { done, dismiss } = useLoader();
-  const [chatHome, setChatHome] = useState(wantsChatHome);
+  // 'checking' until the API confirms the chat works, so the home never flashes up and away
+  const [chatHome, setChatHome] = useState<'checking' | 'show' | 'hidden'>(wantsChatHome ? 'checking' : 'hidden');
   const [glitch, setGlitch] = useState(false);
   const activate = () => { if (!glitch) setGlitch(true); };
   useKonamiCode(activate);
@@ -51,16 +52,19 @@ export default function App() {
 
   // Without a working chat (no API key, API down) go straight to the portfolio
   useEffect(() => {
-    if (wantsChatHome) fetchQuota().then((q) => { if (!q?.available) setChatHome(false); });
+    if (!wantsChatHome) return;
+    // A slow API shouldn't hold the portfolio back
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+    Promise.race([fetchQuota(), timeout]).then((q) => setChatHome(q?.available ? 'show' : 'hidden'));
   }, []);
 
   const showPortfolio = () => {
     try { sessionStorage.setItem(HOME_KEY, '1'); } catch {}
     window.scrollTo(0, 0);
-    setChatHome(false);
+    setChatHome('hidden');
   };
   // The hero, scrollbar and chat button make their entrance once the portfolio is in view
-  const portfolioReady = done && !chatHome;
+  const portfolioReady = done && chatHome === 'hidden';
 
   useEffect(() => {
     initSmoothScroll();
@@ -95,7 +99,7 @@ export default function App() {
           {!done && <Loader key="loader" onDone={dismiss} />}
         </AnimatePresence>
         <AnimatePresence>
-          {chatHome && <ChatHome key="chat-home" ready={done} onExit={showPortfolio} />}
+          {chatHome === 'show' && <ChatHome key="chat-home" ready={done} onExit={showPortfolio} />}
         </AnimatePresence>
         <Navbar />
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
