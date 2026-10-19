@@ -98,7 +98,7 @@ export function ChatHome({ ready, quota, onExit }: { ready: boolean; quota: Quot
             </motion.div>
 
             <motion.div {...enter(0)} className="relative">
-              <img src="/kevin.jpg" alt="" className="h-20 w-20 rounded-full object-cover object-[50%_30%] md:h-24 md:w-24" />
+              <img src="/ai-kevin.webp" alt="" className="h-28 w-28 object-contain md:h-36 md:w-36" />
             </motion.div>
 
             <motion.p {...enter(1)} className="mt-6 text-center text-[17px] text-muted md:text-xl">

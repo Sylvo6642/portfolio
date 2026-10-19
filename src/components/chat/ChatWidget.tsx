@@ -42,7 +42,7 @@ export function ChatWidget({ ready }: { ready: boolean }) {
             aria-haspopup="dialog"
             className="fixed bottom-5 right-5 z-[50] flex h-14 items-center gap-2.5 rounded-full bg-ink pl-1.5 pr-5 text-[15px] text-white shadow-[0_8px_30px_rgb(0_0_0/0.25)] ring-1 ring-white/10 transition-colors hover:bg-[#2A2019] md:bottom-8 md:right-8"
           >
-            <img src="/kevin.jpg" alt="" className="h-11 w-11 rounded-full object-cover object-[50%_30%]" />
+            <img src="/ai-kevin.webp" alt="" className="h-11 w-11 rounded-full bg-[#F1E4D6] object-contain p-0.5" />
             Ask AI Kevin
           </motion.button>
         )}

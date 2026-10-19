@@ -1,4 +1,5 @@
 import { useChat } from '@ai-sdk/react';
+import { motion } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ToolCard } from './ChatCards';
 import { MAX_CHARS, PromptBox } from './PromptBox';
@@ -73,6 +74,27 @@ function Message({ message, showInternals }: { message: ChatMessage; showInterna
       })}
       {showInternals && message.metadata && <Internals meta={message.metadata} />}
     </div>
+  );
+}
+
+/** While an answer is on its way: my photo with a warm arc circling it */
+function Thinking() {
+  return (
+    <motion.div
+      role="status"
+      aria-label="Thinking"
+      className="relative h-10 w-10"
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <img src="/ai-kevin.webp" alt="" className="absolute inset-[5px] h-[30px] w-[30px] rounded-full bg-[#F1E4D6] object-contain p-px" />
+      {/* r = 18.5, so the circumference (stroke-dasharray in index.css) is 116.24 */}
+      <svg viewBox="0 0 40 40" className="think-ring absolute inset-0 h-full w-full" aria-hidden>
+        <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgb(var(--edge))" strokeWidth="1.5" />
+        <circle className="arc" cx="20" cy="20" r="18.5" fill="none" stroke="rgb(var(--accent))" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </motion.div>
   );
 }
 
@@ -192,7 +214,8 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
   return (
     <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
       <header className={`flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 ${page ? 'md:px-8' : ''}`}>
-        <img src="/kevin.jpg" alt="" className="h-9 w-9 rounded-full object-cover object-[50%_30%]" />
+        {/* The AI's own avatar: an illustrated me on a cream disc that reads in both themes */}
+        <img src="/ai-kevin.webp" alt="" className="h-9 w-9 rounded-full bg-[#F1E4D6] object-contain p-0.5" />
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-medium leading-tight">Ask AI Kevin</p>
           <p className="truncate text-[11px] text-muted">An AI version of me, answering from my portfolio</p>
@@ -235,13 +258,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
             </div>
           ))}
 
-          {status === 'submitted' && (
-            <div className="flex gap-1 py-2" aria-label="Thinking">
-              {[0, 1, 2].map((i) => (
-                <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted" style={{ animationDelay: `${i * 120}ms` }} />
-              ))}
-            </div>
-          )}
+          {status === 'submitted' && <Thinking />}
 
           {problem?.kind === 'error' && <p className="text-[13px] text-[#E39A9A]">{problem.message}</p>}
           {limited && <LimitNotice resetAt={problem?.resetAt ?? quota?.resetAt} />}

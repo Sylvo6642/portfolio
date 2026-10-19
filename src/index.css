@@ -437,6 +437,20 @@ body {
   .photo-float { animation: none; }
 }
 
+/* Chat "thinking" ring: an arc that grows and shrinks as it circles Kevin's photo */
+@keyframes think-spin { to { transform: rotate(360deg); } }
+@keyframes think-arc {
+  0%, 100% { stroke-dashoffset: 104; }
+  50%      { stroke-dashoffset: 34; }
+}
+.think-ring { transform-origin: center; animation: think-spin 1.6s linear infinite; }
+.think-ring .arc { stroke-dasharray: 116.24; animation: think-arc 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  /* A still, complete ring instead */
+  .think-ring, .think-ring .arc { animation: none; }
+  .think-ring .arc { stroke-dashoffset: 0; }
+}
+
 /* Animated theme toggler — view transition */
 [data-magicui-theme-vt="active"]::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration, 600ms);
