@@ -37,7 +37,8 @@ function shuffled(n: number) {
   return order;
 }
 
-const BG = '#1E1611';
+// The dark-mode hero colour (--hero), a step lighter than ink
+const BG = '#3A2E25';
 const EASE = [0.76, 0, 0.24, 1] as const;
 
 function MorphingWords({ onComplete }: { onComplete: () => void }) {
