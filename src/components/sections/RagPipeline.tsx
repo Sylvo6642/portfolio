@@ -162,7 +162,7 @@ export function RagPipeline({ className = '' }: { className?: string }) {
         is embedded, the closest chunks of my portfolio are retrieved and reranked, packed into the prompt, and the
         answer is generated with citations.
       </p>
-      <div aria-hidden className="rounded-2xl hairline bg-surface/50 p-4 md:p-6">
+      <div aria-hidden className="rounded-2xl bg-surface p-4 ring-1 ring-accent/30 md:p-6">
         {/* Header: pipeline stages */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Label className="mb-0">RAG pipeline · trace</Label>
