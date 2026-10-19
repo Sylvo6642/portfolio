@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { setScrollLocked } from '../../lib/scroll';
 
 // The AI SDK and the panel load on first hover or open, not with the page
@@ -10,12 +10,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function ChatWidget({ ready }: { ready: boolean }) {
   const [open, setOpen] = useState(false);
-  // The first time it appears, it catches the chat home shrinking into it with a small pop;
-  // after that (closing the panel) it just comes back
-  const firstShow = useRef(true);
-  useEffect(() => {
-    if (open) firstShow.current = false;
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -40,11 +34,10 @@ export function ChatWidget({ ready }: { ready: boolean }) {
             onClick={() => setOpen(true)}
             onPointerEnter={loadPanel}
             onFocus={loadPanel}
-            initial={firstShow.current ? { opacity: 0, scale: 0.6 } : { opacity: 0, y: 16, scale: 0.9 }}
-            animate={firstShow.current ? { opacity: 1, scale: [0.6, 1.08, 1] } : { opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.9 }}
-            transition={firstShow.current ? { duration: 0.5, delay: 0.4, ease: EASE, opacity: { duration: 0.2, delay: 0.4 } } : { duration: 0.4, ease: EASE }}
-            data-chat-launcher
+            transition={{ duration: 0.4, ease: EASE }}
             aria-label="Ask AI Kevin"
             aria-haspopup="dialog"
             className="fixed bottom-5 right-5 z-[50] flex h-14 items-center gap-2.5 rounded-full bg-ink pl-1.5 pr-5 text-[15px] text-white shadow-[0_8px_30px_rgb(0_0_0/0.25)] ring-1 ring-white/10 transition-colors hover:bg-[#2A2019] md:bottom-8 md:right-8"
