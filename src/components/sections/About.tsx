@@ -1,27 +1,29 @@
-import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
-import { useRef, useCallback, useState, useEffect, type RefObject, type MouseEvent } from 'react';
+import { easeInOut, easeOut, motion, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
+import { useRef, useCallback, useState, useEffect, type MouseEvent, type ReactNode } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
-import { RevealText, useForwardOnly, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
-import { useCountUp } from '../../hooks/useCountUp';
+import { RevealText, useForwardOnly, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 const STATS = [
-  { value: 3, suffix: '+', label: 'Years in Production' },
-  { value: 400, suffix: '+', label: 'APIs Built' },
-  { value: 700, suffix: '+', label: 'Bugs Squashed' },
-  { value: 10, suffix: '+', label: 'Apps Shipped' },
-  { value: 5, suffix: '+', label: 'LLM Providers' },
-  { value: null, suffix: '∞', label: 'Tabs Open' },
+  { value: 3, label: 'Years in production', note: 'Started in cybersecurity, wandered into full-stack, stayed' },
+  { value: 400, label: 'APIs built', note: 'Inventory, billing, orders: the ERP stuff nobody tweets about' },
+  { value: 10, label: 'Apps shipped', note: 'Client ERPs, plus side projects like Clausify' },
+  { value: 5, label: 'LLM providers', note: 'Tried them all. Each one gets a schema and a backup plan' },
 ];
 
 // The pinned scroll, in stages: the first slide writes itself in (see HorizontalAbout), then
-// fades out while the second fades in over it and writes itself in the same way, then the
-// remaining slides move in sideways. Positions are in screen heights scrolled since pinning.
-const SCROLL_VH = 6.8;
+// fades out while the second fades in over it and writes itself in the same way. Each later
+// slide then moves in sideways, starts writing itself in as it arrives, and holds still a
+// little longer once it's done, for reading. Positions are in screen heights scrolled since pinning.
+const SCROLL_VH = 8.5;
 const at = (vh: number) => vh / SCROLL_VH;
 const FADE: [number, number] = [at(1.2), at(1.6)];
 const TRAVEL_REVEAL: [number, number] = [at(1.6), at(3.4)];
-const SLIDE: [number, number] = [at(3.7), at(6.6)];
+// [move starts, move ends] for slides 3, 4 and 5: 0.5 screens of writing in after each move,
+// then 0.4 of reading before the next
+const MOVES: [number, number][] = [[at(3.7), at(4.4)], [at(5.3), at(6.0)], [at(6.9), at(7.6)]];
+// Writing in starts most of the way through the move and ends half a screen after it
+const revealOf = ([from, to]: [number, number]): [number, number] => [from + (to - from) * 0.6, to + at(0.5)];
 
 const PANELS = [
   { id: 'intro' },
@@ -30,21 +32,6 @@ const PANELS = [
   { id: 'philosophy' },
   { id: 'beyond' },
 ];
-
-function Stat({ value, suffix, label, start }: { value: number | null; suffix: string; label: string; start: boolean }) {
-  const v = useCountUp(value ?? 0, 2200, start);
-  return (
-    <div className="flex flex-col items-center text-center">
-      <span className="text-4xl md:text-5xl font-bold tracking-tight tabular-nums">
-        {value === null ? '' : Math.round(v)}
-        <span className="text-accent">{suffix}</span>
-      </span>
-      <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted mt-1.5">
-        {label}
-      </span>
-    </div>
-  );
-}
 
 type Photo = { src: string; alt: string; badge: string };
 
@@ -145,7 +132,7 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
           <RevealText
             progress={progress}
             range={[0.05, 0.5]}
-            segments={['A ', { text: 'security brain', className: 'stroke-text' }, ' and an ', { text: 'AI brain', className: 'stroke-text' }, ', in the same developer.']}
+            segments={['Half ', { text: 'security nerd', className: 'stroke-text' }, ', half ', { text: 'AI tinkerer', className: 'stroke-text' }, '.']}
           />
         </h2>
         <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
@@ -159,7 +146,7 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
             segments={[
               'Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at ',
               { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
-              " — Django, Angular, MongoDB. Now expanding into AI engineering — RAG pipelines over vector databases, tool-calling agents, and LLM features with schema-validated output — alongside React, Supabase, and PostgreSQL. Every project I ship has encryption in it; I don't think that's a coincidence.",
+              " on Django, Angular and MongoDB. I build AI stuff and anything else I find interesting: RAG pipelines, multi-agent systems, full-stack apps, and generally anything that looks shiny at 2AM :) Every project I ship somehow ends up with encryption in it. Old security habits die hard.",
             ]}
           />
         </p>
@@ -184,11 +171,11 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
           <RevealText
             progress={progress}
             range={[0.05, 0.5]}
-            segments={['Building from ', { text: 'Kerala', className: 'stroke-text' }, ', happiest ', { text: 'somewhere new', className: 'stroke-text' }, '.']}
+            segments={['Based in ', { text: 'Kerala', className: 'stroke-text' }, ', usually ', { text: 'somewhere else', className: 'stroke-text' }, '.']}
           />
         </h2>
         <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
-          Quiet. Notices a lot. Usually planning the next trip.
+          Currently planning the next trip. Again.
         </motion.p>
         <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
           <RevealText
@@ -196,7 +183,7 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
             range={[0.55, 1]}
             unit="word"
             segments={[
-              "Home is Kozhikode, Kerala, but I'm at my best somewhere I've never been: snowy trails, unfamiliar streets, food I can't pronounce yet. Getting a little lost is how I reset, and it's how I learn to look at a problem from a new angle. I bring that back to my desk: the curiosity to try new things, and the patience to get the details right.",
+              "Home is Kozhikode, Kerala, but I'm happiest somewhere I've never been: snowy trails, streets I can't find my way around, food I can't pronounce yet. Getting a little lost is how I reset, and weirdly, it's also how I end up fixing the bug I was stuck on. I come back with fresh eyes and a camera roll nobody asked to see.",
             ]}
           />
         </p>
@@ -205,268 +192,148 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
-function PanelStats({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
+/* ─── Panels 3–5 share the first two slides' layout: a written-in heading and mono tagline
+   on the left, the slide's content on the right ─── */
+function SlideHeading({ progress, kicker, heading, tagline }: { progress: MotionValue<number>; kicker: string; heading: Segment[]; tagline: string }) {
+  const kickerStyle = useRevealStyle(progress, 0, 0.15, { y: 8 });
+  const taglineStyle = useRevealStyle(progress, 0.4, 0.6, { y: 12 });
   return (
-    <div className="flex flex-col justify-center items-center h-full max-w-3xl mx-auto w-full">
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-10 text-center"
-      >
-        By the numbers
+    <div className="flex flex-col">
+      <motion.p style={kickerStyle} className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">
+        {kicker}
       </motion.p>
-      <motion.div
-        ref={statsRef}
-        initial={{ opacity: 0, y: 16 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-x-12 md:gap-x-16 gap-y-10 content-center justify-items-center w-full"
-      >
-        {STATS.map((s) => (
-          <Stat key={s.label} {...s} start={inView} />
-        ))}
-      </motion.div>
+      <h3 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
+        <RevealText progress={progress} range={[0.05, 0.45]} segments={heading} />
+      </h3>
+      <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
+        {tagline}
+      </motion.p>
     </div>
   );
 }
 
-/* ─── Panel 4: Philosophy ─── */
-function PanelPhilosophy() {
-  const principles = [
-    {
-      icon: '◈',
-      title: 'Correct at the edges',
-      body: 'The happy path is the easy part. I spend my time on the silent failures the radio button that loaded the wrong record without an error, the count-then-insert race condition, the migration nobody noticed was lossy.',
-    },
-    {
-      icon: '◎',
-      title: 'AI that earns its place',
-      body: 'An LLM call is a dependency like any other: it gets a schema, a fallback, a cost budget and a way to check it was right. If plain code does the job better, plain code wins.',
-    },
-    {
-      icon: '◐',
-      title: 'Real problems over toy ones',
-      body: "I'd rather fix one production bug that nobody wants to touch than rebuild a to-do app in a new framework. The unglamorous stuff is where you actually learn the stack.",
-    },
-  ];
-
+/** One row of the slide's right-hand column, fading in over its own slice of the reveal */
+function SlideRow({ progress, index, count, children }: { progress: MotionValue<number>; index: number; count: number; children: ReactNode }) {
+  const from = 0.4 + (index / count) * 0.45;
+  const style = useRevealStyle(progress, from, from + 0.2, { x: 24 });
   return (
-    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6"
-      >
-        How I work
-      </motion.p>
-      <motion.h3
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="display-type text-2xl md:text-4xl leading-[1.02] mb-6 md:mb-12"
-      >
-        I build software the way I'd want to{' '}
-        <span className="stroke-text">use it</span> correct, considered, and honest.
-      </motion.h3>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8 mb-6 md:mb-14">
-        {principles.map((p, i) => (
-          <motion.div
-            key={p.title}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="hairline rounded-xl p-4 md:p-6 flex flex-col gap-2 md:gap-3 hover:bg-fg/[0.03] transition-colors"
-          >
-            <span className="text-accent text-xl md:text-2xl leading-none">{p.icon}</span>
-            <span className="font-semibold text-sm md:text-base">{p.title}</span>
-            <span className="text-[13px] md:text-sm text-fg/65 leading-relaxed">{p.body}</span>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.blockquote
-        initial={{ opacity: 0, x: -16 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="relative pl-4 md:pl-6"
-        style={{ borderLeft: '2px solid rgb(var(--accent) / 0.5)' }}
-      >
-        <p className="text-base md:text-xl text-fg/70 italic leading-relaxed">
-          "Don't generate sequential IDs by counting existing records. Use atomic counters.
-          The count-then-insert pattern is always a race condition waiting to happen."
-        </p>
-        <footer className="mt-2 md:mt-3 font-mono text-[10px] md:text-xs tracking-[0.15em] uppercase text-muted">
-          — A note to myself, after a long Monday
-        </footer>
-      </motion.blockquote>
-    </div>
+    <motion.div style={style} className={`py-4 md:py-5 ${index > 0 ? 'hairline-t' : ''}`}>
+      {children}
+    </motion.div>
   );
 }
 
-/* ─── Panel 5: Beyond Code ─── */
-function PanelBeyond() {
-  const offKeyboard = [
-    {
-      group: 'Body',
-      items: [
-        { label: 'Gym', icon: '◈' },
-        { label: 'Swimming', icon: '◎' },
-        { label: 'Long walks', icon: '◌' },
-      ],
-    },
-    {
-      group: 'Mind',
-      items: [
-        { label: 'Cybersecurity rabbit holes', icon: '◉' },
-        { label: 'AI papers & model releases', icon: '✦' },
-        { label: 'UI/UX teardowns', icon: '✧' },
-        { label: 'Cooking', icon: '♪', note: 'keyword: attempting' },
-      ],
-    },
-    {
-      group: 'On the go',
-      items: [
-        { label: 'Travel', icon: '✦', note: 'planned months out' },
-        { label: 'Gaming', icon: '◐' },
-      ],
-    },
-  ];
-
-  const now = [
-    { kind: 'building', label: 'Clausify', meta: 'Gemini · structured outputs · React' },
-    { kind: 'learning', label: 'RAG & AI agents', meta: 'Weaviate · Pinecone · tool calling' },
-    { kind: 'reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
-    { kind: 'shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
-  ];
-
-
+/* ─── Panel 3: Stats ─── */
+function StatNumber({ value, progress, from }: { value: number; progress: MotionValue<number>; from: number }) {
+  // Counts up as the row writes in, easing out so the last digits settle slowly
+  const count = useTransform(progress, [from, Math.min(1, from + 0.35)], [0, value], { ease: easeOut });
+  const text = useTransform(count, (v) => String(Math.round(v)));
   return (
-    <div className="flex flex-col justify-center md:h-full max-w-3xl mx-auto w-full">
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6"
-      >
-        Beyond the code
-      </motion.p>
-      <motion.h3
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="display-type text-2xl md:text-4xl leading-[1.02] mb-6 md:mb-10"
-      >
-        Lost in airports,{' '}
-        <span className="stroke-text">found in terminals.</span>
-      </motion.h3>
+    <span className="display-type text-5xl md:text-6xl lg:text-7xl leading-none tabular-nums">
+      <motion.span>{text}</motion.span>
+      <span className="text-accent">+</span>
+    </span>
+  );
+}
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10">
-        {/* Off-keyboard — grouped chips */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="md:col-span-3 flex flex-col gap-3 md:gap-5"
-        >
-          <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
-            Off-keyboard
-          </p>
-          {offKeyboard.map((g, gi) => (
-            <div key={g.group} className="flex flex-col gap-1.5 md:gap-2.5">
-              <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-fg/35">
-                {g.group}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {g.items.map((item, i) => (
-                  <motion.span
-                    key={item.label}
-                    initial={{ opacity: 0, y: 6 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: 0.15 + gi * 0.08 + i * 0.04 }}
-                    className="inline-flex items-baseline gap-1.5 hairline rounded-full px-2.5 py-1 md:px-3 md:py-1.5 text-[13px] md:text-sm hover:bg-fg/5 transition-colors"
-                  >
-                    <span className="text-accent text-xs">{item.icon}</span>
-                    <span>{item.label}</span>
-                    {item.note && (
-                      <span className="font-mono text-[10px] text-fg/40 tracking-wide ml-0.5">
-                        {item.note}
-                      </span>
-                    )}
-                  </motion.span>
-                ))}
+function PanelStats({ progress }: { progress: MotionValue<number> }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <SlideHeading
+        progress={progress}
+        kicker="By the numbers"
+        heading={['The ', { text: 'receipts', className: 'stroke-text' }, ' from three years of ', { text: 'shipping', className: 'stroke-text' }, '.']}
+        tagline="Counted, not guessed. Tabs open: still ∞."
+      />
+      <div className="flex flex-col">
+        {STATS.map((s, i) => (
+          <SlideRow key={s.label} progress={progress} index={i} count={STATS.length}>
+            <div className="grid grid-cols-[6.5rem_1fr] md:grid-cols-[9.5rem_1fr] lg:grid-cols-[11rem_1fr] items-center gap-4 md:gap-6">
+              <StatNumber value={s.value} progress={progress} from={0.4 + (i / STATS.length) * 0.45} />
+              <div className="flex flex-col gap-1">
+                <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">{s.label}</span>
+                <span className="text-[15px] md:text-base text-fg/75 leading-snug">{s.note}</span>
               </div>
             </div>
-          ))}
-        </motion.div>
-
-        {/* Now — live status card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="md:col-span-2 flex flex-col gap-3 md:gap-6"
-        >
-          <div className="hairline rounded-xl p-4 md:p-5 bg-fg/[0.02] flex flex-col gap-3 md:gap-4">
-            <div className="flex items-center justify-between">
-              <p className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted">
-                Now
-              </p>
-              <span className="relative inline-flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-60 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
-              </span>
-            </div>
-            <div className="flex flex-col gap-3">
-              {now.map((item, i) => (
-                <motion.div
-                  key={item.kind}
-                  initial={{ opacity: 0, x: 12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: 0.3 + i * 0.07 }}
-                  className="flex flex-col gap-0.5"
-                >
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[9px] tracking-[0.22em] uppercase text-accent w-[58px]">
-                      {item.kind}
-                    </span>
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-muted tracking-wide pl-[66px]">
-                    {item.meta}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-        </motion.div>
+          </SlideRow>
+        ))}
       </div>
+    </div>
+  );
+}
 
-      {/* Signature line */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.7 }}
-        className="mt-6 pt-4 md:mt-10 md:pt-6 hairline-t text-[13px] md:text-sm text-fg/55 italic leading-relaxed max-w-2xl"
-      >
-        I'm quiet, that's just me. I don't say much, but I notice a lot and I'm always
-        paying attention. Once I'm comfortable, though, you'll wish I'd shut up.
-      </motion.p>
+/* ─── Panel 4: How I work ─── */
+const PRINCIPLES = [
+  {
+    title: 'Correct at the edges',
+    body: "The happy path is easy. I'm the one poking at the weird stuff: the radio button that quietly loaded the wrong record, the migration that lost data and told no one.",
+  },
+  {
+    title: 'AI that earns its place',
+    body: 'An LLM call is just another dependency: it gets a schema, a fallback, a budget and a sanity check. And if plain old code does the job better, plain old code wins.',
+  },
+  {
+    title: 'Real problems over toy ones',
+    body: "I'd rather fix the production bug everyone's scared of than build another to-do app in this week's framework. The boring stuff is where you actually learn.",
+  },
+];
+
+function PanelPhilosophy({ progress }: { progress: MotionValue<number> }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <SlideHeading
+        progress={progress}
+        kicker="How I work"
+        heading={["If I wouldn't ", { text: 'use it', className: 'stroke-text' }, ", I don't ", { text: 'ship it', className: 'stroke-text' }, '.']}
+        tagline="Note to self: never count-then-insert. Use atomic counters."
+      />
+      <div className="flex flex-col">
+        {PRINCIPLES.map((p, i) => (
+          <SlideRow key={p.title} progress={progress} index={i} count={PRINCIPLES.length}>
+            <div className="grid grid-cols-[2.25rem_1fr] md:grid-cols-[3rem_1fr] gap-2">
+              <span className="font-mono text-xs md:text-sm text-accent pt-1.5 md:pt-2">{String(i + 1).padStart(2, '0')}</span>
+              <div className="flex flex-col gap-1.5 md:gap-2">
+                <span className="display-type text-xl md:text-2xl leading-tight">{p.title}</span>
+                <span className="text-[15px] md:text-base text-fg/70 leading-relaxed">{p.body}</span>
+              </div>
+            </div>
+          </SlideRow>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Panel 5: Right now ─── */
+const NOW = [
+  { kind: 'Building', label: 'Clausify', meta: 'Gemini · structured outputs · React' },
+  { kind: 'Learning', label: 'RAG & AI agents', meta: 'Weaviate · Pinecone · tool calling' },
+  { kind: 'Shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
+  { kind: 'Reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
+];
+
+function PanelBeyond({ progress }: { progress: MotionValue<number> }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+      <SlideHeading
+        progress={progress}
+        kicker="Right now"
+        heading={["What's eating my ", { text: 'free time', className: 'stroke-text' }, ' right now.']}
+        tagline="Off-keyboard: gym, swimming, long walks, gaming, and cooking (keyword: attempting)."
+      />
+      <div className="flex flex-col">
+        {NOW.map((item, i) => (
+          <SlideRow key={item.kind} progress={progress} index={i} count={NOW.length}>
+            <div className="grid grid-cols-[5.5rem_1fr] md:grid-cols-[7rem_1fr] items-baseline gap-2">
+              <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-accent">{item.kind}</span>
+              <div className="flex flex-col gap-1">
+                <span className="display-type text-2xl md:text-3xl leading-tight">{item.label}</span>
+                <span className="font-mono text-[11px] md:text-xs text-muted tracking-wide">{item.meta}</span>
+              </div>
+            </div>
+          </SlideRow>
+        ))}
+      </div>
     </div>
   );
 }
@@ -490,7 +357,7 @@ function ProgressDot({ position, index }: { position: MotionValue<number>; index
 }
 
 /* ─── Horizontal scroll container ─── */
-function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElement>; inView: boolean }) {
+function HorizontalAbout() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440));
   const isMobile = useMobileLayout();
@@ -510,6 +377,10 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -100%']);
   // The travel slide writes itself in once the first has faded out
   const travelProgress = useForwardOnly(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
+  // The sideways slides write themselves in as they arrive (phones get them already written)
+  const statsProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[0]), [0, 1]));
+  const workProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[1]), [0, 1]));
+  const nowProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[2]), [0, 1]));
 
   // The first two slides share a screen and cross-fade; this follows the scroll both ways (only
   // the writing-in is one-way), so scrolling back up brings the first slide back
@@ -521,12 +392,12 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
   const travelPointer = useTransform(travelOpacity, (v) => (v > 0.5 ? 'auto' : 'none'));
 
   // Which slide is on screen, 0 to 4, for the progress dots
-  const position = useTransform(scrollYProgress, [FADE[0], FADE[1], SLIDE[0], SLIDE[1]], [0, 1, 1, PANELS.length - 1]);
+  const position = useTransform(scrollYProgress, [FADE[0], FADE[1], ...MOVES.flat()], [0, 1, 1, 2, 2, 3, 3, 4]);
 
   // Follows scroll directly: Lenis already smooths the page, and a spring on top of it
-  // made the slides trail behind the scroll
-  const totalShift = -(PANELS.length - 2) * vw;
-  const x = useTransform(scrollYProgress, SLIDE, [0, totalShift]);
+  // made the slides trail behind the scroll. Each move eases in and out, and the track
+  // holds still between moves while the slide on screen writes itself in.
+  const x = useTransform(scrollYProgress, MOVES.flat(), [0, -vw, -vw, -2 * vw, -2 * vw, -3 * vw], { ease: easeInOut });
 
   // Native document flow avoids resizing/scaling an entire sticky track as
   // mobile browser chrome expands and collapses during a swipe.
@@ -537,21 +408,22 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
         <div className="space-y-20">
           <PanelIntro progress={introProgress} />
           <PanelTravel progress={travelProgress} />
-          <PanelStats statsRef={statsRef} inView={inView} />
-          <PanelPhilosophy />
-          <PanelBeyond />
+          <PanelStats progress={statsProgress} />
+          <PanelPhilosophy progress={workProgress} />
+          <PanelBeyond progress={nowProgress} />
         </div>
       </div>
     );
   }
 
+  const slide = 'mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 grid items-center';
   return (
     /* Outer — one screen for the pinned view plus the scroll distance of all the stages */
     <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
       {/* Sticky viewport — use dvh so mobile browser chrome doesn't cause jumps */}
       <div className="sticky top-0 overflow-hidden" style={{ height: '100dvh' }}>
-        {/* Section label + progress dots */}
-        <div className="absolute top-20 left-6 right-6 z-20 flex items-center justify-between pointer-events-none">
+        {/* Section label + progress dots, kept left: the floating menu button owns the top-right corner */}
+        <div className="absolute top-20 left-6 z-20 flex items-center gap-6 pointer-events-none">
           <SectionReveal>
             <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted">
               (02) — About
@@ -573,7 +445,7 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
         >
           {/* Panels 1 and 2 — Intro, then Travel, stacked on one screen */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 grid items-center">
+            <div className={slide}>
               <motion.div style={{ opacity: introOpacity, y: introY, pointerEvents: introPointer }} className="col-start-1 row-start-1">
                 <PanelIntro progress={introProgress} />
               </motion.div>
@@ -585,23 +457,17 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 
           {/* Panel 3 — Stats */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelStats statsRef={statsRef} inView={inView} />
-            </div>
+            <div className={slide}><PanelStats progress={statsProgress} /></div>
           </div>
 
-          {/* Panel 4 — Philosophy */}
+          {/* Panel 4 — How I work */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelPhilosophy />
-            </div>
+            <div className={slide}><PanelPhilosophy progress={workProgress} /></div>
           </div>
 
-          {/* Panel 5 — Beyond */}
+          {/* Panel 5 — Right now */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className="mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 flex flex-col justify-center">
-              <PanelBeyond />
-            </div>
+            <div className={slide}><PanelBeyond progress={nowProgress} /></div>
           </div>
         </motion.div>
       </div>
@@ -610,12 +476,9 @@ function HorizontalAbout({ statsRef, inView }: { statsRef: RefObject<HTMLDivElem
 }
 
 export function About() {
-  const statsRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(statsRef, { once: true, amount: 0.4 });
-
   return (
     <section id="about" className="hairline-b bg-bg">
-      <HorizontalAbout statsRef={statsRef} inView={inView} />
+      <HorizontalAbout />
     </section>
   );
 }
