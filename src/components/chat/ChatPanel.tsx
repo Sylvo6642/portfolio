@@ -56,7 +56,7 @@ function Message({ message, showInternals }: { message: ChatMessage; showInterna
     const text = message.parts.map((p) => (p.type === 'text' ? p.text : '')).join('');
     return (
       <div className="flex justify-end">
-        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-accent px-3.5 py-2 text-[14px] leading-relaxed text-on-accent">{text}</p>
+        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-accent px-3.5 py-2 text-[14px] leading-relaxed text-on-accent dark:bg-edge-strong dark:text-fg">{text}</p>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
   };
 
   return (
-    <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
+    <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'flex h-full flex-col overflow-hidden bg-bg text-fg md:rounded-2xl md:border md:border-edge md:shadow-[0_24px_60px_rgb(42_31_24/0.18)] dark:md:shadow-[0_24px_80px_rgb(0_0_0/0.5)]'}>
       <header className={`flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 ${page ? 'md:px-8' : ''}`}>
         {page ? (
           // The AI's own avatar: an illustrated me on a cream disc that reads in both themes
@@ -272,7 +272,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
           {/* The mini chat shows this in its header logo instead */}
           {status === 'submitted' && page && <Thinking />}
 
-          {problem?.kind === 'error' && <p className="text-[13px] text-[#E39A9A]">{problem.message}</p>}
+          {problem?.kind === 'error' && <p className="text-[13px] text-[#A8443A] dark:text-[#E39A9A]">{problem.message}</p>}
           {limited && <LimitNotice resetAt={problem?.resetAt ?? quota?.resetAt} />}
         </div>
       </div>
