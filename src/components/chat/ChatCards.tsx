@@ -189,7 +189,7 @@ function MessageDraft({ id, draft }: { id: string; draft: ChatDraft }) {
         <Field label="Name"><input value={fields.name} onChange={set('name')} maxLength={80} required className={fieldClass} /></Field>
         <Field label="Email"><input type="email" value={fields.email} onChange={set('email')} maxLength={120} required className={fieldClass} /></Field>
         <Field label="Message"><textarea value={fields.message} onChange={set('message')} maxLength={1000} rows={3} required className={`${fieldClass} resize-none`} /></Field>
-        {status === 'error' && <p className="text-[12px] text-[#E39A9A]">Couldn't send that. Try again, or email me directly.</p>}
+        {status === 'error' && <p className="text-[12px] text-[#A8443A] dark:text-[#E39A9A]">Couldn't send that. Try again, or email me directly.</p>}
         {waitMs > 0 && <p className="text-[12px] text-muted">You sent me a message a moment ago. You can send another in {Math.ceil(waitMs / 60000)} min.</p>}
         <button
           type="submit"
