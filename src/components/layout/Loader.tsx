@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 import { GREETING_HEIGHT_EM, GREETING_SHAPES, GREETING_VIEWBOX } from '../../data/greetingPaths';
 
 const SESSION_KEY = 'kr-loader-seen';
@@ -110,6 +110,11 @@ function MorphingWords({ onComplete }: { onComplete: () => void }) {
 
 export function Loader({ onDone }: { onDone: () => void }) {
   const [size] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  // iOS Safari tints its status and tab bars from fixed elements touching the screen
+  // edges, and keeps that tint after the loader slides away (its layout box never moves,
+  // only its transform). Dropping the panel's own fill as the exit starts lets Safari
+  // pick up the page colour again; the latte SVG below still paints the sliding panel.
+  const isPresent = useIsPresent();
 
   // index.html paints the page in the loader colour before React mounts; the loader
   // covers the screen now, so hand the background back to the theme
@@ -126,7 +131,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-[100] flex items-center justify-center select-none"
-      style={{ background: BG }}
+      style={{ background: isPresent ? BG : 'transparent' }}
       initial={{ y: 0 }}
       exit={{ y: '-100vh', transition: { duration: 0.8, ease: EASE, delay: 0.2 } }}
     >
