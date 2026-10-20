@@ -22,7 +22,6 @@ import { Experience } from './components/sections/Experience';
 import { Projects } from './components/sections/Projects';
 import { GitHubContributions } from './components/sections/GitHubContributions';
 import { Courses } from './components/sections/Courses';
-import { Blog } from './components/sections/Blog';
 import { Contact } from './components/sections/Contact';
 import { Admin } from './components/sections/Admin';
 import { NotFound } from './pages/NotFound';
@@ -142,7 +141,6 @@ export default function App() {
               <Experience />
               <GitHubContributions />
               <Courses />
-              <Blog />
               <Contact />
             </div>
           </AnimatePresence>
