@@ -17,7 +17,7 @@ const CHUNKS: Chunk[] = [
   { id: 2, source: 'clausify/stack.md', text: 'Schema-constrained JSON output from the Gemini API at low temperature, so the UI can always trust it.', x: 170, y: 52 },
   { id: 3, source: 'experience/indeeya.md', text: 'Full-stack developer at Indeeya® (Lidex Tech), shipping Django, Angular and React products.', x: 48, y: 44 },
   { id: 4, source: 'commitgrid/README.md', text: 'Animated GitHub-style contribution heatmap for React, published on npm.', x: 30, y: 72 },
-  { id: 5, source: 'portfolio/ask-ai-kevin.md', text: 'A tool-calling chat assistant on gpt-4o-mini, grounded in my portfolio and rate limited.', x: 128, y: 58 },
+  { id: 5, source: 'portfolio/ask-ai-kevin.md', text: 'A tool-calling chat assistant, grounded in my portfolio and rate limited.', x: 128, y: 58 },
   { id: 6, source: 'voidvault/README.md', text: 'Encrypted personal cloud storage on a Discord backend.', x: 112, y: 108 },
   { id: 7, source: 'about.md', text: 'Came up through cybersecurity before moving into full-stack and AI engineering.', x: 74, y: 112 },
 ];
@@ -44,7 +44,7 @@ const QUERIES: Query[] = [
     reranked: [{ id: 1, score: 0.94 }, { id: 5, score: 0.91 }, { id: 2, score: 0.77 }],
     contextTokens: 1184,
     questionTokens: 9,
-    answer: "He built Clausify, an LLM pipeline that flags risky contract clauses [1], and this site's tool-calling assistant on gpt-4o-mini [5].",
+    answer: "He built Clausify, an LLM pipeline that flags risky contract clauses [1], and this site's tool-calling AI assistant [5].",
   },
   {
     question: 'Which frontend frameworks does he ship with?',

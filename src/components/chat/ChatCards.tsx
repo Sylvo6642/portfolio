@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
-import type { ChatAvailability, ChatContact, ChatExperience, ChatMessage, ChatProject } from './chatClient';
+import { useState, type FormEvent, type ReactNode } from 'react';
+import { getCooldownRemaining, sendContactMessage } from '../../lib/contact';
+import type { ChatAvailability, ChatContact, ChatDraft, ChatExperience, ChatMessage, ChatProject } from './chatClient';
 
 type ToolPart = Extract<ChatMessage['parts'][number], { type: `tool-${string}` }>;
 
@@ -9,6 +10,7 @@ const LOADING: Record<string, string> = {
   'tool-showSkills': 'Gathering my stack',
   'tool-showContact': 'Getting my contact details',
   'tool-showResume': 'Fetching my CV',
+  'tool-draftMessage': 'Writing up your message',
 };
 
 function Card({ children }: { children: ReactNode }) {
@@ -134,6 +136,73 @@ function Resume({ url, name }: { url: string; name: string }) {
   );
 }
 
+// Drafts already sent this page load, so reopening the chat doesn't offer to send them again
+const sentDrafts = new Set<string>();
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+const fieldClass = 'mt-1 w-full rounded-lg hairline bg-transparent px-2.5 py-1.5 text-[13px] text-fg outline-none transition-colors focus:border-accent';
+
+/** The message the chat wrote up from what the visitor said: they can fix anything, then send it */
+function MessageDraft({ id, draft }: { id: string; draft: ChatDraft }) {
+  const [fields, setFields] = useState(draft);
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(() => (sentDrafts.has(id) ? 'sent' : 'idle'));
+  const [waitMs, setWaitMs] = useState(0);
+  const set = (key: keyof ChatDraft) => (e: { target: { value: string } }) => setFields((f) => ({ ...f, [key]: e.target.value }));
+
+  const valid = fields.name.trim() && EMAIL_SHAPE.test(fields.email.trim()) && fields.message.trim();
+
+  const send = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!valid || status === 'sending') return;
+    const wait = getCooldownRemaining();
+    if (wait > 0) { setWaitMs(wait); return; }
+    setStatus('sending');
+    const ok = await sendContactMessage({ name: fields.name.trim(), email: fields.email.trim(), message: fields.message.trim() });
+    if (ok) sentDrafts.add(id);
+    setStatus(ok ? 'sent' : 'error');
+  };
+
+  if (status === 'sent') {
+    return (
+      <Card>
+        <p className="flex items-center gap-2 text-[14px] font-medium">
+          <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full bg-accent text-[11px] text-on-accent">✓</span>
+          Sent! I'll get back to you at {fields.email.trim()}.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <form onSubmit={send} className="flex flex-col gap-2.5">
+        <p className="text-[13px] text-fg/75">Check it over, then send it my way.</p>
+        <Field label="Name"><input value={fields.name} onChange={set('name')} maxLength={80} required className={fieldClass} /></Field>
+        <Field label="Email"><input type="email" value={fields.email} onChange={set('email')} maxLength={120} required className={fieldClass} /></Field>
+        <Field label="Message"><textarea value={fields.message} onChange={set('message')} maxLength={1000} rows={3} required className={`${fieldClass} resize-none`} /></Field>
+        {status === 'error' && <p className="text-[12px] text-[#E39A9A]">Couldn't send that. Try again, or email me directly.</p>}
+        {waitMs > 0 && <p className="text-[12px] text-muted">You sent me a message a moment ago. You can send another in {Math.ceil(waitMs / 60000)} min.</p>}
+        <button
+          type="submit"
+          disabled={!valid || status === 'sending'}
+          className="mt-0.5 self-start rounded-lg bg-accent px-3.5 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
+        >
+          {status === 'sending' ? 'Sending…' : 'Send message'}
+        </button>
+      </form>
+    </Card>
+  );
+}
+
 export function ToolCard({ part, showInternals }: { part: ToolPart; showInternals: boolean }) {
   const call = showInternals && 'input' in part && part.input && (
     <p className="mb-1.5 font-mono text-[10px] text-muted">
@@ -160,6 +229,7 @@ export function ToolCard({ part, showInternals }: { part: ToolPart; showInternal
     case 'tool-showSkills': card = <Skills skills={part.output.skills} />; break;
     case 'tool-showContact': card = <Contact contact={part.output.contact} availability={part.output.availability} />; break;
     case 'tool-showResume': card = <Resume url={part.output.url} name={part.output.name} />; break;
+    case 'tool-draftMessage': card = <MessageDraft id={part.toolCallId} draft={part.output} />; break;
   }
   return <div>{call}{card}</div>;
 }

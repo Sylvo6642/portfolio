@@ -22,11 +22,12 @@ type ChatTools = {
   showSkills: { input: Record<string, never>; output: { skills: { title: string; items: string[] }[] } };
   showContact: { input: Record<string, never>; output: { contact: ChatContact; availability: ChatAvailability } };
   showResume: { input: Record<string, never>; output: { url: string; name: string } };
+  draftMessage: { input: ChatDraft; output: ChatDraft };
 };
+export type ChatDraft = { name: string; email: string; message: string };
 
 /** Sent with each finished answer: usage for the "behind the scenes" view, plus the quota */
 export type ChatMetadata = {
-  model: string;
   tools: string[];
   inputTokens: number;
   outputTokens: number;

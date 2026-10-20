@@ -1,17 +1,7 @@
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useState, useEffect, useRef, type FormEvent, type ButtonHTMLAttributes } from 'react';
-import { supabase } from '../../lib/supabase';
+import { COOLDOWN_MS, getCooldownRemaining, sendContactMessage } from '../../lib/contact';
 import { RoundButton } from '../shared/RoundButton';
-
-const COOLDOWN_MS = 5 * 60 * 1000;
-const LS_KEY = 'contact_last_sent';
-
-function getCooldownRemaining(): number {
-  const raw = localStorage.getItem(LS_KEY);
-  if (!raw) return 0;
-  const elapsed = Date.now() - parseInt(raw, 10);
-  return Math.max(0, COOLDOWN_MS - elapsed);
-}
 
 function formatTime(ms: number): string {
   const totalSec = Math.ceil(ms / 1000);
@@ -227,25 +217,12 @@ export function Contact() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (cooldown > 0) return;
-    if (!supabase) { setStatus('error'); return; }
     setStatus('sending');
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-
-    const [{ error }] = await Promise.all([
-      supabase.from('messages').insert([{ name, email, message }]),
-      fetch(`${supabaseUrl}/functions/v1/send-contact-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
-      }).catch(() => null),
-    ]);
-
-    if (error) {
+    if (!(await sendContactMessage({ name, email, message }))) {
       setStatus('error');
       window.setTimeout(() => setStatus('idle'), 4000);
     } else {
-      localStorage.setItem(LS_KEY, Date.now().toString());
       setCooldown(COOLDOWN_MS);
       setStatus('sent');
       setName('');

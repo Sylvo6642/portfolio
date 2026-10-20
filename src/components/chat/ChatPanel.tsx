@@ -2,6 +2,7 @@ import { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ToolCard } from './ChatCards';
+import { KRLoader } from './KRLoader';
 import { MAX_CHARS, PromptBox } from './PromptBox';
 import { chat, describeError, fetchQuota, type ChatMessage, type ChatMetadata, type Quota } from './chatClient';
 
@@ -59,11 +60,13 @@ function Message({ message, showInternals }: { message: ChatMessage; showInterna
       </div>
     );
   }
+  // A message card speaks for itself, and the reply's "hit Send" would linger after it's sent
+  const drafted = message.parts.some((p) => p.type === 'tool-draftMessage');
   return (
     <div className="flex max-w-[92%] flex-col gap-2">
       {message.parts.map((part, i) => {
         if (part.type === 'text') {
-          return part.text ? (
+          return part.text && !drafted ? (
             <p key={i} className="whitespace-pre-wrap break-words text-[14px] leading-relaxed text-fg/90"><RichText text={part.text} /></p>
           ) : null;
         }
@@ -214,8 +217,16 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
   return (
     <div className={page ? 'flex h-full flex-col overflow-hidden bg-bg text-fg' : 'on-ink flex h-full flex-col overflow-hidden md:rounded-xl md:shadow-[0_24px_80px_rgb(0_0_0/0.35)] md:ring-1 md:ring-white/10'}>
       <header className={`flex items-center gap-3 border-b border-edge px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 ${page ? 'md:px-8' : ''}`}>
-        {/* The AI's own avatar: an illustrated me on a cream disc that reads in both themes */}
-        <img src="/ai-kevin.webp" alt="" className="h-9 w-9 rounded-full bg-[#F1E4D6] object-contain p-0.5" />
+        {page ? (
+          // The AI's own avatar: an illustrated me on a cream disc that reads in both themes
+          <img src="/ai-kevin.webp" alt="" className="h-9 w-9 rounded-full bg-[#F1E4D6] object-contain p-0.5" />
+        ) : (
+          // The mini chat wears the KR logo, which folds into a loading ring while an answer is on its way
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-edge">
+            <KRLoader loading={busy} className="h-6 w-6" />
+            <span role="status" className="sr-only">{busy ? 'Thinking' : ''}</span>
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-medium leading-tight">Ask AI Kevin</p>
           <p className="truncate text-[11px] text-muted">An AI version of me, answering from my portfolio</p>
@@ -258,7 +269,8 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
             </div>
           ))}
 
-          {status === 'submitted' && <Thinking />}
+          {/* The mini chat shows this in its header logo instead */}
+          {status === 'submitted' && page && <Thinking />}
 
           {problem?.kind === 'error' && <p className="text-[13px] text-[#E39A9A]">{problem.message}</p>}
           {limited && <LimitNotice resetAt={problem?.resetAt ?? quota?.resetAt} />}

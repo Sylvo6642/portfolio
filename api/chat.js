@@ -103,7 +103,6 @@ export default async function handler(req, res) {
       messageMetadata: ({ part }) => {
         if (part.type !== 'finish') return undefined;
         return {
-          model: MODEL_ID,
           tools: [...toolsUsed],
           inputTokens: part.totalUsage.inputTokens ?? 0,
           outputTokens: part.totalUsage.outputTokens ?? 0,
@@ -115,6 +114,18 @@ export default async function handler(req, res) {
         };
       },
       onError: () => 'Sorry, something broke on my side. Try again in a moment.',
-    }),
+    }).pipeThrough(hideProvider()),
+  });
+}
+
+// The SDK tags streamed parts with the AI provider's own metadata; visitors don't need to
+// see what the chat runs on, so it's dropped before anything reaches the browser
+function hideProvider() {
+  return new TransformStream({
+    transform(chunk, controller) {
+      // eslint-disable-next-line no-unused-vars
+      const { providerMetadata, ...rest } = chunk;
+      controller.enqueue(rest);
+    },
   });
 }

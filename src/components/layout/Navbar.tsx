@@ -19,11 +19,10 @@ const DRAWER_LINKS = [
   { id: 'experience', label: 'Experience' },
   { id: 'contributions', label: 'Activity' },
   { id: 'courses', label: 'Courses' },
-  { id: 'blog', label: 'Notes' },
   { id: 'contact', label: 'Contact' },
 ];
 // Document order — the scroll spy needs it to pick the section in view
-const SECTIONS = ['hero', 'projects', 'about', 'skills', 'experience', 'contributions', 'courses', 'blog', 'contact'];
+const SECTIONS = ['hero', 'projects', 'about', 'skills', 'experience', 'contributions', 'courses', 'contact'];
 export const SOCIALS = [
   { label: 'LinkedIn', href: 'https://linkedin.com/in/kevinsylvester6642' },
   { label: 'GitHub', href: 'https://github.com/Sylvo6642' },

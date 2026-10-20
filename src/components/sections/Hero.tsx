@@ -90,8 +90,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
       aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
       <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale }}>
-        {/* Cut-out portrait standing on the bottom edge; its edges are feathered and the cut-off
-            table fades out at the sides (baked into the image), so it sits straight on the hero */}
+        {/* Cut-out portrait standing on the bottom edge, in front of the scrolling name */}
         <motion.div
           className="absolute inset-x-0 bottom-0 z-[1] flex justify-center"
           style={reduced ? undefined : { y: photoY }}
@@ -99,9 +98,9 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           animate={ready ? { opacity: 1 } : undefined}
           transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1199/1312]">
+          <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1122/1080]">
             <img
-              src="/kevin-cutout.webp"
+              src="/kevin-hero.webp"
               alt=""
               className="h-full w-full object-contain object-bottom select-none pointer-events-none"
               draggable={false}
