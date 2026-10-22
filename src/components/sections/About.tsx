@@ -1,7 +1,7 @@
 import { easeInOut, easeOut, motion, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type MouseEvent, type ReactNode } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
-import { RevealText, useForwardOnly, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
+import { StepRevealText, useForwardOnly, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 const STATS = [
@@ -116,7 +116,7 @@ function PhotoFrame({ photo }: { photo: Photo }) {
 }
 
 /* ─── Panel 1: Intro ─── */
-// Revealed by scrolling (see HorizontalAbout): the heading writes itself letter by letter,
+// Revealed by scrolling (see HorizontalAbout): the heading writes itself word by word,
 // then the tagline and story fade in; it never reverses
 function PanelIntro({ progress }: { progress: MotionValue<number> }) {
   const photoStyle = useRevealStyle(progress, 0, 0.4, { x: 40 });
@@ -129,7 +129,7 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
       </motion.div>
       <div className="flex flex-col">
         <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
-          <RevealText
+          <StepRevealText
             progress={progress}
             range={[0.05, 0.5]}
             segments={['Half ', { text: 'security nerd', className: 'stroke-text' }, ', half ', { text: 'AI tinkerer', className: 'stroke-text' }, '.']}
@@ -139,10 +139,9 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
           Quiet. Notices a lot. Remembers what you said three conversations ago.
         </motion.p>
         <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
-          <RevealText
+          <StepRevealText
             progress={progress}
             range={[0.55, 1]}
-            unit="word"
             segments={[
               'Based in Kozhikode, Kerala. Came up through cybersecurity, now full-stack at ',
               { text: 'Indeeya® (Lidex Tech)', className: 'text-fg font-medium' },
@@ -168,7 +167,7 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
       </motion.div>
       <div className="flex flex-col md:order-1">
         <h2 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
-          <RevealText
+          <StepRevealText
             progress={progress}
             range={[0.05, 0.5]}
             segments={['Based in ', { text: 'Kerala', className: 'stroke-text' }, ', usually ', { text: 'somewhere else', className: 'stroke-text' }, '.']}
@@ -178,10 +177,9 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
           Currently planning the next trip. Again.
         </motion.p>
         <p className="mt-4 md:mt-6 text-[15px] md:text-lg text-fg/75 leading-relaxed">
-          <RevealText
+          <StepRevealText
             progress={progress}
             range={[0.55, 1]}
-            unit="word"
             segments={[
               "Home is Kozhikode, Kerala, but I'm happiest somewhere I've never been: snowy trails, streets I can't find my way around, food I can't pronounce yet. Getting a little lost is how I reset, and weirdly, it's also how I end up fixing the bug I was stuck on. I come back with fresh eyes and a camera roll nobody asked to see.",
             ]}
@@ -203,7 +201,7 @@ function SlideHeading({ progress, kicker, heading, tagline }: { progress: Motion
         {kicker}
       </motion.p>
       <h3 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
-        <RevealText progress={progress} range={[0.05, 0.45]} segments={heading} />
+        <StepRevealText progress={progress} range={[0.05, 0.45]} segments={heading} />
       </h3>
       <motion.p style={taglineStyle} className="mt-3 md:mt-4 font-mono text-[13px] md:text-sm text-fg/45 tracking-wide">
         {tagline}

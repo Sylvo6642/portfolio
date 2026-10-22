@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { Fragment, useEffect, type RefObject } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 type Edge = 'start' | 'end';
@@ -40,68 +40,116 @@ export function useRevealStyle(progress: MotionValue<number>, from: number, to: 
   return { opacity, x: tx, y: ty };
 }
 
-// Each character fades over this share of its range; their starts are spread across the rest
-const CHAR_SPAN = 0.18;
+export type Segment = string | { text: string; className?: string };
 
-function Piece({ text, at, progress, range, className, span }: { text: string; at: number; progress: MotionValue<number>; range: [number, number]; className?: string; span: number }) {
-  const [from, to] = range;
-  const start = from + at * (1 - span) * (to - from);
-  const end = start + span * (to - from);
-  const opacity = useTransform(progress, [start, end], [0, 1]);
-  const x = useTransform(progress, [start, end], ['0.6em', '0em']);
+type WordPart = { text: string; className?: string };
+
+// Words run across segments when no space separates them ("nerd" + ","), each part keeping its styling
+const segmentWords = (segments: Segment[]) => {
+  const words: { word: string; parts: WordPart[] }[] = [];
+  let open = false;
+  for (const s of segments) {
+    const { text, className } = typeof s === 'string' ? { text: s, className: undefined } : s;
+    for (const piece of text.split(/(\s+)/)) {
+      if (!piece) continue;
+      if (/^\s+$/.test(piece)) {
+        open = false;
+      } else if (open) {
+        const w = words[words.length - 1];
+        w.word += piece;
+        w.parts.push({ text: piece, className });
+      } else {
+        words.push({ word: piece, parts: [{ text: piece, className }] });
+        open = true;
+      }
+    }
+  }
+  return words;
+};
+
+/** How many words `StepRevealText` will step through, for sizing its scroll range */
+export const wordCount = (segments: Segment[]) => segmentWords(segments).length;
+
+// Each line starts this far right (in em) and eases into place while its words switch on:
+// breakthroughenergy.org's 100px at a 60px font
+const LINE_SHIFT_EM = 1.67;
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
+function StepWord({ parts, at, line, progress, spanRef }: { parts: WordPart[]; at: number; line: { start: number; end: number }; progress: MotionValue<number>; spanRef: (el: HTMLSpanElement | null) => void }) {
+  const opacity = useTransform(progress, (v) => (v >= at ? 1 : 0));
+  // Every word on a line shares the line's slide, so the line moves as one
+  const x = useTransform(progress, (v) => {
+    const t = Math.min(1, Math.max(0, (v - line.start) / (line.end - line.start)));
+    return `${LINE_SHIFT_EM * (1 - easeOutCubic(t))}em`;
+  });
   return (
-    <motion.span className={`inline-block ${className ?? ''}`} style={{ opacity, x }}>
-      {text}
+    <motion.span ref={spanRef} className="inline-block" style={{ opacity, x }}>
+      {parts.map((p, i) => (
+        <span key={i} className={p.className}>
+          {p.text}
+        </span>
+      ))}
     </motion.span>
   );
 }
 
-export type Segment = string | { text: string; className?: string };
-
-// Words are fewer and longer than letters, so each takes a bigger share of the range
-const WORD_SPAN = 0.3;
-
 /**
- * Slide left by character (or by word, for longer copy): each letter fades in from the right,
- * one after another, as `progress` moves through `range`. Words stay unbroken; segments keep
- * their own styling. Screen readers get the plain text.
+ * Word by word, each word switching fully on at its own point in `range` (no fade), while each
+ * line slides in from the right as its words appear, landing as the next line starts. It follows
+ * the scroll both ways, so scrolling back switches words off and slides lines back out
+ * (the breakthroughenergy.org reveal). Screen readers get the plain text.
  */
-export function RevealText({ segments, progress, range = [0, 1], unit = 'char' }: { segments: Segment[]; progress: MotionValue<number>; range?: [number, number]; unit?: 'char' | 'word' }) {
-  const chars = segments.flatMap((s) => {
-    const { text, className } = typeof s === 'string' ? { text: s, className: undefined } : s;
-    return [...text].map((char) => ({ char, className }));
-  });
-  const letters = chars.filter((c) => c.char !== ' ').length;
+export function StepRevealText({ segments, progress, range = [0, 1] }: { segments: Segment[]; progress: MotionValue<number>; range?: [number, number] }) {
+  const words = segmentWords(segments);
+  const [from, to] = range;
+  const step = (to - from) / words.length;
+  const at = (i: number) => from + (i + 0.5) * step;
 
-  const words: { char: string; className?: string; at: number }[][] = [[]];
-  let n = 0;
-  for (const c of chars) {
-    if (c.char === ' ') words.push([]);
-    else words[words.length - 1].push({ ...c, at: n++ / letters });
-  }
+  // Which line each word sits on, read from the layout (transforms don't affect offsetTop)
+  const spans = useRef<(HTMLSpanElement | null)[]>([]);
+  const [lineStarts, setLineStarts] = useState<number[]>([0]);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const starts: number[] = [];
+      let top = -Infinity;
+      spans.current.forEach((el, i) => {
+        if (el && el.offsetTop > top + 2) {
+          starts.push(i);
+          top = el.offsetTop;
+        }
+      });
+      setLineStarts((prev) => (prev.join() === starts.join() ? prev : starts));
+    };
+    measure();
+    // The block around the words: resize observers ignore inline elements
+    const container = spans.current[0]?.parentElement?.parentElement;
+    if (!container) return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [words.length]);
 
-  const filled = words.filter((w) => w.length);
+  // A line slides from just before its first word until just before the next line's first word
+  const lineOf = (i: number) => {
+    let l = 0;
+    while (l + 1 < lineStarts.length && lineStarts[l + 1] <= i) l++;
+    const next = lineStarts[l + 1] ?? words.length;
+    return { start: at(lineStarts[l]) - step / 2, end: at(next) - step / 2 };
+  };
+
   return (
     <>
-      {/* Not selectable, so copying the visible text doesn't paste it twice */}
-      <span className="sr-only select-none">{chars.map((c) => c.char).join('')}</span>
+      <span className="sr-only select-none">{words.map((w) => w.word).join(' ')}</span>
       <span aria-hidden>
-        {filled.map((word, w) => (
-          // Real spaces between words, so copied text reads normally
-          <Fragment key={w}>
-            {w > 0 && ' '}
-            {unit === 'word' ? (
-              // A word may mix styles (rare); it takes the styling of its first letter
-              <Piece text={word.map((c) => c.char).join('')} at={w / filled.length} progress={progress} range={range} className={word[0].className} span={WORD_SPAN} />
-            ) : (
-              <span className="inline-block whitespace-nowrap">
-                {word.map((c, i) => (
-                  <Piece key={i} text={c.char} at={c.at} progress={progress} range={range} className={c.className} span={CHAR_SPAN} />
-                ))}
-              </span>
-            )}
-          </Fragment>
-        ))}
+        {words.map((w, i) => {
+          const line = lineOf(i);
+          return (
+            <Fragment key={`${i}-${line.start}`}>
+              {i > 0 && ' '}
+              <StepWord parts={w.parts} at={at(i)} line={line} progress={progress} spanRef={(el) => (spans.current[i] = el)} />
+            </Fragment>
+          );
+        })}
       </span>
     </>
   );
