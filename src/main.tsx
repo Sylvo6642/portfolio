@@ -21,7 +21,7 @@ console.log(
   If you find one, it's a feature. If you find two, we don't talk about it.
 
   If you're hiring (or just want to roast my code):
-  → robinkevin648@gmail.com
+  → kevinrobin673@gmail.com
   → kevinsylvester.xyz/#contact
 `,
   a, c, b,

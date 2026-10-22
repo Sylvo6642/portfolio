@@ -6,7 +6,7 @@ import { KRLoader } from './KRLoader';
 import { MAX_CHARS, PromptBox } from './PromptBox';
 import { chat, describeError, fetchQuota, type ChatMessage, type ChatMetadata, type Quota } from './chatClient';
 
-const EMAIL = 'robinkevin648@gmail.com';
+const EMAIL = 'kevinrobin673@gmail.com';
 const INTERNALS_KEY = 'kr-chat-internals';
 
 const SUGGESTIONS = [
