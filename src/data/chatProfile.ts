@@ -30,7 +30,7 @@ export const CHAT_PROFILE = {
     locations: 'Remote, or on-site in Kerala',
   },
   contact: {
-    email: 'robinkevin648@gmail.com',
+    email: 'kevinrobin673@gmail.com',
     linkedin: 'https://linkedin.com/in/kevinsylvester6642',
     github: 'https://github.com/Sylvo6642',
     website: 'https://kevinsylvester.xyz',

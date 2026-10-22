@@ -164,7 +164,7 @@ function CopyButton({ value }: { value: string }) {
   );
 }
 
-const EMAIL = 'robinkevin648@gmail.com';
+const EMAIL = 'kevinrobin673@gmail.com';
 const LINKEDIN = 'https://linkedin.com/in/kevinsylvester6642';
 const EASE = [0.76, 0, 0.24, 1] as const;
 

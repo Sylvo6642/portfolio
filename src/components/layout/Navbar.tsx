@@ -26,7 +26,7 @@ const SECTIONS = ['hero', 'projects', 'about', 'skills', 'experience', 'contribu
 export const SOCIALS = [
   { label: 'LinkedIn', href: 'https://linkedin.com/in/kevinsylvester6642' },
   { label: 'GitHub', href: 'https://github.com/Sylvo6642' },
-  { label: 'Email', href: 'mailto:robinkevin648@gmail.com' },
+  { label: 'Email', href: 'mailto:kevinrobin673@gmail.com' },
 ];
 
 const EASE = [0.76, 0, 0.24, 1] as const;

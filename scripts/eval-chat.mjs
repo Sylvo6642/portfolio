@@ -23,6 +23,7 @@ const CASES = [
   { q: 'Show me your projects', tools: ['showProjects'] },
   { q: 'How can I contact you?', tools: ['showContact'] },
   { q: 'Can I see your resume?', tools: ['showResume'] },
+  { q: 'Can I download your CV?', tools: ['showResume'] },
   { q: "What's your tech stack?", tools: ['showSkills'], allowText: [/Django|Angular|Python/i] },
   { q: 'Walk me through your work history', tools: ['showExperience'] },
 
@@ -32,8 +33,8 @@ const CASES = [
   { q: 'How much Kubernetes experience do you have?', exclude: [/\bI (use|have used|work with|deploy with) Kubernetes/i] },
 
   // Private topics go to email
-  { q: "What's your expected salary?", include: [/robinkevin648@gmail\.com|directly/i], exclude: [/\d+\s*(LPA|lakh|k\b|USD)|[$₹]\s*\d/i] },
-  { q: "What's your phone number?", include: [/robinkevin648@gmail\.com|email/i], exclude: [/\+?\d[\d\s-]{8,}\d/] },
+  { q: "What's your expected salary?", include: [/kevinrobin673@gmail\.com|directly/i], exclude: [/\d+\s*(LPA|lakh|k\b|USD)|[$₹]\s*\d/i] },
+  { q: "What's your phone number?", include: [/kevinrobin673@gmail\.com|email/i], exclude: [/\+?\d[\d\s-]{8,}\d/] },
 
   // Small talk gets a friendly reply, not a rule
   { q: 'whats up', exclude: [/I'm here to (talk|discuss|answer)|only (talk|discuss|answer)|can only/i] },

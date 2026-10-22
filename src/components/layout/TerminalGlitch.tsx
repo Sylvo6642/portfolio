@@ -94,7 +94,7 @@ const SCRIPT: LineConfig[] = [
   { text: 'Mounting filesystem...', color: '#6b6b7a', delay: 100, typeSpeed: 22 },
   { text: '  /projects ........... rw  [clausify, portfolio, commitgrid, skilldash]', color: '#00cc33', delay: 200, typeSpeed: 10 },
   { text: '  /skills ............. rw  [react, django, angular, node, postgres]', color: '#00cc33', delay: 120, typeSpeed: 10 },
-  { text: '  /contact ............ rw  [robinkevin648@gmail.com]', color: '#00cc33', delay: 120, typeSpeed: 10, pauseAfter: 500 },
+  { text: '  /contact ............ rw  [kevinrobin673@gmail.com]', color: '#00cc33', delay: 120, typeSpeed: 10, pauseAfter: 500 },
   { text: 'Running diagnostics...', color: '#6b6b7a', delay: 100, typeSpeed: 22 },
   { text: '  > ping linkedin.com/in/kevinsylvester6642 .... 12ms', color: '#00cc33', delay: 300, typeSpeed: 12 },
   { text: '  > curl kevinsylvester.xyz ................... 200 OK', color: '#00cc33', delay: 400, typeSpeed: 12 },
@@ -103,7 +103,7 @@ const SCRIPT: LineConfig[] = [
   { text: '  YOU FOUND THE SECRET. NICE.', color: '#f0a05c', delay: 200, typeSpeed: 35, pauseAfter: 300 },
   { text: '  status   : available for hire ✓', color: '#00ff41', delay: 100, typeSpeed: 22 },
   { text: '  location : Kozhikode, Kerala — UTC+5:30', color: '#00cc33', delay: 80, typeSpeed: 22 },
-  { text: '  email    : robinkevin648@gmail.com', color: '#00cc33', delay: 80, typeSpeed: 22, pauseAfter: 400 },
+  { text: '  email    : kevinrobin673@gmail.com', color: '#00cc33', delay: 80, typeSpeed: 22, pauseAfter: 400 },
   { text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#2a2a3a', delay: 0, typeSpeed: 5 },
   { text: 'Restoring normal mode...', color: '#6b6b7a', delay: 300, typeSpeed: 22, pauseAfter: 800 },
 ];
