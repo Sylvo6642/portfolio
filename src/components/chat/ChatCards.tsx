@@ -122,6 +122,8 @@ function Contact({ contact, availability }: { contact: ChatContact; availability
 }
 
 function Resume({ url, name }: { url: string; name: string }) {
+  // The profile gives the production URL; `download` only works same-origin, so use the path
+  const local = url.replace(/^https:\/\/kevinsylvester\.xyz/, '');
   return (
     <Card>
       <div className="flex items-center gap-3">
@@ -130,7 +132,23 @@ function Resume({ url, name }: { url: string; name: string }) {
           <p className="truncate text-[14px] font-medium">{name}</p>
           <p className="text-xs text-muted">Full experience, skills and education</p>
         </div>
-        <LinkButton href={url}>View</LinkButton>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <a
+          href={local}
+          download="Kevin_Chris_Robin_CV.pdf"
+          className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-hover"
+        >
+          Download <span aria-hidden>↓</span>
+        </a>
+        <a
+          href={local}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 rounded-lg hairline px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:border-accent"
+        >
+          View <span aria-hidden>↗</span>
+        </a>
       </div>
     </Card>
   );

@@ -78,7 +78,7 @@ export const tools = {
     execute: async () => ({ contact: PROFILE.contact, availability: PROFILE.availability }),
   }),
   showResume: tool({
-    description: 'Show a card to view or download my CV.',
+    description: 'Show a card to view or download my CV. Use whenever someone asks for my resume or CV, or to download it.',
     inputSchema: z.object({}),
     execute: async () => ({ url: PROFILE.contact.resume, name: `${PROFILE.name} — CV` }),
   }),
