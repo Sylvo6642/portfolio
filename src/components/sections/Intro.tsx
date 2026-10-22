@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { RevealText, useRevealProgress, useRevealStyle } from '../shared/ScrollReveal';
-import { RagPipeline } from './RagPipeline';
+import { RagVideo } from './RagVideo';
 
 const STATEMENT = 'Building web products and AI-powered tools that are correct at the edges and considered in motion.';
 
@@ -24,10 +24,10 @@ export function Intro() {
           </h2>
         </div>
 
-        {/* Shows the AI side of "considered in motion": a RAG pipeline answering questions about my work.
+        {/* Shows the AI side of "considered in motion": a film of a RAG pipeline answering a question about my work.
             Fades in sliding left as it scrolls up into view */}
-        <motion.div ref={cardRef} style={cardStyle} className="mt-14 md:mt-20">
-          <RagPipeline />
+        <motion.div ref={cardRef} style={cardStyle} className="mt-14 md:mt-20 md:ml-auto md:max-w-[75%]">
+          <RagVideo />
         </motion.div>
       </div>
     </section>
