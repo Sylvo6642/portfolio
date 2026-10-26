@@ -17,8 +17,8 @@ export const PROFILE = {
     "Real problems over toy ones: would rather fix one production bug nobody wants to touch than rebuild a to-do app in a new framework."
   ],
   "now": {
-    "building": "Clausify",
-    "learning": "RAG & AI agents",
+    "building": "FileMindAI",
+    "learning": "AI Engineering",
     "reading": "Sci-fi, mostly",
     "shipping": "Indeeya ERP modules"
   },
