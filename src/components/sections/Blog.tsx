@@ -25,7 +25,7 @@ export function Blog() {
               key={post.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
+              viewport={{ amount: 0.15 }}
               transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -4 }}
               className={`shimmer p-6 hairline bg-bg/40 backdrop-blur-sm group ${post.content ? 'cursor-pointer hover:bg-fg/[0.04] transition-colors' : ''}`}

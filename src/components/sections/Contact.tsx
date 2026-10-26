@@ -243,7 +243,7 @@ export function Contact() {
               aria-label={HEADING}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, amount: 0.5 }}
+              viewport={{ amount: 0.5 }}
             >
               <span className="flex items-center gap-[0.22em]" aria-hidden>
                 <motion.img

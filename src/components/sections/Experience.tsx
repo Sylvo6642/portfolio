@@ -16,7 +16,7 @@ function DurationBadge({ start, end, inView }: { start: string; end: string | nu
 
 function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
+  const inView = useInView(ref, { amount: 0.3 });
   const isLeft = idx % 2 === 0;
 
   return (
@@ -24,7 +24,7 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
       {/* Dot on the timeline */}
       <motion.span
         initial={{ scale: 0 }}
-        animate={inView ? { scale: 1 } : {}}
+        animate={inView ? { scale: 1 } : { scale: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
         className={`absolute top-2 h-3 w-3 rounded-full bg-accent ring-4 ring-bg
           left-[14px] -translate-x-1/2
@@ -34,7 +34,7 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
       {/* Date side */}
       <motion.div
         initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-        animate={inView ? { opacity: 1, x: 0 } : {}}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: isLeft ? -20 : 20 }}
         transition={{ duration: 0.5 }}
         className={`pl-10 md:pl-0 md:pr-8 ${isLeft ? 'md:text-right md:order-1' : 'md:text-left md:order-2'} mb-3 md:mb-0`}
       >
@@ -50,7 +50,7 @@ function TimelineEntry({ entry, idx }: { entry: Exp; idx: number }) {
       {/* Card side */}
       <motion.div
         initial={{ opacity: 0, x: 30 }}
-        animate={inView ? { opacity: 1, x: 0 } : {}}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
         transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         className={`pl-10 md:pl-8 ${isLeft ? 'md:order-2' : 'md:order-1 md:pl-0 md:pr-8'}`}
       >

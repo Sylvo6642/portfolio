@@ -183,7 +183,7 @@ export function Projects() {
                 key={p.name}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ amount: 0.3 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.05 * i }}
                 className="border-t border-edge"
               >
@@ -226,7 +226,7 @@ export function Projects() {
                 key={c.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ amount: 0.3 }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.06 * (i % 2) }}
                 className={`border-b border-edge py-8 md:py-10 ${i % 2 === 0 ? 'md:pr-10 md:border-r' : 'md:pl-10'}`}
               >

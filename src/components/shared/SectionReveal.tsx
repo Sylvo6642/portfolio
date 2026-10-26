@@ -23,7 +23,7 @@ export function SectionReveal({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.15 }}
+      viewport={{ amount: 0.15 }}
       variants={variants}
       transition={{ delay }}
     >
