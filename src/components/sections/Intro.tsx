@@ -1,6 +1,5 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { StepRevealText, useRevealProgress, useRevealStyle, wordCount, type Segment } from '../shared/ScrollReveal';
 import { RagVideo } from './RagVideo';
 
@@ -42,7 +41,7 @@ function FilmCard() {
   );
 }
 
-/** Phones and Reduce Motion: both texts in normal flow, each writing itself in as it rises up the screen */
+/** Reduce Motion: both texts in normal flow, shown in full */
 function StackedIntro() {
   const statementRef = useRef<HTMLHeadingElement>(null);
   const followUpRef = useRef<HTMLParagraphElement>(null);
@@ -67,8 +66,7 @@ function StackedIntro() {
 }
 
 export function Intro() {
-  const stacked = useMobileLayout() || !!useReducedMotion();
-  return stacked ? <StackedIntro /> : <PinnedIntro />;
+  return useReducedMotion() ? <StackedIntro /> : <PinnedIntro />;
 }
 
 function PinnedIntro() {
@@ -87,19 +85,25 @@ function PinnedIntro() {
       <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
         {/* Clipped, so a line still sliding in from the right can't widen the page */}
         <div className="sticky top-0 flex items-center overflow-hidden" style={{ height: '100dvh' }}>
-          {/* The statement spans the row and cross-fades into the follow-up and film, side by side */}
-          <div className="mx-auto grid w-full max-w-[1200px] grid-cols-[1fr_1.15fr] items-center gap-x-10 px-5 sm:px-8 md:px-10 lg:gap-x-14">
-            <motion.h2 style={{ opacity: statementOpacity }} className={`col-span-2 col-start-1 row-start-1 max-w-[60%] ${statementClass}`}>
+          {/* The statement spans the row and cross-fades into the follow-up and film, side by side.
+              Phones have no room beside the text, so both texts share one cell and the film follows below */}
+          <div className="mx-auto grid w-full max-w-[1200px] items-center px-5 sm:px-8 md:grid-cols-[1fr_1.15fr] md:gap-x-10 md:px-10 lg:gap-x-14">
+            <motion.h2 style={{ opacity: statementOpacity }} className={`col-start-1 row-start-1 md:col-span-2 md:max-w-[60%] ${statementClass}`}>
               <StepRevealText segments={STATEMENT} progress={scrollYProgress} range={at(STATEMENT_IN)} />
             </motion.h2>
-            <motion.p style={{ opacity: followUpOpacity }} className={`col-start-1 row-start-1 text-[clamp(1.05rem,1.75vw,1.6rem)] ${followUpClass}`}>
+            <motion.p style={{ opacity: followUpOpacity }} className={`col-start-1 row-start-1 text-[1.2rem] md:text-[clamp(1.05rem,1.75vw,1.6rem)] ${followUpClass}`}>
               <StepRevealText segments={FOLLOW_UP} progress={scrollYProgress} range={at(FOLLOW_UP_IN)} />
             </motion.p>
-            <motion.div style={{ opacity: followUpOpacity, x: filmX }} className="col-start-2 row-start-1">
+            <motion.div style={{ opacity: followUpOpacity, x: filmX }} className="hidden md:block col-start-2 row-start-1">
               <RagVideo />
             </motion.div>
           </div>
         </div>
+      </div>
+
+      {/* Clipped, so the film sliding in from the right can't widen the page */}
+      <div className="mx-auto max-w-[1200px] overflow-x-clip px-5 sm:px-8 md:hidden">
+        <FilmCard />
       </div>
     </section>
   );
