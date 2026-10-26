@@ -303,8 +303,8 @@ function PanelPhilosophy({ progress }: { progress: MotionValue<number> }) {
 
 /* ─── Panel 5: Right now ─── */
 const NOW = [
-  { kind: 'Building', label: 'Clausify', meta: 'Gemini · structured outputs · React' },
-  { kind: 'Learning', label: 'RAG & AI agents', meta: 'Weaviate · Pinecone · tool calling' },
+  { kind: 'Building', label: 'FileMindAI', meta: 'side project · in progress' },
+  { kind: 'Learning', label: 'AI Engineering', meta: 'RAG · agents · evals' },
   { kind: 'Shipping', label: 'Indeeya ERP modules', meta: 'inventory · billing · orders' },
   { kind: 'Reading', label: 'Sci-fi, mostly', meta: 'paperback over kindle' },
 ];
