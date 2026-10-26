@@ -394,15 +394,9 @@ body {
 .nav-theme-toggle:hover { opacity: 1; background: rgb(255 255 255 / 0.12); }
 :is(header, aside) :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
-/* Avoid overlapping viewport-sized layers on the mobile scroll compositor. */
+/* The timeline's slide-in offsets would otherwise widen the page on phones */
 @media (max-width: 767px), (pointer: coarse) {
-  .hero-curtain { position: relative; }
   #experience { overflow-x: clip; }
-  /* Every blurred card, skill pill and badge is its own backdrop layer that the
-     compositor re-samples each scroll frame, which flickers on mobile GPUs. They
-     only sit over the solid page background, so the blur adds nothing here.
-     !important also beats the inline backdropFilter on the skill pills. */
-  [class*='backdrop-blur'], [style*='backdrop-filter'] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 }
 
 /* Caret blink */

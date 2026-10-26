@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useCountUp(target: number, durationMs = 1400, start = false) {
   const [value, setValue] = useState(0);
-  const startedRef = useRef(false);
 
   useEffect(() => {
-    if (!start || startedRef.current) return;
-    startedRef.current = true;
+    // Back to zero when stopped, so it counts up again next time
+    if (!start) {
+      setValue(0);
+      return;
+    }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
       setValue(target);

@@ -1,35 +1,31 @@
 import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 type Edge = 'start' | 'end';
 type Offset = [`${Edge} ${Edge}` | `${Edge} ${number}%`, `${Edge} ${Edge}` | `${Edge} ${number}%`];
 
 /**
- * A copy of `source` (0–1) that only ever moves forward: going back doesn't undo it, so once
- * something has been revealed it stays revealed. Phones and Reduce Motion start complete
- * (scroll-linked motion is what made iOS flicker).
+ * A copy of `source` (0–1) that follows the scroll both ways, so scrolling back rewinds the
+ * reveal. Reduce Motion stays complete.
  */
-export function useForwardOnly(source: MotionValue<number>) {
-  const mobile = useMobileLayout();
-  const reduced = useReducedMotion();
-  const skip = mobile || !!reduced;
+export function useScrollLinked(source: MotionValue<number>) {
+  const skip = !!useReducedMotion();
   // Start complete when skipping, so nothing relies on a later update reaching the letters
-  const progress = useMotionValue(skip ? 1 : 0);
+  const progress = useMotionValue(skip ? 1 : source.get());
 
   useEffect(() => {
-    progress.set(skip ? 1 : Math.max(progress.get(), source.get()));
+    progress.set(skip ? 1 : source.get());
   }, [skip, progress, source]);
   useMotionValueEvent(source, 'change', (v) => {
-    if (!skip && v > progress.get()) progress.set(v);
+    if (!skip) progress.set(v);
   });
   return progress;
 }
 
-/** Forward-only scroll progress of `target` through `offset` */
+/** Scroll progress of `target` through `offset`, rewinding as the page scrolls back */
 export function useRevealProgress(target: RefObject<HTMLElement>, offset: Offset) {
   const { scrollYProgress } = useScroll({ target, offset });
-  return useForwardOnly(scrollYProgress);
+  return useScrollLinked(scrollYProgress);
 }
 
 /** Opacity and a short slide, driven by a slice [from, to] of a reveal progress */

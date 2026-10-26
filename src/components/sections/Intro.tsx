@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { StepRevealText, useRevealProgress, useRevealStyle, wordCount, type Segment } from '../shared/ScrollReveal';
@@ -26,7 +26,7 @@ const at = ([from, to]: [number, number]): [number, number] => [from / END, to /
 
 const statementClass = 'display-type text-[clamp(1.75rem,3.6vw,3.1rem)] leading-[1.25] tracking-[-0.025em]';
 // Not .display-type: its line-height 1 suits a headline but crowds a paragraph
-const followUpClass = 'text-[clamp(1.25rem,2.3vw,2rem)] leading-[1.4] tracking-[-0.015em] text-fg/70';
+const followUpClass = 'leading-[1.4] tracking-[-0.015em] text-fg/70';
 
 /** The film, sliding in from the right as it scrolls up into view */
 function FilmCard() {
@@ -42,35 +42,44 @@ function FilmCard() {
   );
 }
 
+/** Phones and Reduce Motion: both texts in normal flow, each writing itself in as it rises up the screen */
+function StackedIntro() {
+  const statementRef = useRef<HTMLHeadingElement>(null);
+  const followUpRef = useRef<HTMLParagraphElement>(null);
+  const statementProgress = useRevealProgress(statementRef, ['start 85%', 'end 50%']);
+  const followUpProgress = useRevealProgress(followUpRef, ['start 85%', 'end 50%']);
+
+  return (
+    <section id="intro" className="relative bg-bg py-24 sm:py-32">
+      <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
+        <h2 ref={statementRef} className={statementClass}>
+          <StepRevealText segments={STATEMENT} progress={statementProgress} />
+        </h2>
+        <p ref={followUpRef} className={`mt-8 text-[clamp(1.25rem,2.3vw,2rem)] ${followUpClass}`}>
+          <StepRevealText segments={FOLLOW_UP} progress={followUpProgress} />
+        </p>
+        <div className="mt-14">
+          <FilmCard />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Intro() {
+  const stacked = useMobileLayout() || !!useReducedMotion();
+  return stacked ? <StackedIntro /> : <PinnedIntro />;
+}
+
+function PinnedIntro() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  // Phones and Reduce Motion get both texts in normal flow, fully shown
-  const stacked = useMobileLayout() || !!reduced;
-  const shown = useMotionValue(1);
 
   // Follows the scroll both ways: scrolling back switches words off and brings the statement back
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start 25%', 'end end'] });
   const statementOpacity = useTransform(scrollYProgress, at(FADE), [1, 0]);
   const followUpOpacity = useTransform(scrollYProgress, at(FADE), [0, 1]);
-
-  if (stacked) {
-    return (
-      <section id="intro" className="relative bg-bg py-24 sm:py-32">
-        <div ref={trackRef} className="mx-auto max-w-[1200px] px-5 sm:px-8">
-          <h2 className={statementClass}>
-            <StepRevealText segments={STATEMENT} progress={shown} />
-          </h2>
-          <p className={`mt-8 ${followUpClass}`}>
-            <StepRevealText segments={FOLLOW_UP} progress={shown} />
-          </p>
-          <div className="mt-14">
-            <FilmCard />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // The film joins the follow-up in the pinned view, sliding in from the right as the statement fades
+  const filmX = useTransform(scrollYProgress, at(FADE), [48, 0]);
 
   return (
     <section id="intro" className="relative bg-bg pb-24 sm:pb-32 md:pb-44">
@@ -78,20 +87,19 @@ export function Intro() {
       <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
         {/* Clipped, so a line still sliding in from the right can't widen the page */}
         <div className="sticky top-0 flex items-center overflow-hidden" style={{ height: '100dvh' }}>
-          {/* Both texts share one grid cell and cross-fade in place */}
-          <div className="mx-auto grid w-full max-w-[1200px] items-center px-5 sm:px-8 md:px-10">
-            <motion.h2 style={{ opacity: statementOpacity }} className={`col-start-1 row-start-1 md:max-w-[60%] ${statementClass}`}>
+          {/* The statement spans the row and cross-fades into the follow-up and film, side by side */}
+          <div className="mx-auto grid w-full max-w-[1200px] grid-cols-[1fr_1.15fr] items-center gap-x-10 px-5 sm:px-8 md:px-10 lg:gap-x-14">
+            <motion.h2 style={{ opacity: statementOpacity }} className={`col-span-2 col-start-1 row-start-1 max-w-[60%] ${statementClass}`}>
               <StepRevealText segments={STATEMENT} progress={scrollYProgress} range={at(STATEMENT_IN)} />
             </motion.h2>
-            <motion.p style={{ opacity: followUpOpacity }} className={`col-start-1 row-start-1 md:max-w-[72%] ${followUpClass}`}>
+            <motion.p style={{ opacity: followUpOpacity }} className={`col-start-1 row-start-1 text-[clamp(1.05rem,1.75vw,1.6rem)] ${followUpClass}`}>
               <StepRevealText segments={FOLLOW_UP} progress={scrollYProgress} range={at(FOLLOW_UP_IN)} />
             </motion.p>
+            <motion.div style={{ opacity: followUpOpacity, x: filmX }} className="col-start-2 row-start-1">
+              <RagVideo />
+            </motion.div>
           </div>
         </div>
-      </div>
-
-      <div className="mx-auto max-w-[1200px] px-5 sm:px-8 md:px-10">
-        <FilmCard />
       </div>
     </section>
   );

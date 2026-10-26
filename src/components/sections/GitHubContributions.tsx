@@ -13,7 +13,7 @@ export function GitHubContributions() {
   const [data, setData] = useState<ContributionData | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  const inView = useInView(ref, { amount: 0.2 });
   // The busiest days glow on a loop; only run it while the graph is on screen
   const onScreen = useInView(ref);
 
@@ -75,7 +75,7 @@ export function GitHubContributions() {
               ref={wrapRef}
               className="commitgrid-wrap w-fit max-w-full mx-auto"
               initial={{ opacity: 0, y: 16 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               {/* commitgrid's scroll container has overflow-x:auto, which clips

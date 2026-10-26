@@ -138,7 +138,7 @@ export function Skills() {
             key={group.title}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ amount: 0.2 }}
             transition={{ duration: 0.5, delay: gi * 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted mb-4">
@@ -150,7 +150,6 @@ export function Skills() {
                   key={name}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: gi * 0.08 + i * 0.04 }}
                 >
                   <SkillPill
@@ -178,7 +177,7 @@ export function Skills() {
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ amount: 0.2 }}
               transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               className="hairline p-5 bg-bg/40 flex flex-col gap-2 hover:bg-fg/[0.04] transition-colors"
             >

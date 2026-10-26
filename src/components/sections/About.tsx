@@ -1,7 +1,7 @@
 import { easeInOut, easeOut, motion, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type MouseEvent, type ReactNode } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
-import { StepRevealText, useForwardOnly, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
+import { StepRevealText, useScrollLinked, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 const STATS = [
@@ -86,7 +86,6 @@ function TiltPhoto({ photo }: { photo: Photo }) {
         style={{ background: 'rgb(var(--bg) / 0.85)', color: 'rgb(var(--accent))' }}
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
         transition={{ delay: 0.8, duration: 0.5 }}
       >
         {photo.badge}
@@ -354,6 +353,17 @@ function ProgressDot({ position, index }: { position: MotionValue<number>; index
   );
 }
 
+/* ─── Phones: the slides stack in normal flow, each writing itself in as it rises up the screen ─── */
+function StackedPanel({ Panel }: { Panel: (props: { progress: MotionValue<number> }) => ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const progress = useRevealProgress(ref, ['start 85%', 'end 60%']);
+  return (
+    <div ref={ref}>
+      <Panel progress={progress} />
+    </div>
+  );
+}
+
 /* ─── Horizontal scroll container ─── */
 function HorizontalAbout() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -374,14 +384,14 @@ function HorizontalAbout() {
   // until a screen into the pinned stretch, before it fades out
   const introProgress = useRevealProgress(trackRef, ['start 20%', 'start -100%']);
   // The travel slide writes itself in once the first has faded out
-  const travelProgress = useForwardOnly(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
-  // The sideways slides write themselves in as they arrive (phones get them already written)
-  const statsProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[0]), [0, 1]));
-  const workProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[1]), [0, 1]));
-  const nowProgress = useForwardOnly(useTransform(scrollYProgress, revealOf(MOVES[2]), [0, 1]));
+  const travelProgress = useScrollLinked(useTransform(scrollYProgress, TRAVEL_REVEAL, [0, 1]));
+  // The sideways slides write themselves in as they arrive
+  const statsProgress = useScrollLinked(useTransform(scrollYProgress, revealOf(MOVES[0]), [0, 1]));
+  const workProgress = useScrollLinked(useTransform(scrollYProgress, revealOf(MOVES[1]), [0, 1]));
+  const nowProgress = useScrollLinked(useTransform(scrollYProgress, revealOf(MOVES[2]), [0, 1]));
 
-  // The first two slides share a screen and cross-fade; this follows the scroll both ways (only
-  // the writing-in is one-way), so scrolling back up brings the first slide back
+  // The first two slides share a screen and cross-fade; like the writing, this follows the scroll both ways,
+  // so scrolling back up brings the first slide back
   const introOpacity = useTransform(scrollYProgress, FADE, [1, 0]);
   const introY = useTransform(scrollYProgress, FADE, [0, -24]);
   const travelOpacity = useTransform(scrollYProgress, FADE, [0, 1]);
@@ -404,11 +414,9 @@ function HorizontalAbout() {
       <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
         <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
-          <PanelIntro progress={introProgress} />
-          <PanelTravel progress={travelProgress} />
-          <PanelStats progress={statsProgress} />
-          <PanelPhilosophy progress={workProgress} />
-          <PanelBeyond progress={nowProgress} />
+          {[PanelIntro, PanelTravel, PanelStats, PanelPhilosophy, PanelBeyond].map((Panel, i) => (
+            <StackedPanel key={PANELS[i].id} Panel={Panel} />
+          ))}
         </div>
       </div>
     );
