@@ -5,11 +5,11 @@ let animationFrame = 0;
 
 /**
  * Lenis inertia smooth scroll, phantom.land style.
- * Keep native scrolling on touch devices, small screens, and reduced motion.
+ * Touch swipes keep the phone's own momentum; only reduced motion skips Lenis entirely.
  */
 export function initSmoothScroll() {
   if (lenis) return lenis;
-  if (window.matchMedia('(prefers-reduced-motion: reduce), (max-width: 767px), (pointer: coarse)').matches) return null;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
 
   lenis = new Lenis({
     lerp: 0.1,

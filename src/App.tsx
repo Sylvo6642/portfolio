@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { initSmoothScroll, destroySmoothScroll } from './lib/scroll';
-import { useMobileLayout } from './hooks/useMobileLayout';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { useKonamiCode } from './hooks/useKonamiCode';
 import { useMobileSecret } from './hooks/useMobileSecret';
@@ -39,7 +38,6 @@ const wantsChatHome = (() => {
 })();
 
 export default function App() {
-  const mobile = useMobileLayout();
   useVisitorTracking();
   const { done, dismiss } = useLoader();
   // 'checking' until the API confirms the chat works, so the home never flashes up and away
@@ -73,7 +71,7 @@ export default function App() {
   useEffect(() => {
     initSmoothScroll();
     return destroySmoothScroll;
-  }, [mobile]);
+  }, []);
 
   // Once the sections have slid all the way over the sticky hero, stop drawing it: its ticker
   // and spinning globe otherwise keep costing frames behind the rest of the page
@@ -129,21 +127,16 @@ export default function App() {
           <div ref={heroRef} className="hero-curtain sticky top-0" style={{ zIndex: 0, visibility: heroCovered ? 'hidden' : undefined }}>
             <Hero ready={portfolioReady} />
           </div>
-          {/* On mobile, sections render already revealed. Dozens of reveal
-              animations starting mid-scroll make iOS Safari re-rasterize text
-              as each one ends, which reads as shimmering on the first pass. */}
-          <AnimatePresence initial={!mobile}>
-            <div key="sections" className="relative bg-bg" style={{ zIndex: 1 }}>
-              <Intro />
-              <Projects />
-              <About />
-              <Skills />
-              <Experience />
-              <GitHubContributions />
-              <Courses />
-              <Contact />
-            </div>
-          </AnimatePresence>
+          <div className="relative bg-bg" style={{ zIndex: 1 }}>
+            <Intro />
+            <Projects />
+            <About />
+            <Skills />
+            <Experience />
+            <GitHubContributions />
+            <Courses />
+            <Contact />
+          </div>
         </main>
         <Footer />
         {portfolioReady && <ScrollBar />}
