@@ -1,8 +1,7 @@
-import { easeInOut, easeOut, motion, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
+import { easeInOut, easeOut, motion, useReducedMotion, useScroll, useTransform, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
 import { useRef, useCallback, useState, useEffect, type MouseEvent, type ReactNode } from 'react';
 import { SectionReveal } from '../shared/SectionReveal';
 import { StepRevealText, useScrollLinked, useRevealProgress, useRevealStyle, type Segment } from '../shared/ScrollReveal';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 const STATS = [
   { value: 3, label: 'Years in production', note: 'Started in cybersecurity, wandered into full-stack, stayed' },
@@ -122,7 +121,7 @@ function PanelIntro({ progress }: { progress: MotionValue<number> }) {
   const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 items-center md:h-full">
       <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 w-full">
         <PhotoFrame photo={WORK_PHOTO} />
       </motion.div>
@@ -160,7 +159,7 @@ function PanelTravel({ progress }: { progress: MotionValue<number> }) {
   const taglineStyle = useRevealStyle(progress, 0.45, 0.65, { y: 12 });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 items-center md:h-full">
       <motion.div style={photoStyle} className="max-w-[150px] md:max-w-sm mx-auto md:mx-0 md:ml-auto w-full md:order-2">
         <PhotoFrame photo={TRAVEL_PHOTO} />
       </motion.div>
@@ -196,7 +195,7 @@ function SlideHeading({ progress, kicker, heading, tagline }: { progress: Motion
   const taglineStyle = useRevealStyle(progress, 0.4, 0.6, { y: 12 });
   return (
     <div className="flex flex-col">
-      <motion.p style={kickerStyle} className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">
+      <motion.p style={kickerStyle} className="font-mono text-xs tracking-[0.2em] uppercase text-accent mb-3 md:mb-6">
         {kicker}
       </motion.p>
       <h3 className="display-type text-2xl md:text-4xl lg:text-5xl leading-[1.02]">
@@ -214,7 +213,7 @@ function SlideRow({ progress, index, count, children }: { progress: MotionValue<
   const from = 0.4 + (index / count) * 0.45;
   const style = useRevealStyle(progress, from, from + 0.2, { x: 24 });
   return (
-    <motion.div style={style} className={`py-4 md:py-5 ${index > 0 ? 'hairline-t' : ''}`}>
+    <motion.div style={style} className={`py-3 md:py-5 ${index > 0 ? 'hairline-t' : ''}`}>
       {children}
     </motion.div>
   );
@@ -235,7 +234,7 @@ function StatNumber({ value, progress, from }: { value: number; progress: Motion
 
 function PanelStats({ progress }: { progress: MotionValue<number> }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 items-center md:h-full">
       <SlideHeading
         progress={progress}
         kicker="By the numbers"
@@ -277,7 +276,7 @@ const PRINCIPLES = [
 
 function PanelPhilosophy({ progress }: { progress: MotionValue<number> }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 items-center md:h-full">
       <SlideHeading
         progress={progress}
         kicker="How I work"
@@ -291,7 +290,7 @@ function PanelPhilosophy({ progress }: { progress: MotionValue<number> }) {
               <span className="font-mono text-xs md:text-sm text-accent pt-1.5 md:pt-2">{String(i + 1).padStart(2, '0')}</span>
               <div className="flex flex-col gap-1.5 md:gap-2">
                 <span className="display-type text-xl md:text-2xl leading-tight">{p.title}</span>
-                <span className="text-[15px] md:text-base text-fg/70 leading-relaxed">{p.body}</span>
+                <span className="text-[15px] md:text-base text-fg/70 leading-normal md:leading-relaxed">{p.body}</span>
               </div>
             </div>
           </SlideRow>
@@ -311,7 +310,7 @@ const NOW = [
 
 function PanelBeyond({ progress }: { progress: MotionValue<number> }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-20 items-center md:h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 items-center md:h-full">
       <SlideHeading
         progress={progress}
         kicker="Right now"
@@ -353,7 +352,7 @@ function ProgressDot({ position, index }: { position: MotionValue<number>; index
   );
 }
 
-/* ─── Phones: the slides stack in normal flow, each writing itself in as it rises up the screen ─── */
+/* ─── Reduce Motion: the slides stack in normal flow, shown in full ─── */
 function StackedPanel({ Panel }: { Panel: (props: { progress: MotionValue<number> }) => ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const progress = useRevealProgress(ref, ['start 85%', 'end 60%']);
@@ -364,11 +363,44 @@ function StackedPanel({ Panel }: { Panel: (props: { progress: MotionValue<number
   );
 }
 
+/* ─── One screen of the sideways track. A slide taller than the screen (long copy on a short
+   phone) shrinks until it fits, rather than being cut off top and bottom ─── */
+function Slide({ children }: { children: ReactNode }) {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+    const fit = () => {
+      const { paddingTop, paddingBottom } = getComputedStyle(outer);
+      const room = outer.clientHeight - parseFloat(paddingTop) - parseFloat(paddingBottom);
+      // offsetHeight ignores the transform, so shrinking never feeds back into the measurement
+      setScale(Math.min(1, room / inner.offsetHeight));
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(outer);
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={outerRef} className="mx-auto max-w-6xl px-6 w-full h-full pt-28 pb-4 md:pt-20 md:pb-10 grid items-center">
+      {/* Shrinks from the top, where an overflowing grid row starts */}
+      <div ref={innerRef} className="col-start-1 row-start-1 grid origin-top" style={{ transform: scale < 1 ? `scale(${scale})` : undefined }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Horizontal scroll container ─── */
 function HorizontalAbout() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440));
-  const isMobile = useMobileLayout();
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -407,11 +439,10 @@ function HorizontalAbout() {
   // holds still between moves while the slide on screen writes itself in.
   const x = useTransform(scrollYProgress, MOVES.flat(), [0, -vw, -vw, -2 * vw, -2 * vw, -3 * vw], { ease: easeInOut });
 
-  // Native document flow avoids resizing/scaling an entire sticky track as
-  // mobile browser chrome expands and collapses during a swipe.
-  if (isMobile) {
+  // Reduce Motion gets the slides stacked in normal flow instead of a sideways track
+  if (reduced) {
     return (
-      <div ref={trackRef} className="about-mobile mx-auto max-w-6xl px-6 pt-28 pb-16">
+      <div ref={trackRef} className="mx-auto max-w-6xl px-6 pt-28 pb-16">
         <p className="font-mono text-xs tracking-[0.25em] uppercase text-muted mb-10">(02) — About</p>
         <div className="space-y-20">
           {[PanelIntro, PanelTravel, PanelStats, PanelPhilosophy, PanelBeyond].map((Panel, i) => (
@@ -422,7 +453,6 @@ function HorizontalAbout() {
     );
   }
 
-  const slide = 'mx-auto max-w-6xl px-6 w-full h-full pt-32 pb-6 md:pt-20 md:pb-10 grid items-center';
   return (
     /* Outer — one screen for the pinned view plus the scroll distance of all the stages */
     <div ref={trackRef} style={{ height: `${(SCROLL_VH + 1) * 100}vh` }}>
@@ -451,29 +481,29 @@ function HorizontalAbout() {
         >
           {/* Panels 1 and 2 — Intro, then Travel, stacked on one screen */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className={slide}>
+            <Slide>
               <motion.div style={{ opacity: introOpacity, y: introY, pointerEvents: introPointer }} className="col-start-1 row-start-1">
                 <PanelIntro progress={introProgress} />
               </motion.div>
               <motion.div style={{ opacity: travelOpacity, pointerEvents: travelPointer }} className="col-start-1 row-start-1">
                 <PanelTravel progress={travelProgress} />
               </motion.div>
-            </div>
+            </Slide>
           </div>
 
           {/* Panel 3 — Stats */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className={slide}><PanelStats progress={statsProgress} /></div>
+            <Slide><PanelStats progress={statsProgress} /></Slide>
           </div>
 
           {/* Panel 4 — How I work */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className={slide}><PanelPhilosophy progress={workProgress} /></div>
+            <Slide><PanelPhilosophy progress={workProgress} /></Slide>
           </div>
 
           {/* Panel 5 — Right now */}
           <div className="flex-shrink-0 w-screen h-full">
-            <div className={slide}><PanelBeyond progress={nowProgress} /></div>
+            <Slide><PanelBeyond progress={nowProgress} /></Slide>
           </div>
         </motion.div>
       </div>
