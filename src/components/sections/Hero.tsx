@@ -115,7 +115,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           {...enter(0.15)}
           className="hidden md:flex absolute z-[2] left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
         >
-          <p className="text-[15px] leading-[1.35]">
+          <p className="text-[18px] leading-[1.35]">
             Located
             <br />
             in Kerala,
@@ -135,7 +135,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="mb-5 md:mb-9" aria-hidden>
             <path d="M6 6l12 12M18 8v10H8" />
           </svg>
-          <p className="text-[clamp(1.6rem,2.6vw,2.6rem)] leading-[1.25] tracking-[-0.02em]">
+          <p className="text-[clamp(1.6rem,2.6vw,2.6rem)] md:text-[clamp(2rem,3.2vw,3.25rem)] leading-[1.25] tracking-[-0.02em]">
             Full-Stack &amp;
             <br />
             AI Engineer

@@ -6,8 +6,8 @@ import { RagVideo } from './RagVideo';
 const STATEMENT: Segment[] = ['Building web products and AI-powered tools that are correct at the edges and considered in motion.'];
 
 const FOLLOW_UP: Segment[] = [
-  { text: 'The model is the easy part.', className: 'text-fg' },
-  " The engineering is everything around it: the schema it has to fill, the eval that catches it lying, the budget that stops it running up a bill. It's the API key that never reaches the browser, the tools it's allowed to call and nothing more, and the prompt injection it has to shrug off. Get those right and the model can be swapped out on a Friday afternoon. Get them wrong and no model will save you.",
+  { text: 'Anyone can get an LLM to say something clever.', className: 'text-fg' },
+  " Getting it to say the right thing, every time, with a real user's data, is the part I actually enjoy. Schemas, evals, fallbacks, cost caps, and a healthy distrust of anything the model says.",
 ];
 
 // Timeline in screen heights scrolled since the section's top passed 25% down the screen
