@@ -88,7 +88,7 @@ function PinnedIntro() {
           {/* The statement spans the row and cross-fades into the follow-up and film, side by side.
               Phones have no room beside the text, so both texts share one cell and the film follows below */}
           <div className="mx-auto grid w-full max-w-[1200px] items-center px-5 sm:px-8 md:grid-cols-[1fr_1.15fr] md:gap-x-10 md:px-10 lg:gap-x-14">
-            <motion.h2 style={{ opacity: statementOpacity }} className={`col-start-1 row-start-1 md:col-span-2 md:max-w-[60%] ${statementClass}`}>
+            <motion.h2 style={{ opacity: statementOpacity }} className={`col-start-1 row-start-1 md:col-end-3 md:max-w-[60%] ${statementClass}`}>
               <StepRevealText segments={STATEMENT} progress={scrollYProgress} range={at(STATEMENT_IN)} />
             </motion.h2>
             <motion.p style={{ opacity: followUpOpacity }} className={`col-start-1 row-start-1 text-[1.2rem] md:text-[clamp(1.05rem,1.75vw,1.6rem)] ${followUpClass}`}>
