@@ -128,7 +128,7 @@ export default function App() {
         <AnimatePresence>
           {chatHome === 'show' && <ChatHome key="chat-home" ready={done} quota={quota} onExit={showPortfolio} />}
         </AnimatePresence>
-        <Navbar />
+        <Navbar ready={portfolioReady} />
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div ref={heroRef} className="hero-curtain sticky top-0" style={{ zIndex: 0, visibility: heroCovered ? 'hidden' : undefined }}>

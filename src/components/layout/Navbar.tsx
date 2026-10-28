@@ -54,7 +54,8 @@ function DrawerCurve() {
   );
 }
 
-export function Navbar() {
+/** `ready`: the portfolio is on screen, so the logo writes itself in */
+export function Navbar({ ready = true }: { ready?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
@@ -101,7 +102,7 @@ export function Navbar() {
       <header className="absolute top-0 inset-x-0 z-30 text-white">
         <div className="flex items-center justify-between px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
           <a href="#hero" onClick={(event) => go(event, 'hero')} aria-label="Kevin Robin, back to top">
-            <KRLogo className="h-7 w-7" />
+            <KRLogo className="h-7 w-7" draw={ready} />
           </a>
 
           <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-base" aria-label="Main navigation">

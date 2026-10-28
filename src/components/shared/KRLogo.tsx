@@ -1,31 +1,82 @@
-import { forwardRef, useId } from 'react';
+import { forwardRef, useEffect, useId, useState, type CSSProperties } from 'react';
 
-/** The KR mark as three strokes, traced from KR_light.png (500×500): stem, K arm flowing into the R, K leg */
-export const KR_PATHS = [
-  'M144.5 146 V356',
-  'M150 259.5 L254 155.5 H309 A52 52 0 0 1 309 259.5 H272.4 L362.4 356',
-  'M178.6 230.9 L295.4 356',
+/** The serif KR monogram as one filled outline, traced from the 1254×1254 master artwork */
+export const KR_SHAPE =
+  'M943.2 888.2C932.8 887.8 920.1 886 908.8 883.3C884.5 877.3 863.9 866 848.5 850.2C838.1 839.5 830.8 829.3 816.8 805.6C814.2 801.1 812 797.3 812 797.2C812 797 811.6 796.3 811.1 795.6C810.6 794.8 809.5 793 808.6 791.5C807.8 790 804.6 784.4 801.5 779C798.4 773.6 795 767.8 794 766C791 760.8 783.5 747.9 778.8 739.8C776.4 735.6 773.5 730.7 772.4 728.8C769.2 723.2 763.2 713.8 758.5 706.8C742.8 683.6 727.4 672.7 704.8 668.9C703.1 668.6 694.9 668.2 686.5 668.1L671.2 667.8L671.2 665.2L671.2 662.8L688.8 662.4C716.9 661.9 728.9 659.8 746.3 652.3C759.3 646.7 770.8 638.7 781.1 628.2C795.2 613.9 804.4 597.6 809.5 578.2C811.5 570.3 812.2 564.7 812.2 554.5C812.3 539.8 810.6 531 804.9 516.6C802.8 511.3 801.3 508.4 797.4 502.5C790.3 491.8 783.8 484.9 774.5 477.9C759.4 466.7 744.1 460.6 723.2 457.5C711.4 455.8 708.8 455.8 641 455.8L573.7 455.8L570.2 458.8C568.3 460.4 562.3 465.7 556.9 470.5C551.4 475.3 545.5 480.5 543.8 482C542 483.5 538.3 486.8 535.5 489.2C529.4 494.6 527 496.8 515.5 506.7C510.7 510.8 502.2 518.3 496.5 523.2C481.4 536.3 477.1 540 469 547.2C465 550.7 461.1 554.1 460.4 554.8C457.8 557.1 458.3 557.2 467.8 556C469.8 555.7 475.8 555.4 481.1 555.2C514.1 554.1 541.3 562.5 565.2 581.1C569.4 584.4 581.8 596 585.7 600.2C598.9 614.9 612.1 631.5 626.2 651.3C628.4 654.3 631 657.9 632 659.2C633 660.6 637.8 667.3 642.6 674C658.3 696 659.5 697.7 665.6 706.2C669 710.9 672.5 715.8 673.5 717.2C675.9 720.8 694.8 746.2 697.8 749.8C715.5 771.5 724.4 780.6 738 790.8C748.3 798.6 755.4 802.7 770.2 809.5C772.4 810.5 782 813.5 786.8 814.7C792.3 816.1 795.7 816.7 802.1 817.5C804.5 817.8 806.5 818.3 806.5 818.5C806.5 819.7 776.1 819.7 767.8 818.5C743.9 815 731.8 811.5 714 802.9C696.7 794.5 681.6 783.1 662.7 764.3C647.6 749.2 635 734.9 615 710.1C610.4 704.5 605.5 698.4 604 696.5C598.5 689.8 581.2 668.3 579 665.6C577.8 664 575.2 660.8 573.3 658.5C571.4 656.2 568.3 652.5 566.5 650.2C530.3 606.3 512.6 587.7 497.6 577.7C489.3 572.1 478.4 567.7 469.9 566.5C464.6 565.7 448.8 566.1 447 567C446.4 567.3 444.5 568.9 442.8 570.4C441.1 572 435.6 576.9 430.6 581.4L421.5 589.6L421.6 664.2C421.7 718.2 421.9 739.2 422.3 740.2C422.6 741.1 423.2 742.8 423.5 744C425 749.1 429 755.4 433.3 759.6C441.3 767.2 453.6 772.1 468.4 773.6C474.1 774.1 475.7 774.7 474.3 775.8C473.6 776.3 327.7 776.4 327.2 775.8C327 775.7 327 775.2 327.1 774.8C327.3 774.4 328.8 774 332 773.8C356.6 771.9 373.4 760.7 378.2 742.8L379.2 738.8L379.2 569.8C379.2 409.9 379.2 400.6 378.4 397.1C376.9 391 375.7 388.1 372.8 383.8C368.3 377 361.2 371.5 352.4 368.1C346.8 365.9 342.9 365 333.8 363.7C327.2 362.8 327 362.8 327 361.7C327 361.1 336.8 361 400 361C463.2 361 473 361.1 473 361.7C473 362.2 472.2 362.5 470.6 362.7C452.4 365.1 442 369.1 433.4 377C428.9 381 425.6 386.7 423.6 393.5C423.3 394.5 422.7 396 422.4 397C421.9 398.4 421.7 416.4 421.6 486.4C421.5 561.9 421.6 574 422.2 573.7C422.8 573.3 440.6 557.7 449.8 549.5C451.4 548 455.1 544.8 457.8 542.5C460.5 540.2 464.2 536.9 466 535.2C469.1 532.4 473.8 528.4 488.2 516C491.6 513.1 499.1 506.7 504.8 501.8C520.5 488.2 532.6 477.8 538.8 472.5C541.8 469.9 548.1 464.5 552.8 460.5C562.6 452.1 565.7 449.5 587.1 431.5C592.1 427.3 597.5 422.8 599 421.5C600.5 420.2 607.7 414.2 615 408.2C640.8 386.7 653.9 375.7 662.4 368.4C668.4 363.2 671.3 361 672.2 361C673.5 361 676.2 363.7 675.7 364.5C675.6 364.8 672.2 367.8 668.1 371.3C660.1 378.3 649.9 387.3 641.2 395.2C638.2 398 631 404.4 625.2 409.5C619.5 414.6 613 420.4 610.7 422.5C605.6 427.3 595.2 436.6 589.3 441.7C580.9 449 581.3 448.6 582 449C582.4 449.3 616.9 449.5 658.7 449.5C730.1 449.5 744.4 449.8 756.8 451C779.8 453.3 797.8 458.3 815.3 467.2C823.9 471.7 832.8 478.4 840.5 486.3C852.2 498.3 859 510.4 863.9 527.8C866.9 538.4 867.8 551.8 866.2 563.4C865.4 569.7 865.4 569.8 864.2 574.7C861.8 584.8 857.9 594.2 851.7 604.4C842.2 620.1 826.5 634.8 808.8 644.8C798 650.9 784.6 656.5 774.2 659.3C765.9 661.5 763.8 662 759.2 662.9C753.1 664.2 741 666 738.7 666C736 666 736.7 666.7 740.4 667.6C757.4 671.7 773.3 679.5 787 690.4C803.5 703.6 816.2 720.5 843 765C847.7 772.8 851.5 779.2 854.8 784.7C870.8 811.4 872.6 814.3 879.6 824.8C889.5 839.5 895.2 846.6 904.6 855.8C913.9 864.8 921.3 870.2 933 876C944.7 881.9 953.5 884.6 967.4 886.5C970 886.9 971.5 887.3 971.4 887.7C971.2 888.2 954.7 888.5 943.2 888.2Z';
+
+/** A square box around the mark, centred on it */
+const VIEWBOX = '309.5 284.5 680 680';
+
+/**
+ * Pen strokes that write the mark in, in drawing order: stem, top serif, bottom serif, K arm, R bowl,
+ * K leg, R leg. They live in a mask over the filled outline, so the real letterforms show through as
+ * each one is drawn. `len` is the stroke's length (for the dash), `at` when it starts in the intro (s)
+ */
+export const KR_PENS = [
+  { d: 'M400 334L400 802', w: 64, len: 468, at: 0 },
+  { d: 'M474 365L328 365', w: 30, len: 146, at: 0.22 },
+  { d: 'M328 771L474 771', w: 30, len: 146, at: 0.3 },
+  { d: 'M678 356L414 582', w: 42, len: 348, at: 0.3 },
+  { d: 'M570 453L700 453C792 453 839 502 839 557C839 612 792 660 700 661L664 663', w: 66, len: 555, at: 0.5 },
+  { d: 'M436 572C510 558 568 618 624 698C680 776 730 816 810 819', w: 74, len: 471, at: 0.7 },
+  { d: 'M668 665C734 668 766 702 796 753C846 838 882 885 976 887', w: 68, len: 402, at: 0.9 },
 ];
-/** Centre of the mark, in path coordinates */
-export const KR_CENTER = [252.5, 247.5] as const;
+/** How long the intro runs, in ms: the last pen's start plus a pen's duration (.kr-intro in index.css) */
+const INTRO_MS = (KR_PENS[KR_PENS.length - 1].at + 0.6) * 1000;
 
-/** Static KR logo in currentColor; KRLoader animates this same markup */
-export const KRLogo = forwardRef<SVGSVGElement, { className?: string }>(function KRLogo({ className }, ref) {
+type Props = {
+  className?: string;
+  /** Leave unset for a plain static mark. false: hidden, waiting to draw in. true: writes itself in once */
+  draw?: boolean;
+};
+
+/** The KR logo in currentColor. KRLoader drives the same pens to loop it while the chat is thinking */
+export const KRLogo = forwardRef<SVGSVGElement, Props>(function KRLogo({ className, draw }, ref) {
   // useId's colons would break the url(#…) reference
-  const clip = `kr-clip-${useId().replace(/:/g, '')}`;
+  const mask = `kr-mask-${useId().replace(/:/g, '')}`;
+  // Once the intro has played the mask comes off, so the finished mark is the exact outline
+  const [drawn, setDrawn] = useState(false);
+  useEffect(() => {
+    if (!draw) return;
+    const timer = window.setTimeout(() => setDrawn(true), INTRO_MS);
+    return () => window.clearTimeout(timer);
+  }, [draw]);
+
+  const masked = draw !== undefined && !drawn;
+  const mode = masked ? (draw ? 'kr-intro' : 'kr-waiting') : '';
+
   return (
-    <svg ref={ref} viewBox="122.5 117.5 260 260" className={className} overflow="visible" aria-hidden>
+    <svg ref={ref} viewBox={VIEWBOX} className={`${mode} ${className ?? ''}`} aria-hidden>
       <defs>
-        {/* Cuts the leg ends flat, like the PNG */}
-        <clipPath id={clip}><rect x="0" y="145.5" width="500" height="204" /></clipPath>
-      </defs>
-      <g clipPath={`url(#${clip})`}>
-        <g data-kr-spin>
-          {KR_PATHS.map((d) => (
-            <path key={d} d={d} fill="none" stroke="currentColor" strokeWidth={20} strokeLinejoin="miter" />
+        <mask id={mask} maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+          {KR_PENS.map((pen) => (
+            <path
+              key={pen.d}
+              data-kr-pen
+              d={pen.d}
+              fill="none"
+              stroke="#fff"
+              strokeWidth={pen.w}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="kr-pen"
+              style={{ '--len': pen.len, '--at': `${pen.at}s` } as CSSProperties}
+            />
           ))}
-        </g>
-      </g>
+        </mask>
+      </defs>
+      {/* The thin hairline stroke keeps the serifs and the K's hairline arm at least a pixel wide
+          at icon sizes; it doesn't scale, so it vanishes into the letters when the mark is large */}
+      <path
+        data-kr-ink
+        d={KR_SHAPE}
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth={0.75}
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        mask={masked ? `url(#${mask})` : undefined}
+      />
     </svg>
   );
 });

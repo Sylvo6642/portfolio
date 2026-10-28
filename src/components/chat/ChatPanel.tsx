@@ -221,7 +221,7 @@ export default function ChatPanel({ onClose, variant = 'panel', initialQuestion,
           // The AI's own avatar: an illustrated me on a cream disc that reads in both themes
           <img src="/ai-kevin.webp" alt="" className="h-9 w-9 rounded-full bg-[#F1E4D6] object-contain p-0.5" />
         ) : (
-          // The mini chat wears the KR logo, which folds into a loading ring while an answer is on its way
+          // The mini chat wears the KR logo, which keeps rewriting itself while an answer is on its way
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-edge">
             <KRLoader loading={busy} className="h-6 w-6" />
             <span role="status" className="sr-only">{busy ? 'Thinking' : ''}</span>
