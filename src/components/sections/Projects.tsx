@@ -171,7 +171,7 @@ export function Projects() {
   const hovered = PROJECTS[hover.index];
 
   return (
-    <section id="projects" className="relative bg-bg pb-28 md:pb-40">
+    <section id="projects" className="relative bg-bg pt-20 pb-28 md:pt-28 md:pb-40">
       <div className="mx-auto max-w-[1200px] px-5 sm:px-8 md:px-10">
         <p className="eyebrow mb-8 md:mb-12 md:px-[6%]">(01) — Recent work</p>
 

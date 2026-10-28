@@ -71,15 +71,17 @@ export const wordCount = (segments: Segment[]) => segmentWords(segments).length;
 const LINE_SHIFT_EM = 1.67;
 const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
 
-function StepWord({ parts, at, line, progress, spanRef }: { parts: WordPart[]; at: number; line: { start: number; end: number }; progress: MotionValue<number>; spanRef: (el: HTMLSpanElement | null) => void }) {
+function StepWord({ parts, at, line, progress, fadeMs, spanRef }: { parts: WordPart[]; at: number; line: { start: number; end: number }; progress: MotionValue<number>; fadeMs: number; spanRef: (el: HTMLSpanElement | null) => void }) {
   const opacity = useTransform(progress, (v) => (v >= at ? 1 : 0));
+  // A CSS transition on opacity only, so the switch eases over a fixed time however fast the scroll
+  const fade = fadeMs ? { transition: `opacity ${fadeMs}ms ease-out` } : undefined;
   // Every word on a line shares the line's slide, so the line moves as one
   const x = useTransform(progress, (v) => {
     const t = Math.min(1, Math.max(0, (v - line.start) / (line.end - line.start)));
     return `${LINE_SHIFT_EM * (1 - easeOutCubic(t))}em`;
   });
   return (
-    <motion.span ref={spanRef} className="inline-block" style={{ opacity, x }}>
+    <motion.span ref={spanRef} className="inline-block" style={{ opacity, x, ...fade }}>
       {parts.map((p, i) => (
         <span key={i} className={p.className}>
           {p.text}
@@ -90,12 +92,13 @@ function StepWord({ parts, at, line, progress, spanRef }: { parts: WordPart[]; a
 }
 
 /**
- * Word by word, each word switching fully on at its own point in `range` (no fade), while each
+ * Word by word, each word switching on at its own point in `range` with a quick fade, while each
  * line slides in from the right as its words appear, landing as the next line starts. It follows
  * the scroll both ways, so scrolling back switches words off and slides lines back out
  * (the breakthroughenergy.org reveal). Screen readers get the plain text.
+ * Each switch is a quick `fadeMs` fade, in and out (0 for a hard switch).
  */
-export function StepRevealText({ segments, progress, range = [0, 1] }: { segments: Segment[]; progress: MotionValue<number>; range?: [number, number] }) {
+export function StepRevealText({ segments, progress, range = [0, 1], fadeMs = 180 }: { segments: Segment[]; progress: MotionValue<number>; range?: [number, number]; fadeMs?: number }) {
   const words = segmentWords(segments);
   const [from, to] = range;
   const step = (to - from) / words.length;
@@ -142,7 +145,7 @@ export function StepRevealText({ segments, progress, range = [0, 1] }: { segment
           return (
             <Fragment key={`${i}-${line.start}`}>
               {i > 0 && ' '}
-              <StepWord parts={w.parts} at={at(i)} line={line} progress={progress} spanRef={(el) => (spans.current[i] = el)} />
+              <StepWord parts={w.parts} at={at(i)} line={line} progress={progress} fadeMs={fadeMs} spanRef={(el) => (spans.current[i] = el)} />
             </Fragment>
           );
         })}

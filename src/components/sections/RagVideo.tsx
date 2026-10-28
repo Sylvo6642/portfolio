@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 
 const SRC = '/media/rag-explainer';
 
-export function RagVideo({ className = '' }: { className?: string }) {
+export function RagVideo({ className = '', paused = false }: { className?: string; paused?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   // Low threshold: on phones the card is only a slice of the screen
@@ -21,9 +21,9 @@ export function RagVideo({ className = '' }: { className?: string }) {
     const video = videoRef.current;
     if (!video) return;
     // play() rejects if autoplay is blocked; the poster frame stays up, which is fine
-    if (inView) video.play().catch(() => {});
+    if (inView && !paused) video.play().catch(() => {});
     else video.pause();
-  }, [inView]);
+  }, [inView, paused]);
 
   return (
     <figure ref={ref} className={className}>

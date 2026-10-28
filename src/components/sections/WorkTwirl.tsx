@@ -11,7 +11,7 @@ import { RagVideo } from './RagVideo';
  * cost one style pass per frame instead of a React render.
  */
 
-const LINE: Segment[] = ["Some things I've designed and built end to end, from LLM pipelines to encrypted storage."];
+const LINE: Segment[] = ["What I build when nobody's assigning tickets."];
 
 const FILM = '/media/rag-explainer';
 
@@ -65,23 +65,26 @@ const T = {
 } as const;
 // Screens of scroll the pinned stage holds for
 const TRACK_VH = 5;
+/** Screens of scroll the tiles spend spiralling off: the project list rises over the twirl during these */
+export const TWIRL_EXIT_SCREENS = (1 - T.exit[0]) * TRACK_VH;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const span = (p: number, [a, b]: readonly [number, number]) => clamp01((p - a) / (b - a));
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-export function WorkTwirl() {
-  return useReducedMotion() ? <StillWork /> : <TwirlingWork />;
+/** `paused`: covered by the next section, so the film stops playing behind it */
+export function WorkTwirl({ paused = false }: { paused?: boolean }) {
+  return useReducedMotion() ? <StillWork paused={paused} /> : <TwirlingWork paused={paused} />;
 }
 
 /** Reduce Motion: the film as a card and the line beneath it, nothing moving */
-function StillWork() {
+function StillWork({ paused }: { paused: boolean }) {
   return (
     <section aria-label="Selected work" className="relative bg-bg py-20 sm:py-28">
       <div className="mx-auto max-w-[1000px] px-5 sm:px-8">
-        <RagVideo />
-        <p className="mt-10 display-type text-[clamp(1.5rem,3vw,2.4rem)] leading-[1.2] tracking-[-0.025em] text-center">
+        <RagVideo paused={paused} />
+        <p className="mt-10 display-type !font-medium text-[clamp(1.5rem,3vw,2.4rem)] leading-[1.2] tracking-[-0.025em] text-center">
           {LINE.join('')}
         </p>
       </div>
@@ -89,7 +92,7 @@ function StillWork() {
   );
 }
 
-function TwirlingWork() {
+function TwirlingWork({ paused }: { paused: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const floodRef = useRef<HTMLDivElement>(null);
@@ -210,13 +213,13 @@ function TwirlingWork() {
     });
   }, [near]);
 
-  // The film only plays while the stage is on screen
+  // The film only plays while the stage is on screen and not covered
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (inView) video.play().catch(() => {});
+    if (inView && !paused) video.play().catch(() => {});
     else video.pause();
-  }, [inView]);
+  }, [inView, paused]);
 
   return (
     <section aria-label="Selected work" className="relative bg-bg">
@@ -256,7 +259,7 @@ function TwirlingWork() {
           </div>
 
           <div ref={copyRef} className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 will-change-[opacity]">
-            <p className="display-type max-w-[19ch] text-center text-[clamp(1.6rem,3.4vw,3rem)] leading-[1.15] tracking-[-0.03em] sm:max-w-[24ch]">
+            <p className="display-type !font-medium max-w-[19ch] text-center text-[clamp(1.6rem,3.4vw,3rem)] leading-[1.15] tracking-[-0.03em] sm:max-w-[24ch]">
               <StepRevealText segments={LINE} progress={progress} range={[...T.words]} />
             </p>
           </div>

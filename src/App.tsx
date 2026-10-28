@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, MotionConfig } from 'framer-motion';
+import { AnimatePresence, MotionConfig, useReducedMotion } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { initSmoothScroll, destroySmoothScroll } from './lib/scroll';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
@@ -19,7 +19,8 @@ import { About } from './components/sections/About';
 import { Skills } from './components/sections/Skills';
 import { Experience } from './components/sections/Experience';
 import { Projects } from './components/sections/Projects';
-import { WorkTwirl } from './components/sections/WorkTwirl';
+import { TWIRL_EXIT_SCREENS, WorkTwirl } from './components/sections/WorkTwirl';
+import { CurtainPin } from './components/shared/CurtainPin';
 import { GitHubContributions } from './components/sections/GitHubContributions';
 import { Courses } from './components/sections/Courses';
 import { Contact } from './components/sections/Contact';
@@ -73,6 +74,8 @@ export default function App() {
     initSmoothScroll();
     return destroySmoothScroll;
   }, []);
+
+  const reduced = useReducedMotion();
 
   // Once the sections have slid all the way over the sticky hero, stop drawing it: its ticker
   // and spinning globe otherwise keep costing frames behind the rest of the page
@@ -133,8 +136,11 @@ export default function App() {
           </div>
           <div className="relative bg-bg" style={{ zIndex: 1 }}>
             <Intro />
-            <WorkTwirl />
-            <Projects />
+            {/* The work list slides up over the twirl while its tiles are still spiralling off, as the
+                intro does over the hero. Reduce Motion has no twirl, so the list waits for its end */}
+            <CurtainPin next={<Projects />} overlap={reduced ? 0 : TWIRL_EXIT_SCREENS}>
+              {(covered) => <WorkTwirl paused={covered} />}
+            </CurtainPin>
             <About />
             <Skills />
             <Experience />
