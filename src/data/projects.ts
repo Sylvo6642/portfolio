@@ -1,4 +1,4 @@
-export type ProjectStatus = 'live' | 'wip' | 'private';
+export type ProjectStatus = 'live' | 'completed' | 'wip' | 'private';
 
 export interface PersonalProject {
   name: string;
@@ -30,10 +30,30 @@ export interface ProfessionalCard {
 
 export const PERSONAL_PROJECTS: PersonalProject[] = [
   {
+    name: 'FileMind AI',
+    category: 'AI Engineering · RAG & Tool Calling',
+    previewBg: '#0B0B0F',
+    cover: { type: 'video', src: '/media/filemind-cover.mp4', poster: '/media/filemind-cover.jpg' },
+    status: 'completed',
+    summary: 'Finds files by what they say, not what they’re called: ask for "the contract about website maintenance" and get the file, with the passage that matches. Built to learn embeddings, vector databases, RAG, tool calling and evaluation.',
+    highlights: [
+      'Claude Haiku agent loop with search_files and inspect_file tools, written by hand with no agent framework, to learn the mechanics',
+      'Hybrid search: OpenAI embeddings in ChromaDB plus BM25 keyword ranking with number normalisation, so "50000 rupees" finds "₹50,000"',
+      'Measured on 35 queries over deliberate look-alike documents: Recall@5 100%, Hit@1 90.6% (embeddings alone missed the numeric queries)',
+      'Every file Claude names is checked against what its tools returned, and the token cost of an upload is shown before anything is sent',
+    ],
+    tech: ['Claude API', 'Tool Calling', 'RAG', 'OpenAI Embeddings', 'ChromaDB', 'BM25', 'Evals', 'FastAPI', 'Python', 'Angular', 'SQLite'],
+    link: 'https://github.com/Sylvo6642/FileMindAI',
+    linkLabel: 'GitHub',
+    video: '/media/filemind.mp4',
+    poster: '/media/filemind-cover.jpg',
+  },
+  {
     name: 'Clausify',
     category: 'AI Engineering · LLM Contract Analysis',
     preview: '/projects/previews/clausify.jpg',
     previewBg: '#D5DAE1',
+    cover: { type: 'video', src: '/media/clausify-cover.mp4', poster: '/media/clausify-cover.jpg' },
     status: 'private',
     summary: 'AI contract risk analyzer: an LLM pipeline that flags risky clauses and explains each one in plain English.',
     highlights: [
@@ -46,6 +66,28 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     link: null,
     linkLabel: 'Private',
     liveUrl: '/projects/Clausify/',
+    video: '/media/clausify.mp4',
+    poster: '/media/clausify-cover.jpg',
+  },
+  {
+    name: 'SkillDash',
+    category: 'Marketplace & Full-Stack',
+    preview: '/projects/previews/skilldash.jpg',
+    previewBg: '#F2A93B',
+    cover: { type: 'video', src: '/media/skilldash-cover.mp4', poster: '/media/skilldash-cover.jpg' },
+    status: 'wip',
+    summary: 'Connects customers with local manual-labor workers across India.',
+    highlights: [
+      'Live worker map with real-time locations via Supabase Realtime',
+      'Job posting, worker bidding and payment on assignment',
+      'Three Edge Functions for assignment, payout and notifications',
+    ],
+    tech: ['React', 'Vite', 'Tailwind', 'Framer Motion', 'Supabase', 'Postgres', 'Edge Functions', 'Zustand', 'React Router', 'Leaflet'],
+    link: 'https://github.com/Sylvo6642/SkillDash/',
+    linkLabel: 'GitHub',
+    liveUrl: '/projects/SkillDash/',
+    video: '/media/skilldash.mp4',
+    poster: '/media/skilldash-poster.jpg',
   },
   {
     name: 'CommitGrid',
@@ -99,25 +141,6 @@ export const PERSONAL_PROJECTS: PersonalProject[] = [
     liveUrl: '/projects/VoidVault/',
     video: '/media/void-vault.mp4',
     poster: '/media/void-vault-poster.jpg',
-  },
-  {
-    name: 'SkillDash',
-    category: 'Marketplace & Full-Stack',
-    preview: '/projects/previews/skilldash.jpg',
-    previewBg: '#F2A93B',
-    status: 'wip',
-    summary: 'Connects customers with local manual-labor workers across India.',
-    highlights: [
-      'Live worker map with real-time locations via Supabase Realtime',
-      'Job posting, worker bidding and payment on assignment',
-      'Three Edge Functions for assignment, payout and notifications',
-    ],
-    tech: ['React', 'Vite', 'Tailwind', 'Framer Motion', 'Supabase', 'Postgres', 'Edge Functions', 'Zustand', 'React Router', 'Leaflet'],
-    link: 'https://github.com/Sylvo6642/SkillDash/',
-    linkLabel: 'GitHub',
-    liveUrl: '/projects/SkillDash/',
-    video: '/media/skilldash.mp4',
-    poster: '/media/skilldash-poster.jpg',
   },
 ];
 

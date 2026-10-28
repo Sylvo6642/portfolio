@@ -36,7 +36,7 @@ function LinkButton({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-const STATUS: Record<ChatProject['status'], string> = { live: 'Live', wip: 'In progress', private: 'Private' };
+const STATUS: Record<ChatProject['status'], string> = { live: 'Live', completed: 'Completed', wip: 'In progress', private: 'Private' };
 
 function Projects({ projects }: { projects: ChatProject[] }) {
   return (

@@ -6,7 +6,7 @@ import { browserId } from './quota';
 export type ChatProject = {
   name: string;
   category: string;
-  status: 'live' | 'wip' | 'private';
+  status: 'live' | 'completed' | 'wip' | 'private';
   summary: string;
   tech: string[];
   repo: string | null;

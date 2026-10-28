@@ -57,6 +57,33 @@ export const PROFILE = {
   ],
   "projects": [
     {
+      "name": "FileMind AI",
+      "category": "AI Engineering · RAG & Tool Calling",
+      "status": "completed",
+      "summary": "Finds files by what they say, not what they’re called: ask for \"the contract about website maintenance\" and get the file, with the passage that matches. Built to learn embeddings, vector databases, RAG, tool calling and evaluation.",
+      "highlights": [
+        "Claude Haiku agent loop with search_files and inspect_file tools, written by hand with no agent framework, to learn the mechanics",
+        "Hybrid search: OpenAI embeddings in ChromaDB plus BM25 keyword ranking with number normalisation, so \"50000 rupees\" finds \"₹50,000\"",
+        "Measured on 35 queries over deliberate look-alike documents: Recall@5 100%, Hit@1 90.6% (embeddings alone missed the numeric queries)",
+        "Every file Claude names is checked against what its tools returned, and the token cost of an upload is shown before anything is sent"
+      ],
+      "tech": [
+        "Claude API",
+        "Tool Calling",
+        "RAG",
+        "OpenAI Embeddings",
+        "ChromaDB",
+        "BM25",
+        "Evals",
+        "FastAPI",
+        "Python",
+        "Angular",
+        "SQLite"
+      ],
+      "repo": "https://github.com/Sylvo6642/FileMindAI",
+      "liveUrl": null
+    },
+    {
       "name": "Clausify",
       "category": "AI Engineering · LLM Contract Analysis",
       "status": "private",
@@ -81,6 +108,31 @@ export const PROFILE = {
       ],
       "repo": null,
       "liveUrl": "https://kevinsylvester.xyz/projects/Clausify/"
+    },
+    {
+      "name": "SkillDash",
+      "category": "Marketplace & Full-Stack",
+      "status": "wip",
+      "summary": "Connects customers with local manual-labor workers across India.",
+      "highlights": [
+        "Live worker map with real-time locations via Supabase Realtime",
+        "Job posting, worker bidding and payment on assignment",
+        "Three Edge Functions for assignment, payout and notifications"
+      ],
+      "tech": [
+        "React",
+        "Vite",
+        "Tailwind",
+        "Framer Motion",
+        "Supabase",
+        "Postgres",
+        "Edge Functions",
+        "Zustand",
+        "React Router",
+        "Leaflet"
+      ],
+      "repo": "https://github.com/Sylvo6642/SkillDash/",
+      "liveUrl": "https://kevinsylvester.xyz/projects/SkillDash/"
     },
     {
       "name": "CommitGrid",
@@ -123,31 +175,6 @@ export const PROFILE = {
       ],
       "repo": null,
       "liveUrl": "https://kevinsylvester.xyz/projects/VoidVault/"
-    },
-    {
-      "name": "SkillDash",
-      "category": "Marketplace & Full-Stack",
-      "status": "wip",
-      "summary": "Connects customers with local manual-labor workers across India.",
-      "highlights": [
-        "Live worker map with real-time locations via Supabase Realtime",
-        "Job posting, worker bidding and payment on assignment",
-        "Three Edge Functions for assignment, payout and notifications"
-      ],
-      "tech": [
-        "React",
-        "Vite",
-        "Tailwind",
-        "Framer Motion",
-        "Supabase",
-        "Postgres",
-        "Edge Functions",
-        "Zustand",
-        "React Router",
-        "Leaflet"
-      ],
-      "repo": "https://github.com/Sylvo6642/SkillDash/",
-      "liveUrl": "https://kevinsylvester.xyz/projects/SkillDash/"
     }
   ],
   "workHighlights": [

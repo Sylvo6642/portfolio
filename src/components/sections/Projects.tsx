@@ -28,7 +28,7 @@ function GalleryHeader({ counter }: { counter?: { active: number; progress: Moti
     <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8 md:px-10 flex items-end justify-between gap-6">
       <div>
         <p className="eyebrow mb-4 md:mb-6">(01) — Recent work</p>
-        <h2 className="display-type text-[clamp(2rem,4.6vw,3.75rem)] max-w-[12ch] sm:max-w-none">Side projects, shipped.</h2>
+        <h2 className="display-type text-[clamp(2rem,4.6vw,3.75rem)] max-w-[12ch] sm:max-w-none">Things I’ve built.</h2>
       </div>
       {counter && (
         <div className="flex shrink-0 flex-col items-end gap-3 md:gap-4" aria-hidden>

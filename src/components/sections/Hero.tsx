@@ -57,16 +57,6 @@ function NameMarquee({ active }: { active: boolean }) {
   );
 }
 
-function Globe() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-7 w-7 globe-spin" fill="none" stroke="currentColor" strokeWidth="1.1" aria-hidden>
-      <circle cx="12" cy="12" r="9.5" />
-      <ellipse cx="12" cy="12" rx="4.2" ry="9.5" />
-      <path d="M2.5 12h19M4 7h16M4 17h16" />
-    </svg>
-  );
-}
-
 export function Hero({ ready = true, active = true }: { ready?: boolean; active?: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
@@ -111,23 +101,6 @@ export function Hero({ ready = true, active = true }: { ready?: boolean; active?
               fetchPriority="high"
             />
           </div>
-        </motion.div>
-
-        {/* Location pill */}
-        <motion.div
-          {...enter(0.15)}
-          className="hidden md:flex absolute z-[2] left-0 top-[46%] -translate-y-1/2 items-center gap-10 rounded-r-full bg-ink py-3 pl-10 pr-3"
-        >
-          <p className="text-[18px] leading-[1.35]">
-            Located
-            <br />
-            in Kerala,
-            <br />
-            India
-          </p>
-          <span className="grid h-[68px] w-[68px] place-items-center rounded-full bg-hero">
-            <Globe />
-          </span>
         </motion.div>
 
         {/* Role */}

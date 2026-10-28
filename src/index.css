@@ -311,14 +311,6 @@ body {
   transform: scale(1);
 }
 
-@keyframes globe-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.globe-spin {
-  animation: globe-spin 12s linear infinite;
-}
-
 /* ─── Liquid glass (theme-aware: hairline gradient uses --edge) ─── */
 .liquid-glass {
   background: rgb(var(--bg) / 0.45);

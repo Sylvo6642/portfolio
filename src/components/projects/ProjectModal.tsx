@@ -6,7 +6,7 @@ import type { PersonalProject, ProjectStatus } from '../../data/projects';
 import { ProjectCover } from './ProjectCover';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const STATUS_LABEL: Record<ProjectStatus, string> = { live: 'Live', wip: 'In development', private: 'Private build' };
+const STATUS_LABEL: Record<ProjectStatus, string> = { live: 'Live', completed: 'Completed', wip: 'In development', private: 'Private build' };
 
 /** Project details opened from a gallery card: a bottom sheet on phones, a centred panel above */
 export function ProjectModal({ project, onClose, onVideoOpen, videoOpen }: {

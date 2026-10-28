@@ -181,7 +181,8 @@ export function ProjectCover({ project, playing = true }: { project: PersonalPro
         muted
         loop
         playsInline
-        preload="metadata"
+        // Buffer ahead so playback starts without a stall when the card comes into focus
+        preload="auto"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
       />
