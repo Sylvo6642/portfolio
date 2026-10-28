@@ -78,7 +78,9 @@
   --accent-soft-text: 94 54 28; /* #5E361C */
   --highlight: 185 128 63;      /* #B9803F */
   /* Hero backdrop and the dark contact/footer surface */
-  --hero: 107 90 77;            /* #6B5A4D */
+  --hero: 74 58 47;             /* #4A3A2F espresso */
+  --hero-fg: 255 255 255;
+  --hero-muted: 241 228 214;    /* #F1E4D6 */
   --ink: 30 22 17;              /* #1E1611 */
   /* Captures the page background so dark-surface scopes can still reach it */
   --page: var(--bg);
@@ -109,7 +111,9 @@ html.dark {
   --accent-soft: 46 33 24;      /* #2E2118 */
   --accent-soft-text: 232 184 135;
   --highlight: 185 128 63;
-  --hero: 58 46 37;             /* #3A2E25 */
+  --hero: 30 22 17;             /* #1E1611 ink */
+  --hero-fg: 243 236 227;       /* #F3ECE3 */
+  --hero-muted: 200 182 166;    /* #C8B6A6 */
   --page: var(--bg);
   --code-bg: 15 11 8;           /* #0F0B08 */
   --code-bar: 30 22 17;         /* #1E1611 */
@@ -309,6 +313,34 @@ body {
 .nav-link:hover::after,
 .nav-link[aria-current]::after {
   transform: scale(1);
+}
+
+/* ─── Hero backdrop: studio spotlight and grain in light, dot grid on ink in dark ─── */
+.hero-light {
+  background:
+    radial-gradient(ellipse 42% 62% at 50% 78%, rgb(255 228 196 / 0.26), rgb(255 228 196 / 0) 72%),
+    radial-gradient(ellipse 85% 85% at 50% 50%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.4) 100%);
+}
+html.dark .hero-light {
+  background: radial-gradient(ellipse 40% 55% at 50% 82%, rgb(233 201 163 / 0.16), rgb(233 201 163 / 0) 72%);
+}
+.hero-dots {
+  display: none;
+  background-image: radial-gradient(rgb(233 201 163 / 0.22) 1.2px, rgb(233 201 163 / 0) 1.8px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
+}
+html.dark .hero-dots {
+  display: block;
+}
+.hero-grain {
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+html.dark .hero-grain {
+  display: none;
 }
 
 /* ─── Liquid glass (theme-aware: hairline gradient uses --edge) ─── */

@@ -7,8 +7,8 @@ export interface Course {
 }
 
 export const COURSES: Course[] = [
-  { title: 'ChatGPT Prompt Engineering for Developers', org: 'DeepLearning.AI × OpenAI', period: 'Oct 2025' },
   { title: 'AI Engineering', org: 'Coursera', period: 'Aug 2025 – Present' },
+  { title: 'ChatGPT Prompt Engineering for Developers', org: 'DeepLearning.AI × OpenAI', period: 'Oct 2025' },
   { title: 'Python Full Stack Developer', org: 'Techolas Technologies', period: 'Jan – Sep 2023' },
   { title: 'Red Team CICSA Analyst', org: 'Red Team', period: 'May – Dec 2022' },
 ];

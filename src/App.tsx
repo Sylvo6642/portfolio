@@ -132,7 +132,7 @@ export default function App() {
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div ref={heroRef} className="hero-curtain sticky top-0" style={{ zIndex: 0, visibility: heroCovered ? 'hidden' : undefined }}>
-            <Hero ready={portfolioReady} active={!heroCovered} />
+            <Hero ready={portfolioReady} />
           </div>
           <div className="relative bg-bg" style={{ zIndex: 1 }}>
             <Intro />

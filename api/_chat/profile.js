@@ -289,14 +289,14 @@ export const PROFILE = {
   ],
   "courses": [
     {
-      "title": "ChatGPT Prompt Engineering for Developers",
-      "org": "DeepLearning.AI × OpenAI",
-      "period": "Oct 2025"
-    },
-    {
       "title": "AI Engineering",
       "org": "Coursera",
       "period": "Aug 2025 – Present"
+    },
+    {
+      "title": "ChatGPT Prompt Engineering for Developers",
+      "org": "DeepLearning.AI × OpenAI",
+      "period": "Oct 2025"
     },
     {
       "title": "Python Full Stack Developer",

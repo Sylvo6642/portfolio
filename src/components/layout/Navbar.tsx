@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { Magnetic } from '../shared/Magnetic';
+import { KRLogo } from '../shared/KRLogo';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { scrollToId, scrollToTop, setScrollLocked } from '../../lib/scroll';
 
@@ -98,7 +99,10 @@ export function Navbar() {
     <>
       {/* Top bar — sits over the hero and scrolls away with it */}
       <header className="absolute top-0 inset-x-0 z-30 text-white">
-        <div className="flex items-center justify-end px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
+        <div className="flex items-center justify-between px-5 pt-5 sm:px-8 md:px-10 md:pt-8">
+          <a href="#hero" onClick={(event) => go(event, 'hero')} aria-label="Kevin Robin, back to top">
+            <KRLogo className="h-7 w-7" />
+          </a>
 
           <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-base" aria-label="Main navigation">
             {HEADER_LINKS.map((item) => (
@@ -113,8 +117,10 @@ export function Navbar() {
 
           <div className="flex md:hidden items-center gap-1">
             <ThemeToggle />
-            <button type="button" onClick={() => setOpen(true)} className="nav-link text-[15px] pl-2" aria-expanded={open} aria-controls="site-drawer">
-              Menu
+            <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center" aria-label="Menu" aria-expanded={open} aria-controls="site-drawer">
+              <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+                <path d="M1 1h18M1 11h18" />
+              </svg>
             </button>
           </div>
         </div>

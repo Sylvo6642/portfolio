@@ -1,64 +1,8 @@
-import {
-  motion,
-  useAnimationFrame,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useVelocity,
-} from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 
 const EASE = [0.76, 0, 0.24, 1] as const;
-const NAME = 'Kevin Robin';
-// Percent of one copy's width travelled per second when the page is still
-const BASE_SPEED = 4;
 
-function wrap(min: number, max: number, v: number) {
-  const range = max - min;
-  return ((((v - min) % range) + range) % range) + min;
-}
-
-/**
- * Endless name ticker. Always drifts right to left, so the name reads naturally;
- * scrolling either way speeds it up.
- */
-function NameMarquee({ active }: { active: boolean }) {
-  const reduced = useReducedMotion();
-  const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
-  const velocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(velocity, { damping: 50, stiffness: 400 });
-  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 4], { clamp: false });
-
-  // Four copies: shifting by one copy (25% of the row) loops seamlessly
-  const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
-
-  useAnimationFrame((_, delta) => {
-    // Covered by the sections above it: nothing to draw, so skip the per-frame work
-    if (reduced || !active) return;
-    let moveBy = -(BASE_SPEED / 4) * (delta / 1000);
-    moveBy += moveBy * Math.abs(velocityFactor.get());
-    baseX.set(baseX.get() + moveBy);
-  });
-
-  return (
-    <div className="overflow-hidden select-none" aria-hidden>
-      {/* Its own layer: the row moves every frame, and repainting the giant name each time is what stuttered */}
-      <motion.div className="flex w-max whitespace-nowrap" style={{ x, willChange: 'transform' }}>
-        {Array.from({ length: 4 }, (_, i) => (
-          <span key={i} className="display-type pr-[0.3em] text-[22vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
-            {NAME} <span className="inline-block px-[0.12em]">—</span>
-          </span>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
-export function Hero({ ready = true, active = true }: { ready?: boolean; active?: boolean }) {
-  const sectionRef = useRef<HTMLElement>(null);
+export function Hero({ ready = true }: { ready?: boolean }) {
   const reduced = useReducedMotion();
 
   // The next section slides over the (sticky) hero — dim and settle it as it goes
@@ -77,13 +21,42 @@ export function Hero({ ready = true, active = true }: { ready?: boolean; active?
   return (
     <section
       id="hero"
-      ref={sectionRef}
-      className="relative h-[100svh] min-h-[560px] overflow-hidden bg-hero text-white"
+      className="relative h-[100svh] min-h-[560px] overflow-hidden bg-hero text-[rgb(var(--hero-fg))]"
       aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
+      {/* Studio spotlight in light, dot grid on ink in dark */}
+      <div aria-hidden className="hero-light pointer-events-none absolute inset-0" />
+      <div aria-hidden className="hero-dots pointer-events-none absolute inset-0" />
+
       {/* Its own layer, so the scroll-linked scale moves pixels instead of redrawing the giant name */}
-      <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale, willChange: 'transform' }}>
-        {/* Cut-out portrait standing on the bottom edge, in front of the scrolling name */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center md:block"
+        style={reduced ? undefined : { scale: contentScale, willChange: 'transform' }}
+      >
+        {/* Stacked on phones, one line across the top on desktop */}
+        <motion.h1
+          {...enter(0)}
+          className="relative z-0 pt-[88px] md:pt-[clamp(84px,11svh,112px)] px-5 md:px-10 text-center font-medium text-[26vw] md:text-[clamp(88px,15.5vw,236px)] leading-[0.9] tracking-[-0.055em] md:whitespace-nowrap"
+        >
+          Kevin <br className="md:hidden" />
+          Robin
+        </motion.h1>
+
+        {/* Role: under the name on phones, bottom right beside the portrait on desktop */}
+        <motion.div
+          {...enter(0.25)}
+          className="relative z-[2] mt-6 flex max-w-[300px] flex-col items-center gap-2 px-5 text-center md:absolute md:right-[4%] md:bottom-[96px] md:mt-0 md:max-w-[360px] md:items-start md:gap-[22px] md:px-0 md:text-left"
+        >
+          <p className="text-[26px] md:text-[40px] leading-[1.12] tracking-[-0.025em] whitespace-nowrap">
+            Full-Stack &amp; <br className="hidden md:inline" />
+            AI Engineer
+          </p>
+          <p className="text-[15px] md:text-[17px] leading-[1.5] text-[rgb(var(--hero-muted))]">
+            I build LLM features that still give the right answer with a real user’s data.
+          </p>
+        </motion.div>
+
+        {/* Cut-out portrait standing on the bottom edge, in front of the name */}
         <motion.div
           className="absolute inset-x-0 bottom-0 z-[1] flex justify-center"
           style={reduced ? undefined : { y: photoY }}
@@ -91,7 +64,8 @@ export function Hero({ ready = true, active = true }: { ready?: boolean; active?
           animate={ready ? { opacity: 1 } : undefined}
           transition={{ duration: 1.4, ease: 'easeOut' }}
         >
-          <div className="w-[102vw] max-h-[78svh] md:w-auto md:h-[min(96svh,100vw)] aspect-[1122/1080]">
+          {/* Nudged a touch right of centre on desktop, so the role has room beside it */}
+          <div className="aspect-[1122/1080] w-full max-h-[50svh] md:max-h-none md:w-[min(640px,70%,calc((100svh_-_230px)*1.039))] md:translate-x-[4%]">
             <img
               src="/kevin-hero.webp"
               alt=""
@@ -102,31 +76,10 @@ export function Hero({ ready = true, active = true }: { ready?: boolean; active?
             />
           </div>
         </motion.div>
-
-        {/* Role */}
-        <motion.div
-          {...enter(0.25)}
-          className="absolute z-[2] left-5 sm:left-8 top-[11svh] md:left-auto md:right-[7%] md:top-[30%]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="mb-5 md:mb-9" aria-hidden>
-            <path d="M6 6l12 12M18 8v10H8" />
-          </svg>
-          <p className="text-[clamp(1.6rem,2.6vw,2.6rem)] md:text-[clamp(2rem,3.2vw,3.25rem)] leading-[1.25] tracking-[-0.02em]">
-            Full-Stack &amp;
-            <br />
-            AI Engineer
-          </p>
-        </motion.div>
-
-        {/* Name ticker, behind the cut-out so it scrolls past behind me: across the table on
-            desktop, behind my head on phones (where the figure fills the width) */}
-        <motion.div {...enter(0)} className="absolute inset-x-0 top-[31svh] z-0 md:top-auto md:bottom-[4svh]">
-          <NameMarquee active={active} />
-        </motion.div>
       </motion.div>
 
-      <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: shade, willChange: 'opacity' }} />
-      <h1 className="sr-only">Kevin Robin — Full-Stack Developer and AI Engineer based in Kerala, India</h1>
+      <div aria-hidden className="hero-grain pointer-events-none absolute inset-0 z-[3]" />
+      <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-[4] bg-black" style={{ opacity: shade, willChange: 'opacity' }} />
     </section>
   );
 }
