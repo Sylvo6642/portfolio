@@ -19,6 +19,7 @@ import { About } from './components/sections/About';
 import { Skills } from './components/sections/Skills';
 import { Experience } from './components/sections/Experience';
 import { Projects } from './components/sections/Projects';
+import { WorkTwirl } from './components/sections/WorkTwirl';
 import { GitHubContributions } from './components/sections/GitHubContributions';
 import { Courses } from './components/sections/Courses';
 import { Contact } from './components/sections/Contact';
@@ -129,6 +130,7 @@ export default function App() {
           </div>
           <div className="relative bg-bg" style={{ zIndex: 1 }}>
             <Intro />
+            <WorkTwirl />
             <Projects />
             <About />
             <Skills />
