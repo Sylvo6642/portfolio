@@ -79,16 +79,19 @@ export default function App() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [heroCovered, setHeroCovered] = useState(false);
   useEffect(() => {
-    const check = () => {
-      const height = heroRef.current?.offsetHeight ?? window.innerHeight;
-      setHeroCovered(window.scrollY > height + 50);
+    // The height is read on resize only, so scrolling never forces a layout here
+    let height = 0;
+    const check = () => setHeroCovered(window.scrollY > height + 50);
+    const measure = () => {
+      height = heroRef.current?.offsetHeight ?? window.innerHeight;
+      check();
     };
-    check();
+    measure();
     window.addEventListener('scroll', check, { passive: true });
-    window.addEventListener('resize', check);
+    window.addEventListener('resize', measure);
     return () => {
       window.removeEventListener('scroll', check);
-      window.removeEventListener('resize', check);
+      window.removeEventListener('resize', measure);
     };
   }, []);
 
@@ -126,7 +129,7 @@ export default function App() {
         <main className="relative bg-bg" style={{ zIndex: 1 }}>
           {/* Hero is sticky so the intro slides up over it like a curtain */}
           <div ref={heroRef} className="hero-curtain sticky top-0" style={{ zIndex: 0, visibility: heroCovered ? 'hidden' : undefined }}>
-            <Hero ready={portfolioReady} />
+            <Hero ready={portfolioReady} active={!heroCovered} />
           </div>
           <div className="relative bg-bg" style={{ zIndex: 1 }}>
             <Intro />

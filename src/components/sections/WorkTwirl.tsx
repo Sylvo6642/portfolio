@@ -104,6 +104,9 @@ function TwirlingWork() {
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] });
   const progress = useScrollLinked(scrollYProgress);
   const inView = useInView(trackRef, { amount: 0.05 });
+  // Two screens out, so the film buffers and the screenshots decode before they're on screen,
+  // instead of all at once on the frame they first appear
+  const near = useInView(trackRef, { margin: '200% 0px' });
 
   const render = useCallback((p: number) => {
     const { w, h, mobile, tile, cardW, cardH } = size.current;
@@ -189,6 +192,24 @@ function TwirlingWork() {
 
   useMotionValueEvent(progress, 'change', render);
 
+  useEffect(() => {
+    if (!near) return;
+    const video = videoRef.current;
+    if (video && video.preload !== 'auto') {
+      video.preload = 'auto';
+      video.load();
+    }
+    tileRefs.current.forEach((el) => {
+      const img = el?.querySelector('img');
+      // Tiles hidden on phones stay lazy, so they're never fetched there
+      if (img && !img.dataset.decoded && el!.offsetWidth > 0) {
+        img.dataset.decoded = '1';
+        img.loading = 'eager';
+        img.decode().catch(() => {});
+      }
+    });
+  }, [near]);
+
   // The film only plays while the stage is on screen
   useEffect(() => {
     const video = videoRef.current;
@@ -201,7 +222,7 @@ function TwirlingWork() {
     <section aria-label="Selected work" className="relative bg-bg">
       <div ref={trackRef} style={{ height: `${(TRACK_VH + 1) * 100}vh` }}>
         <div ref={stageRef} className="sticky top-0 overflow-hidden bg-bg" style={{ height: '100dvh' }}>
-          <div ref={floodRef} aria-hidden className="absolute inset-0 bg-accent-soft" style={{ opacity: 0 }} />
+          <div ref={floodRef} aria-hidden className="absolute inset-0 bg-accent-soft will-change-[opacity]" style={{ opacity: 0 }} />
 
           <div aria-hidden className="absolute left-1/2 top-1/2">
             {TILES.map((t, i) => (
@@ -234,7 +255,7 @@ function TwirlingWork() {
             </div>
           </div>
 
-          <div ref={copyRef} className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6">
+          <div ref={copyRef} className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 will-change-[opacity]">
             <p className="display-type max-w-[19ch] text-center text-[clamp(1.6rem,3.4vw,3rem)] leading-[1.15] tracking-[-0.03em] sm:max-w-[24ch]">
               <StepRevealText segments={LINE} progress={progress} range={[...T.words]} />
             </p>

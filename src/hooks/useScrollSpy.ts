@@ -21,29 +21,52 @@ export function useScrollSpy(ids: string[], offset = 120) {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => {
+    // Section tops are measured only when the page changes size, never while scrolling:
+    // reading layout on every scroll event forced a reflow per frame
+    let tops: { id: string; top: number }[] = [];
+    let frame = 0;
+    let lastId = '';
+    let lastHash = window.location.hash;
+
+    const measure = () => {
+      tops = ids.flatMap((id) => {
+        const el = document.getElementById(id);
+        return el ? [{ id, top: el.getBoundingClientRect().top + window.scrollY }] : [];
+      });
+    };
+
+    const update = () => {
+      frame = 0;
       const y = window.scrollY + offset;
       let current = ids[0];
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top + window.scrollY <= y) current = id;
+      for (const t of tops) if (t.top <= y) current = t.id;
+      if (current !== lastId) {
+        lastId = current;
+        setActiveId(current);
       }
-      setActiveId(current);
 
       // Update URL hash without adding to history
       const newHash = window.scrollY < 50 ? '' : `#${current}`;
-      const currentHash = window.location.hash;
-      if (newHash !== currentHash) {
+      if (newHash !== lastHash) {
+        lastHash = newHash;
         history.replaceState(null, '', newHash || window.location.pathname);
       }
     };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const remeasure = () => { measure(); schedule(); };
+
+    measure();
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', remeasure);
+    // Sections grow as content loads and accordions open
+    const observer = new ResizeObserver(remeasure);
+    observer.observe(document.body);
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', remeasure);
+      observer.disconnect();
     };
   }, [ids, offset]);
 

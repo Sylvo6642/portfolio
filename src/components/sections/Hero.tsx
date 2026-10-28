@@ -24,7 +24,7 @@ function wrap(min: number, max: number, v: number) {
  * Endless name ticker. Always drifts right to left, so the name reads naturally;
  * scrolling either way speeds it up.
  */
-function NameMarquee() {
+function NameMarquee({ active }: { active: boolean }) {
   const reduced = useReducedMotion();
   const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
@@ -36,7 +36,8 @@ function NameMarquee() {
   const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
 
   useAnimationFrame((_, delta) => {
-    if (reduced) return;
+    // Covered by the sections above it: nothing to draw, so skip the per-frame work
+    if (reduced || !active) return;
     let moveBy = -(BASE_SPEED / 4) * (delta / 1000);
     moveBy += moveBy * Math.abs(velocityFactor.get());
     baseX.set(baseX.get() + moveBy);
@@ -44,7 +45,8 @@ function NameMarquee() {
 
   return (
     <div className="overflow-hidden select-none" aria-hidden>
-      <motion.div className="flex w-max whitespace-nowrap" style={{ x }}>
+      {/* Its own layer: the row moves every frame, and repainting the giant name each time is what stuttered */}
+      <motion.div className="flex w-max whitespace-nowrap" style={{ x, willChange: 'transform' }}>
         {Array.from({ length: 4 }, (_, i) => (
           <span key={i} className="display-type pr-[0.3em] text-[22vw] md:text-[15vw] leading-[1.15] tracking-[-0.04em]">
             {NAME} <span className="inline-block px-[0.12em]">—</span>
@@ -65,7 +67,7 @@ function Globe() {
   );
 }
 
-export function Hero({ ready = true }: { ready?: boolean }) {
+export function Hero({ ready = true, active = true }: { ready?: boolean; active?: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -89,7 +91,8 @@ export function Hero({ ready = true }: { ready?: boolean }) {
       className="relative h-[100svh] min-h-[560px] overflow-hidden bg-hero text-white"
       aria-label="Kevin Robin — Full-Stack & AI Engineer"
     >
-      <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale }}>
+      {/* Its own layer, so the scroll-linked scale moves pixels instead of redrawing the giant name */}
+      <motion.div className="absolute inset-0" style={reduced ? undefined : { scale: contentScale, willChange: 'transform' }}>
         {/* Cut-out portrait standing on the bottom edge, in front of the scrolling name */}
         <motion.div
           className="absolute inset-x-0 bottom-0 z-[1] flex justify-center"
@@ -145,11 +148,11 @@ export function Hero({ ready = true }: { ready?: boolean }) {
         {/* Name ticker, behind the cut-out so it scrolls past behind me: across the table on
             desktop, behind my head on phones (where the figure fills the width) */}
         <motion.div {...enter(0)} className="absolute inset-x-0 top-[31svh] z-0 md:top-auto md:bottom-[4svh]">
-          <NameMarquee />
+          <NameMarquee active={active} />
         </motion.div>
       </motion.div>
 
-      <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: shade }} />
+      <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-black" style={{ opacity: shade, willChange: 'opacity' }} />
       <h1 className="sr-only">Kevin Robin — Full-Stack Developer and AI Engineer based in Kerala, India</h1>
     </section>
   );
