@@ -237,6 +237,24 @@ body {
   color: rgb(var(--muted));
 }
 
+/* ─── Work gallery cards: sized so a whole card (cover + caption) fits under the header ─── */
+.work-card {
+  width: min(82vw, calc((100dvh - 440px) * 0.8));
+  min-width: 240px;
+}
+.work-cover {
+  aspect-ratio: 4 / 5;
+}
+@media (min-width: 768px) {
+  .work-card {
+    width: min(720px, 58vw, calc((100dvh - 460px) * 1.6));
+    min-width: 360px;
+  }
+  .work-cover {
+    aspect-ratio: 16 / 10;
+  }
+}
+
 /* ─── Round button with a fill that rises from below on hover ─── */
 .btn-round {
   position: relative;

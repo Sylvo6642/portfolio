@@ -9,6 +9,8 @@ export interface PersonalProject {
   preview?: string;
   /** Backdrop behind the preview */
   previewBg: string;
+  /** Card cover media for the work gallery; without it the card shows its drawn cover */
+  cover?: { type: 'image' | 'video'; src: string; poster?: string };
   summary: string;
   highlights: string[];
   tech: string[];
