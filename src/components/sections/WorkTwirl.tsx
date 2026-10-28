@@ -94,17 +94,19 @@ function TwirlingWork() {
   const stageRef = useRef<HTMLDivElement>(null);
   const floodRef = useRef<HTMLDivElement>(null);
   const filmRef = useRef<HTMLDivElement>(null);
+  const filmInnerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastRadius = useRef('');
   const copyRef = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const size = useRef({ w: 0, h: 0, mobile: false, tile: 0 });
+  const size = useRef({ w: 0, h: 0, mobile: false, tile: 0, cardW: 0, cardH: 0 });
 
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] });
   const progress = useScrollLinked(scrollYProgress);
   const inView = useInView(trackRef, { amount: 0.05 });
 
   const render = useCallback((p: number) => {
-    const { w, h, mobile, tile } = size.current;
+    const { w, h, mobile, tile, cardW, cardH } = size.current;
     if (!w) return;
 
     // Orbit radii: half the stage, a little wider than the screen on phones so tiles graze the edges
@@ -127,23 +129,31 @@ function TwirlingWork() {
       el.style.opacity = String(clamp01(emerge * 2.5));
     });
 
-    // The film: full screen, down to a card, then out to its slot at tile size
+    // The film: full screen, down to a card, then out to its slot at tile size.
+    // The frame keeps one fixed card size and is only scaled, so the browser never re-lays out or
+    // re-scales the playing video; the video inside gets the inverse of the frame's stretch, which
+    // keeps it at one even scale (cover on desktop, letterboxed on portrait phones)
     const film = filmRef.current;
-    if (film) {
+    const inner = filmInnerRef.current;
+    if (film && inner) {
       const shrink = ease(span(p, T.shrink));
       const out = ease(span(p, T.filmOut));
-      const cardW = mobile ? w * 0.84 : Math.min(w * 0.56, 760);
-      const tileW = tile * 1.35;
-      const fw = lerp(lerp(w, cardW, shrink), tileW, out);
-      const fh = lerp(lerp(h, cardW * 9 / 16, shrink), tileW * 9 / 16, out);
+      const k = lerp(1, (tile * 1.35) / cardW, out);
+      const sx = lerp(w / cardW, 1, shrink) * k;
+      const sy = lerp(h / cardH, 1, shrink) * k;
+      const even = mobile ? Math.min(sx, sy) : Math.max(sx, sy);
       const a = FILM_SLOT.angle + turn * 0.9;
       const fx = Math.cos(a) * FILM_SLOT.ring * out * (1 + exit * 0.3) * ax;
       const fy = Math.sin(a) * FILM_SLOT.ring * out * (1 + exit * 0.3) * ay;
-      film.style.width = `${fw}px`;
-      film.style.height = `${fh}px`;
-      film.style.borderRadius = `${lerp(0, mobile ? 10 : 16, shrink)}px`;
-      film.style.transform = `translate3d(${fx}px, ${fy}px, 0) translate(-50%, -50%)`;
-      film.style.boxShadow = `0 ${lerp(0, 30, shrink)}px ${lerp(0, 70, shrink)}px rgb(0 0 0 / ${lerp(0, 0.22, shrink)})`;
+      film.style.transform = `translate3d(${fx}px, ${fy}px, 0) translate(-50%, -50%) scale(${sx}, ${sy})`;
+      inner.style.transform = `scale(${even / sx}, ${even / sy})`;
+      // Corners grow in only while it shrinks (square at full screen), and are written only when they change
+      const r = lerp(0, mobile ? 10 : 16, shrink);
+      const radius = shrink >= 1 ? `${(mobile ? 10 : 16)}px` : `${(r / sx).toFixed(2)}px / ${(r / sy).toFixed(2)}px`;
+      if (radius !== lastRadius.current) {
+        film.style.borderRadius = radius;
+        lastRadius.current = radius;
+      }
     }
 
     if (floodRef.current) floodRef.current.style.opacity = String(ease(span(p, T.flood)) * (1 - ease(span(p, T.unflood))));
@@ -158,7 +168,14 @@ function TwirlingWork() {
       const h = stage.clientHeight;
       const mobile = w < 768;
       const tile = mobile ? Math.max(92, w * 0.26) : Math.min(Math.max(150, w * 0.14), 250);
-      size.current = { w, h, mobile, tile };
+      const cardW = mobile ? w * 0.84 : Math.min(w * 0.56, 760);
+      const cardH = (cardW * 9) / 16;
+      size.current = { w, h, mobile, tile, cardW, cardH };
+      lastRadius.current = '';
+      if (filmRef.current) {
+        filmRef.current.style.width = `${cardW}px`;
+        filmRef.current.style.height = `${cardH}px`;
+      }
       tileRefs.current.forEach((el, i) => {
         if (el) el.style.width = `${tile * ORBITS[i].size * (TILES[i].portrait ? 0.62 : 1)}px`;
       });
@@ -198,7 +215,8 @@ function TwirlingWork() {
               </div>
             ))}
 
-            <div ref={filmRef} className="absolute left-0 top-0 z-10 overflow-hidden bg-[#FBF8F4] will-change-transform" style={{ width: '100vw', height: '100dvh', transform: 'translate(-50%, -50%)' }}>
+            <div ref={filmRef} className="absolute left-0 top-0 z-10 overflow-hidden bg-[#FBF8F4] shadow-[0_24px_60px_rgb(0_0_0/0.2)] will-change-transform" style={{ transform: 'translate(-50%, -50%)' }}>
+              <div ref={filmInnerRef} className="h-full w-full will-change-transform">
               <video
                 ref={videoRef}
                 muted
@@ -207,12 +225,12 @@ function TwirlingWork() {
                 preload="metadata"
                 poster={`${FILM}-poster.webp`}
                 aria-hidden
-                // Phones are portrait, so the full-screen film is letterboxed rather than cropped to a strip
-                className="block h-full w-full object-contain md:object-cover"
+                className="block h-full w-full object-cover"
               >
                 <source src={`${FILM}.webm`} type="video/webm" />
                 <source src={`${FILM}.mp4`} type="video/mp4" />
               </video>
+              </div>
             </div>
           </div>
 
