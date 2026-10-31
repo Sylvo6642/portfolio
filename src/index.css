@@ -324,6 +324,24 @@ body {
 html.dark .hero-light {
   background: radial-gradient(ellipse 40% 55% at 50% 82%, rgb(233 201 163 / 0.16), rgb(233 201 163 / 0) 72%);
 }
+/* Hero name: white fading into warm brown. A brown glow sits on the right; Hero.tsx slides
+   --hero-y so it travels from the top right down to the bottom right as the name settles in */
+.hero-name {
+  --hero-y: 100%;
+  background-image:
+    radial-gradient(ellipse 38% 75% at 90% var(--hero-y), #B07A50 0%, rgb(176 122 80 / 0.55) 45%, rgb(176 122 80 / 0) 100%),
+    linear-gradient(100deg, #FFFFFF 25%, #F1E4D6 65%, #DDBF9F 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+html.dark .hero-name {
+  background-image:
+    radial-gradient(ellipse 38% 75% at 90% var(--hero-y), #B9803F 0%, rgb(185 128 63 / 0.55) 45%, rgb(185 128 63 / 0) 100%),
+    linear-gradient(100deg, #F3ECE3 25%, #E3CDB4 65%, #CDA77E 100%);
+}
+
 .hero-dots {
   display: none;
   background-image: radial-gradient(rgb(233 201 163 / 0.22) 1.2px, rgb(233 201 163 / 0) 1.8px);

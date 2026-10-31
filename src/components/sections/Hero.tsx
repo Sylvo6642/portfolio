@@ -2,6 +2,11 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 
+// Brown glow on the name: starts top right, slides down to bottom right once the loader has cleared
+// (the h1's top padding fills roughly the first third of its box, so the text starts near 30%)
+const SWEEP_FROM = '25%';
+const SWEEP_TO = '100%';
+
 export function Hero({ ready = true }: { ready?: boolean }) {
   const reduced = useReducedMotion();
 
@@ -35,8 +40,14 @@ export function Hero({ ready = true }: { ready?: boolean }) {
       >
         {/* Stacked on phones, one line across the top on desktop */}
         <motion.h1
-          {...enter(0)}
-          className="relative z-0 pt-[88px] md:pt-[clamp(84px,11svh,112px)] px-5 md:px-10 text-center font-medium text-[26vw] md:text-[clamp(88px,15.5vw,236px)] leading-[0.9] tracking-[-0.055em] md:whitespace-nowrap"
+          initial={{ y: 60, opacity: 0, '--hero-y': reduced ? SWEEP_TO : SWEEP_FROM }}
+          animate={ready ? { y: 0, opacity: 1, '--hero-y': SWEEP_TO } : undefined}
+          transition={{
+            duration: 1.1,
+            ease: EASE,
+            '--hero-y': { duration: 2.4, ease: [0.65, 0, 0.35, 1], delay: 1 },
+          }}
+          className="hero-name relative z-0 pt-[88px] md:pt-[clamp(84px,11svh,112px)] px-5 md:px-10 text-center font-medium text-[26vw] md:text-[clamp(88px,15.5vw,236px)] leading-[0.9] tracking-[-0.055em] md:whitespace-nowrap"
         >
           Kevin <br className="md:hidden" />
           Robin
