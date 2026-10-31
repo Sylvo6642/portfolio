@@ -8,10 +8,12 @@ const LIFT = { duration: 0.42, stagger: 0.06, ease: 'power2.in' };
 const WRITE = { at: 0.7, duration: 0.5, stagger: 0.09, ease: 'power2.out' };
 const LOOP_S = 2.1;
 
-/** The KR logo, which keeps rewriting itself while `loading`, then finishes its stroke and rests */
-export function KRLoader({ loading, className }: { loading: boolean; className?: string }) {
+/** The KR logo, which keeps rewriting itself while `loading`, then finishes its stroke and rests (`onRest`) */
+export function KRLoader({ loading, className, onRest }: { loading: boolean; className?: string; onRest?: () => void }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const loopRef = useRef<gsap.core.Timeline | null>(null);
+  const onRestRef = useRef(onRest);
+  onRestRef.current = onRest;
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -21,6 +23,7 @@ export function KRLoader({ loading, className }: { loading: boolean; className?:
     if (!loading) {
       const loop = loopRef.current;
       if (loop) loop.eventCallback('onRepeat', () => stop(svg, loop));
+      else onRestRef.current?.();
       return;
     }
 
@@ -29,7 +32,7 @@ export function KRLoader({ loading, className }: { loading: boolean; className?:
       const pulse = gsap.to(svg, { opacity: 0.45, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
       return () => {
         pulse.kill();
-        gsap.to(svg, { opacity: 1, duration: 0.4 });
+        gsap.to(svg, { opacity: 1, duration: 0.4, onComplete: () => onRestRef.current?.() });
       };
     }
 
@@ -60,6 +63,7 @@ export function KRLoader({ loading, className }: { loading: boolean; className?:
     loopRef.current = null;
     gsap.set(svg.querySelectorAll('[data-kr-pen]'), { clearProps: 'strokeDashoffset' });
     svg.querySelector('[data-kr-ink]')?.removeAttribute('mask');
+    onRestRef.current?.();
   }
 
   // Unmounting mid-loop: drop anything still running on the detached nodes

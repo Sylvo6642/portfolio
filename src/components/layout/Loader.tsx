@@ -1,6 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, useIsPresent } from 'framer-motion';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useIsPresent } from 'framer-motion';
 import { GREETING_HEIGHT_EM, GREETING_SHAPES, GREETING_VIEWBOX } from '../../data/greetingPaths';
+import { INTRO_MS, KRLogo } from '../shared/KRLogo';
+import { warmFirstVideos } from '../../lib/firstVideo';
+
+// The looping logo needs GSAP, which stays out of the first bundle
+const loadKRLoader = () => import('../chat/KRLoader').then((m) => ({ default: m.KRLoader }));
+const KRLoader = lazy(loadKRLoader);
 
 const SESSION_KEY = 'kr-loader-seen';
 
@@ -35,6 +41,52 @@ function shuffled(n: number) {
     [order[i], order[j]] = [order[j], order[i]];
   }
   return order;
+}
+
+// The logo writes itself in, then keeps rewriting itself while the first film buffers, for at
+// most VIDEO_WAIT_MS from the start; a film that's ready early still gets the whole intro plus LOGO_HOLD_MS
+const VIDEO_WAIT_MS = 4500;
+const LOGO_HOLD_MS = 300;
+
+function LogoMark({ onComplete }: { onComplete: () => void }) {
+  const [looping, setLooping] = useState(false);
+  const [buffering, setBuffering] = useState(true);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    let cancelled = false;
+    let introOver = false;
+    let videoReady = false;
+    loadKRLoader();
+    warmFirstVideos(VIDEO_WAIT_MS).then(() => {
+      if (cancelled) return;
+      videoReady = true;
+      if (introOver) setBuffering(false);
+    });
+    const timer = window.setTimeout(() => {
+      introOver = true;
+      if (videoReady) onCompleteRef.current();
+      else setLooping(true);
+    }, INTRO_MS + LOGO_HOLD_MS);
+    // Backstop if the loop never gets going (GSAP failed to load): one loop past the film's deadline
+    const backstop = window.setTimeout(() => onCompleteRef.current(), VIDEO_WAIT_MS + 2500);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      window.clearTimeout(backstop);
+    };
+  }, []);
+
+  const size = 'h-[clamp(4.5rem,11vw,6.5rem)] w-auto';
+  // Each loop starts and ends on the whole mark, so the static one stands in while GSAP loads
+  return looping ? (
+    <Suspense fallback={<KRLogo className={size} />}>
+      <KRLoader loading={buffering} onRest={onComplete} className={size} />
+    </Suspense>
+  ) : (
+    <KRLogo draw className={size} />
+  );
 }
 
 // Latte: the palette's taupe (dark-mode --muted), between the browns and the creams
@@ -110,6 +162,8 @@ function MorphingWords({ onComplete }: { onComplete: () => void }) {
 
 export function Loader({ onDone }: { onDone: () => void }) {
   const [size] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  // The logo holds the screen while the first film buffers, then hands over to the greetings
+  const [phase, setPhase] = useState<'logo' | 'words'>('logo');
   // iOS Safari tints its status and tab bars from fixed elements touching the screen
   // edges, and keeps that tint after the loader slides away (its layout box never moves,
   // only its transform). Dropping the panel's own fill as the exit starts lets Safari
@@ -135,14 +189,29 @@ export function Loader({ onDone }: { onDone: () => void }) {
       initial={{ y: 0 }}
       exit={{ y: '-100vh', transition: { duration: 0.8, ease: EASE, delay: 0.2 } }}
     >
-      <motion.p
-        className="relative z-[1] text-[#1E1611] font-sans"
-        style={{ fontSize: 'clamp(2.4rem, 4.8vw, 3.3rem)', lineHeight: 1 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.9, transition: { duration: 1, delay: 0.2 } }}
-      >
-        <MorphingWords onComplete={onDone} />
-      </motion.p>
+      <AnimatePresence mode="wait">
+        {phase === 'logo' ? (
+          <motion.div
+            key="logo"
+            className="relative z-[1] text-[#1E1611]"
+            initial={{ opacity: 0.9 }}
+            exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.35, ease: EASE } }}
+          >
+            <LogoMark onComplete={() => setPhase('words')} />
+            <span className="sr-only">Loading</span>
+          </motion.div>
+        ) : (
+          <motion.p
+            key="words"
+            className="relative z-[1] text-[#1E1611] font-sans"
+            style={{ fontSize: 'clamp(2.4rem, 4.8vw, 3.3rem)', lineHeight: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.9, transition: { duration: 0.6 } }}
+          >
+            <MorphingWords onComplete={onDone} />
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       <svg
         className="absolute top-0 left-0 w-full pointer-events-none"

@@ -22,7 +22,7 @@ export const KR_PENS = [
   { d: 'M668 665C734 668 766 702 796 753C846 838 882 885 976 887', w: 68, len: 402, at: 0.9 },
 ];
 /** How long the intro runs, in ms: the last pen's start plus a pen's duration (.kr-intro in index.css) */
-const INTRO_MS = (KR_PENS[KR_PENS.length - 1].at + 0.6) * 1000;
+export const INTRO_MS = (KR_PENS[KR_PENS.length - 1].at + 0.6) * 1000;
 
 type Props = {
   className?: string;
