@@ -24,7 +24,7 @@ const TILES: Tile[] = [
   { src: '/projects/tiles/voidvault-login.webp' },
   { src: '/projects/tiles/spendwise-hero.webp' },
   { src: '/projects/tiles/clausify-how.webp' },
-  { src: '/media/skilldash-poster.jpg' },
+  { src: '/media/skilldash-twirl-poster.webp', video: '/media/skilldash-twirl.mp4' },
   { src: '/media/filemind-twirl-poster.webp', video: '/media/filemind-twirl.mp4' },
   { src: '/projects/previews/voidvault.jpg' },
   { src: '/projects/tiles/skilldash-cats.webp' },
