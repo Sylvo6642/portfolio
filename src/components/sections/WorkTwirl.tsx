@@ -2,7 +2,7 @@ import { useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'fra
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { StepRevealText, useScrollLinked, type Segment } from '../shared/ScrollReveal';
 import { RagVideo } from './RagVideo';
-import { trackFirstFilm } from '../../lib/firstVideo';
+import { trackFirstFilm, whenFirstFilmReady } from '../../lib/firstVideo';
 
 /**
  * The bridge from the intro to the work list, after breakthroughenergy.org: the RAG film fills the
@@ -16,15 +16,16 @@ const LINE: Segment[] = ["What I build when nobody's assigning tickets."];
 
 const FILM = '/media/rag-explainer';
 
-type Tile = { src: string; portrait?: boolean };
+/** `video`: a short looping clip, with `src` as its poster */
+type Tile = { src: string; portrait?: boolean; video?: string };
 const TILES: Tile[] = [
-  { src: '/projects/previews/clausify.jpg' },
+  { src: '/media/clausify-twirl-poster.webp', video: '/media/clausify-twirl.mp4' },
   { src: '/projects/tiles/skilldash-mobile.webp', portrait: true },
   { src: '/projects/tiles/voidvault-login.webp' },
   { src: '/projects/tiles/spendwise-hero.webp' },
   { src: '/projects/tiles/clausify-how.webp' },
   { src: '/media/skilldash-poster.jpg' },
-  { src: '/projects/tiles/clausify-mobile.webp', portrait: true },
+  { src: '/media/filemind-twirl-poster.webp', video: '/media/filemind-twirl.mp4' },
   { src: '/projects/previews/voidvault.jpg' },
   { src: '/projects/tiles/skilldash-cats.webp' },
   { src: '/projects/previews/spendwise.jpg' },
@@ -109,6 +110,22 @@ function TwirlingWork({ paused }: { paused: boolean }) {
   const copyRef = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
   const size = useRef({ w: 0, h: 0, mobile: false, tile: 0, cardW: 0, cardH: 0 });
+  const clipRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  // The clips play only while the stage is on screen and the tiles are out from behind the film
+  const clips = useRef({ visible: false, out: false, playing: false });
+
+  const syncClips = useCallback(() => {
+    const c = clips.current;
+    const play = c.visible && c.out;
+    if (play === c.playing) return;
+    c.playing = play;
+    clipRefs.current.forEach((v) => {
+      // Tiles hidden on phones never play, so they never fetch
+      if (!v || v.offsetWidth === 0) return;
+      if (play) v.play().catch(() => {});
+      else v.pause();
+    });
+  }, []);
 
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] });
   const progress = useScrollLinked(scrollYProgress);
@@ -171,7 +188,10 @@ function TwirlingWork({ paused }: { paused: boolean }) {
 
     if (floodRef.current) floodRef.current.style.opacity = String(ease(span(p, T.flood)) * (1 - ease(span(p, T.unflood))));
     if (copyRef.current) copyRef.current.style.opacity = String(1 - ease(span(p, [0.8, 0.9])));
-  }, []);
+
+    clips.current.out = p > T.emerge[0];
+    syncClips();
+  }, [syncClips]);
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -209,6 +229,14 @@ function TwirlingWork({ paused }: { paused: boolean }) {
 
   useEffect(() => {
     if (!near) return;
+    // The clips buffer only once the film has, so they never slow its start
+    let cancelled = false;
+    whenFirstFilmReady().then(() => {
+      if (cancelled) return;
+      clipRefs.current.forEach((v) => {
+        if (v && v.offsetWidth > 0 && v.preload !== 'auto') v.preload = 'auto';
+      });
+    });
     tileRefs.current.forEach((el) => {
       const img = el?.querySelector('img');
       // Tiles hidden on phones stay lazy, so they're never fetched there
@@ -218,6 +246,9 @@ function TwirlingWork({ paused }: { paused: boolean }) {
         img.decode().catch(() => {});
       }
     });
+    return () => {
+      cancelled = true;
+    };
   }, [near]);
 
   // The film only plays while the stage is on screen and not covered
@@ -226,7 +257,9 @@ function TwirlingWork({ paused }: { paused: boolean }) {
     if (!video) return;
     if (inView && !paused) video.play().catch(() => {});
     else video.pause();
-  }, [inView, paused]);
+    clips.current.visible = inView && !paused;
+    syncClips();
+  }, [inView, paused, syncClips]);
 
   return (
     <section aria-label="Selected work" className="relative bg-bg">
@@ -240,9 +273,23 @@ function TwirlingWork({ paused }: { paused: boolean }) {
                 key={t.src}
                 ref={(el) => (tileRefs.current[i] = el)}
                 className={`absolute left-0 top-0 overflow-hidden rounded-md shadow-[0_18px_40px_rgb(0_0_0/0.18)] will-change-transform ${i >= MOBILE_TILES ? 'max-md:hidden' : ''}`}
-                style={{ aspectRatio: t.portrait ? '1 / 1.35' : '16 / 10', opacity: 0.001 }}
+                style={{ aspectRatio: t.portrait ? '1 / 1.35' : t.video ? '16 / 9' : '16 / 10', opacity: 0.001 }}
               >
-                <img src={t.src} alt="" loading="lazy" decoding="async" className="block h-full w-full object-cover" />
+                {t.video ? (
+                  <video
+                    ref={(el) => (clipRefs.current[i] = el)}
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    poster={t.src}
+                    className="block h-full w-full object-cover"
+                  >
+                    <source src={t.video} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={t.src} alt="" loading="lazy" decoding="async" className="block h-full w-full object-cover" />
+                )}
               </div>
             ))}
 
@@ -275,7 +322,7 @@ function TwirlingWork({ paused }: { paused: boolean }) {
 
           <p className="sr-only">
             A film of a RAG pipeline answering "What has Kevin built with LLMs?" shrinks into a cloud of screenshots
-            from Clausify, Void Vault, SkillDash and SpendWise.
+            and clips from Clausify, FileMind AI, Void Vault, SkillDash and SpendWise.
           </p>
         </div>
       </div>

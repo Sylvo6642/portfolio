@@ -21,6 +21,9 @@ export function trackFirstFilm(video: HTMLVideoElement | null) {
   video.querySelectorAll('source').forEach((s) => s.addEventListener('error', release, { once: true }));
 }
 
+/** Resolves once the film can play through, so lesser media can wait their turn behind it */
+export const whenFirstFilmReady = () => ready;
+
 // Resolves once the film can play through or maxMs passes, so a slow network can't hold the loader
 export function waitForFirstFilm(maxMs: number): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
