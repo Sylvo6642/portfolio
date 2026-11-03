@@ -157,7 +157,11 @@ const DRAWN: Record<string, () => JSX.Element> = {
   SkillDash: SkillDashArt,
 };
 
-export function ProjectCover({ project, playing = true }: { project: PersonalProject; playing?: boolean }) {
+/**
+ * `preload`: whether a cover video may buffer yet. The gallery holds them back until it's close, so
+ * they never compete with the films above it for bandwidth
+ */
+export function ProjectCover({ project, playing = true, preload = true }: { project: PersonalProject; playing?: boolean; preload?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cover = project.cover;
 
@@ -181,8 +185,8 @@ export function ProjectCover({ project, playing = true }: { project: PersonalPro
         muted
         loop
         playsInline
-        // Buffer ahead so playback starts without a stall when the card comes into focus
-        preload="auto"
+        // Buffer ahead, once allowed, so playback starts without a stall when the card comes into focus
+        preload={preload ? 'auto' : 'none'}
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
       />

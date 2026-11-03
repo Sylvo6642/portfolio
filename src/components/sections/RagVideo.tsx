@@ -48,8 +48,8 @@ export function RagVideo({ className = '', paused = false }: { className?: strin
             aria-hidden
             className="block h-full w-full object-cover"
           >
-            <source src={`${SRC}.webm`} type="video/webm" />
             <source src={`${SRC}.mp4`} type="video/mp4" />
+            <source src={`${SRC}.webm`} type="video/webm" />
           </video>
         )}
       </div>

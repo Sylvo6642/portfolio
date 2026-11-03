@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useIsPresent } from 'framer-motion';
 import { GREETING_HEIGHT_EM, GREETING_SHAPES, GREETING_VIEWBOX } from '../../data/greetingPaths';
 import { INTRO_MS, KRLogo } from '../shared/KRLogo';
-import { warmFirstVideos } from '../../lib/firstVideo';
+import { waitForFirstFilm } from '../../lib/firstVideo';
 
 // The looping logo needs GSAP, which stays out of the first bundle
 const loadKRLoader = () => import('../chat/KRLoader').then((m) => ({ default: m.KRLoader }));
@@ -59,7 +59,7 @@ function LogoMark({ onComplete }: { onComplete: () => void }) {
     let introOver = false;
     let videoReady = false;
     loadKRLoader();
-    warmFirstVideos(VIDEO_WAIT_MS).then(() => {
+    waitForFirstFilm(VIDEO_WAIT_MS).then(() => {
       if (cancelled) return;
       videoReady = true;
       if (introOver) setBuffering(false);

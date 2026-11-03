@@ -1,38 +1,29 @@
-import { PERSONAL_PROJECTS } from '../data/projects';
+// The first film a visitor meets is the WorkTwirl explainer. Its own <video> buffers from page load
+// and reports here, so the loader waits on the element that will actually play, not on a hidden copy
+// whose download the real element can't reuse
 
-// The first films a visitor meets: the WorkTwirl explainer, then the first project cover
-const TWIRL_FILM = '/media/rag-explainer';
+let release: () => void = () => {};
+const ready = new Promise<void>((resolve) => {
+  release = resolve;
+});
 
-function firstSources(): string[] {
-  const probe = document.createElement('video');
-  const twirl = probe.canPlayType('video/webm') ? `${TWIRL_FILM}.webm` : `${TWIRL_FILM}.mp4`;
-  const cover = PERSONAL_PROJECTS.find((p) => p.cover?.type === 'video')?.cover?.src;
-  return cover ? [twirl, cover] : [twirl];
+/**
+ * Called by the section that shows the film. Pass the element once it's mounted, or null when there
+ * is no film to wait for (Reduce Motion shows a still instead)
+ */
+export function trackFirstFilm(video: HTMLVideoElement | null) {
+  if (!video || video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+    release();
+    return;
+  }
+  video.addEventListener('canplaythrough', release, { once: true });
+  // With <source> children a failed fetch is reported on the source, not the video
+  video.querySelectorAll('source').forEach((s) => s.addEventListener('error', release, { once: true }));
 }
 
-// Resolves once a hidden <video> can play through, errors, or the shared deadline passes
-function warm(src: string): Promise<void> {
-  return new Promise((resolve) => {
-    const video = document.createElement('video');
-    const finish = () => {
-      video.removeEventListener('canplaythrough', finish);
-      video.removeEventListener('error', finish);
-      resolve();
-    };
-    video.addEventListener('canplaythrough', finish, { once: true });
-    video.addEventListener('error', finish, { once: true });
-    video.muted = true;
-    video.preload = 'auto';
-    video.src = src;
-    video.load();
-  });
-}
-
-// Starts buffering the first films so they're in the HTTP cache when their sections mount;
-// never takes longer than maxMs, so a slow network can't hold the loader
-export function warmFirstVideos(maxMs: number): Promise<void> {
-  if (typeof document === 'undefined') return Promise.resolve();
-  const ready = Promise.all(firstSources().map(warm)).then(() => undefined);
+// Resolves once the film can play through or maxMs passes, so a slow network can't hold the loader
+export function waitForFirstFilm(maxMs: number): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
   const deadline = new Promise<void>((resolve) => window.setTimeout(resolve, maxMs));
   return Promise.race([ready, deadline]);
 }

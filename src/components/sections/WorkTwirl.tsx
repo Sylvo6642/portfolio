@@ -2,6 +2,7 @@ import { useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'fra
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { StepRevealText, useScrollLinked, type Segment } from '../shared/ScrollReveal';
 import { RagVideo } from './RagVideo';
+import { trackFirstFilm } from '../../lib/firstVideo';
 
 /**
  * The bridge from the intro to the work list, after breakthroughenergy.org: the RAG film fills the
@@ -75,7 +76,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** `paused`: covered by the next section, so the film stops playing behind it */
 export function WorkTwirl({ paused = false }: { paused?: boolean }) {
-  return useReducedMotion() ? <StillWork paused={paused} /> : <TwirlingWork paused={paused} />;
+  const reduced = useReducedMotion();
+  // Reduce Motion shows a still, so the loader has no film to wait for
+  useEffect(() => {
+    if (reduced) trackFirstFilm(null);
+  }, [reduced]);
+  return reduced ? <StillWork paused={paused} /> : <TwirlingWork paused={paused} />;
 }
 
 /** Reduce Motion: the film as a card and the line beneath it, nothing moving */
@@ -107,8 +113,8 @@ function TwirlingWork({ paused }: { paused: boolean }) {
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] });
   const progress = useScrollLinked(scrollYProgress);
   const inView = useInView(trackRef, { amount: 0.05 });
-  // Two screens out, so the film buffers and the screenshots decode before they're on screen,
-  // instead of all at once on the frame they first appear
+  // Two screens out, so the screenshots decode before they're on screen, instead of all at once on
+  // the frame they first appear. The film doesn't wait for this: it buffers from page load
   const near = useInView(trackRef, { margin: '200% 0px' });
 
   const render = useCallback((p: number) => {
@@ -132,7 +138,8 @@ function TwirlingWork({ paused }: { paused: boolean }) {
       const y = Math.sin(a) * o.ring * spread * ay;
       const s = lerp(0.35, 1, emerge);
       el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(${s})`;
-      el.style.opacity = String(clamp01(emerge * 2.5));
+      // Never quite 0, so the browser draws the tiles ahead of time instead of on their first frame
+      el.style.opacity = String(Math.max(0.001, clamp01(emerge * 2.5)));
     });
 
     // The film: full screen, down to a card, then out to its slot at tile size.
@@ -195,13 +202,13 @@ function TwirlingWork({ paused }: { paused: boolean }) {
 
   useMotionValueEvent(progress, 'change', render);
 
+  // The loader holds until this element can play through, so it's buffered before anyone scrolls here
+  useEffect(() => {
+    trackFirstFilm(videoRef.current);
+  }, []);
+
   useEffect(() => {
     if (!near) return;
-    const video = videoRef.current;
-    if (video && video.preload !== 'auto') {
-      video.preload = 'auto';
-      video.load();
-    }
     tileRefs.current.forEach((el) => {
       const img = el?.querySelector('img');
       // Tiles hidden on phones stay lazy, so they're never fetched there
@@ -233,7 +240,7 @@ function TwirlingWork({ paused }: { paused: boolean }) {
                 key={t.src}
                 ref={(el) => (tileRefs.current[i] = el)}
                 className={`absolute left-0 top-0 overflow-hidden rounded-md shadow-[0_18px_40px_rgb(0_0_0/0.18)] will-change-transform ${i >= MOBILE_TILES ? 'max-md:hidden' : ''}`}
-                style={{ aspectRatio: t.portrait ? '1 / 1.35' : '16 / 10', opacity: 0 }}
+                style={{ aspectRatio: t.portrait ? '1 / 1.35' : '16 / 10', opacity: 0.001 }}
               >
                 <img src={t.src} alt="" loading="lazy" decoding="async" className="block h-full w-full object-cover" />
               </div>
@@ -246,13 +253,15 @@ function TwirlingWork({ paused }: { paused: boolean }) {
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                // Buffers from page load: it's the first film on the page and only 3MB
+                preload="auto"
                 poster={`${FILM}-poster.webp`}
                 aria-hidden
                 className="block h-full w-full object-cover"
               >
-                <source src={`${FILM}.webm`} type="video/webm" />
+                {/* H.264 first: it has hardware decoding almost everywhere, where VP9 often decodes on the CPU */}
                 <source src={`${FILM}.mp4`} type="video/mp4" />
+                <source src={`${FILM}.webm`} type="video/webm" />
               </video>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import {
   AnimatePresence,
   motion,
+  useInView,
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
@@ -58,7 +59,13 @@ function GalleryHeader({ counter }: { counter?: { active: number; progress: Moti
   );
 }
 
-function CardBody({ project, active, onOpen }: { project: PersonalProject; active: boolean; onOpen: (p: PersonalProject) => void }) {
+function CardBody({ project, active, playing = active, preload = true, onOpen }: {
+  project: PersonalProject;
+  active: boolean;
+  playing?: boolean;
+  preload?: boolean;
+  onOpen: (p: PersonalProject) => void;
+}) {
   return (
     <button
       type="button"
@@ -69,7 +76,7 @@ function CardBody({ project, active, onOpen }: { project: PersonalProject; activ
     >
       <div className="work-cover relative w-full overflow-hidden rounded-[14px] md:rounded-2xl border border-edge">
         <div className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover/card:scale-[1.035]">
-          <ProjectCover project={project} playing={active} />
+          <ProjectCover project={project} playing={playing} preload={preload} />
         </div>
         <span className="absolute bottom-4 right-4 grid h-12 w-12 md:h-16 md:w-16 place-items-center rounded-full bg-accent text-[12px] md:text-[13px] text-on-accent transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] md:scale-0 md:group-hover/card:scale-100 md:group-focus-visible/card:scale-100">
           Open
@@ -83,11 +90,13 @@ function CardBody({ project, active, onOpen }: { project: PersonalProject; activ
   );
 }
 
-function PinnedCard({ project, index, progress, active, onOpen, onFocus }: {
+function PinnedCard({ project, index, progress, active, playing, preload, onOpen, onFocus }: {
   project: PersonalProject;
   index: number;
   progress: MotionValue<number>;
   active: boolean;
+  playing: boolean;
+  preload: boolean;
   onOpen: (p: PersonalProject) => void;
   onFocus: (index: number, e: FocusEvent<HTMLDivElement>) => void;
 }) {
@@ -97,7 +106,7 @@ function PinnedCard({ project, index, progress, active, onOpen, onFocus }: {
   const opacity = useTransform(distance, [0, 1], [1, 0.6]);
   return (
     <motion.div className="work-card shrink-0" style={{ scale, opacity }} onFocus={(e) => onFocus(index, e)}>
-      <CardBody project={project} active={active} onOpen={onOpen} />
+      <CardBody project={project} active={active} playing={playing} preload={preload} onOpen={onOpen} />
     </motion.div>
   );
 }
@@ -133,6 +142,11 @@ function PinnedGallery({ onOpen }: { onOpen: (p: PersonalProject) => void }) {
   const hint = useTransform(scrollYProgress, [0, 0.04], [1, 0]);
 
   const [active, setActive] = useState(0);
+  // Covers buffer only once the gallery is a screen away, and only the card in focus and the next one,
+  // so they don't take bandwidth from the RAG film while it's on screen
+  const near = useInView(containerRef, { margin: '100% 0px' });
+  // A cover plays only while the gallery fills most of the screen, never behind the twirl above it
+  const onScreen = useInView(stageRef, { amount: 0.5 });
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     const i = Math.round(v * (COUNT - 1));
     setActive((prev) => (prev === i ? prev : i));
@@ -157,7 +171,17 @@ function PinnedGallery({ onOpen }: { onOpen: (p: PersonalProject) => void }) {
             style={{ x, ...TRACK_PAD }}
           >
             {PROJECTS.map((p, i) => (
-              <PinnedCard key={p.name} project={p} index={i} progress={scrollYProgress} active={active === i} onOpen={onOpen} onFocus={onCardFocus} />
+              <PinnedCard
+                key={p.name}
+                project={p}
+                index={i}
+                progress={scrollYProgress}
+                active={active === i}
+                playing={onScreen && active === i}
+                preload={near && (i === active || i === active + 1)}
+                onOpen={onOpen}
+                onFocus={onCardFocus}
+              />
             ))}
           </motion.div>
         </div>
@@ -184,7 +208,8 @@ function StaticRail({ onOpen }: { onOpen: (p: PersonalProject) => void }) {
       >
         {PROJECTS.map((p) => (
           <div key={p.name} className="work-card shrink-0 snap-start">
-            <CardBody project={p} active={false} onOpen={onOpen} />
+            {/* Covers never play here, so they keep to their posters and download nothing */}
+            <CardBody project={p} active={false} preload={false} onOpen={onOpen} />
           </div>
         ))}
       </div>
